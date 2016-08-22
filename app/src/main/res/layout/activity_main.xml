@@ -24,6 +24,20 @@
         android:text="返回"/>
          -->
     <com.example.a835127729qqcom.photodealdemo.GuaGuaKa
+        android:id="@+id/guagua"
         android:layout_width="400dp"
         android:layout_height="400dp" />
+    <Button
+        android:layout_below="@id/guagua"
+        android:onClick="change"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="模式"/>
+    <Button
+        android:layout_marginLeft="110dp"
+        android:layout_below="@id/guagua"
+        android:onClick="back"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="返回"/>
 </RelativeLayout>
