@@ -8,21 +8,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.a835127729qqcom.photodealdemo.MainActivity">
-<!--
-    <com.example.a835127729qqcom.photodealdemo.TestView
-        android:id="@+id/test"
-        android:src="@drawable/testicon"
-        android:layout_width="400dp"
-        android:layout_height="400dp"
-        android:scaleType="fitXY"
-       />
-    <Button
-        android:layout_below="@id/test"
-        android:onClick="back"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:text="返回"/>
-         -->
 
     <FrameLayout
         android:id="@+id/work_space"
@@ -36,6 +21,12 @@
             android:layout_height="400dp" />
         <com.xinlan.imageeditlibrary.editimage.view.CropImageView
             android:id="@+id/crop"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        <com.xinlan.imageeditlibrary.editimage.view.TextStickerView
+            android:id="@+id/text"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -68,4 +59,12 @@
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:text="旋转"/>
+    <Button
+        android:layout_marginLeft="110dp"
+        android:layout_marginTop="70dp"
+        android:layout_below="@id/work_space"
+        android:onClick="text"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="文本"/>
 </RelativeLayout>

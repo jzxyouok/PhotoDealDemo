@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         initImageLoader();
         cropImageView = (CropImageView) findViewById(R.id.crop);
 
-        //testView = (TestView) findViewById(R.id.test);
         guaKa = (ActionImageView) findViewById(R.id.guagua);
         //guaKa.setEnabled(false);
         ImageLoader.getInstance().displayImage(testurl,guaKa,new ImageLoadingListener(){
@@ -126,6 +125,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void rotate(View view){
         Log.i("tag","rotate");
+        guaKa.rotate(guaKa.mCurrentAngle+90);
+    }
+
+    public void text(View view){
+        Log.i("tag","text");
         guaKa.rotate(guaKa.mCurrentAngle+90);
     }
 }

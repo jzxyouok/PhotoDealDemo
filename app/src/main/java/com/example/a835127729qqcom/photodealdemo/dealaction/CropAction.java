@@ -39,7 +39,8 @@ public class CropAction implements Action{
 
     @Override
     public void stop(Object... params) {
-
+        mCropBitmap.recycle();
+        mCropBitmap = null;
     }
 
     public Bitmap getmCropBitmap() {

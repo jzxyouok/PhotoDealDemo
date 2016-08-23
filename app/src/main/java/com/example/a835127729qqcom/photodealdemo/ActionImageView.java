@@ -3,6 +3,7 @@ package com.example.a835127729qqcom.photodealdemo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.Matrix;
 import android.graphics.Paint.Style;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,10 +27,8 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
-import com.xinlan.imageeditlibrary.editimage.view.imagezoom.easing.Bounce;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -83,10 +82,6 @@ public class ActionImageView extends ImageView {
 	 * 当前旋转角度
 	 */
 	float mCurrentAngle = 0;
-	/**
-	 * 当前RotateAction应该插入的位置
-	 */
-	int mCurrentHeaderIndex = 0;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -149,13 +144,18 @@ public class ActionImageView extends ImageView {
 			//旋转底片
 			canvas.save();
 			canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-			canvas.drawBitmap(masicBitmap,null,getmRect(),null);
+			canvas.drawBitmap(masicBitmap,null,getRotatedmRect(),null);
+			//canvas.drawBitmap(originBitmap,null,getRotatedmRect(),null);
 			canvas.restore();
 
 			if (!isComplete) {
 				drawActions(canvas,mForeCanvas);
-				canvas.drawBitmap(mForeBackground,null,getmRect(),null);
+				canvas.save();
+				canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+				canvas.drawBitmap(mForeBackground,null,getRotatedmRect(),null);
+				canvas.restore();
 			}
+
 		}else{
 			super.onDraw(canvas);
 		}
@@ -169,7 +169,7 @@ public class ActionImageView extends ImageView {
 		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		foreCanvas.save();
-		foreCanvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		//foreCanvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
 		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
 		foreCanvas.restore();
 
@@ -182,6 +182,7 @@ public class ActionImageView extends ImageView {
 				break;
 			}
 		}
+
 		//开始绘制
 		float startAngle = 0;
 		for(Action action:actions){
@@ -192,14 +193,13 @@ public class ActionImageView extends ImageView {
 			if(lastRotateAction!=null) {//至少一次旋转
 				Log.i("cky",lastRotateAction.getmAngle()+"");
 				foreCanvas.save();
-				foreCanvas.rotate(lastRotateAction.getmAngle() - startAngle,mWidth/2,mHeight/2);
+				foreCanvas.rotate(lastRotateAction.getmAngle() - startAngle - mCurrentAngle,mWidth/2,mHeight/2);
 				action.execute(foreCanvas);
 				foreCanvas.restore();
 			}else{
 				action.execute(foreCanvas);
 			}
 		}
-
 	}
 
 	@Override
@@ -270,6 +270,9 @@ public class ActionImageView extends ImageView {
 					if(i<0){
 						mCurrentAngle = 0;
 					}
+				}else if(action instanceof CropAction){
+					isCrop = false;
+					action.stop();
 				}
 				postInvalidate();
 			}
@@ -324,6 +327,43 @@ public class ActionImageView extends ImageView {
      */
 	public RectF getmRect(){
 		return new RectF(getLeft(),getTop(),getRight(),getBottom());
+	}
+
+	private RectF getScalemRect(){
+		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
+		float scale = 1.0f * mWidth/mHeight;
+		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
+		return r;
+	}
+
+	private RectF getSpmRect(){
+		RectF r = new RectF(getLeft(),getTop(),getRight(),getBottom());
+		Matrix m = new Matrix();
+		m.setRotate(90,mWidth/2,mHeight/2);
+		m.mapRect(r);
+		return r;
+	}
+
+	private RectF getRotatedmRect(){
+		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
+		float scale = 1.0f * mWidth/mHeight;
+		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
+		Matrix m = new Matrix();
+		m.setRotate(mCurrentAngle,mWidth/2,mHeight/2);
+		m.mapRect(r);
+		Log.i("before",r.toString());
+		/*
+		if(mCurrentAngle/90%2==0) return r;
+		Matrix m = new Matrix();
+		float scale = 1.0f * mWidth/mHeight;
+		m.setScale(1,scale*scale);
+
+		m.setTranslate(0,(1-scale*scale)*mHeight/2);
+		//m.setRotate(mCurrentAngle,mWidth/2,mHeight/2);
+		m.mapRect(r);
+		*/
+		Log.i("after",r.toString());
+		return r;
 	}
 
 	public void setMode(int mode){
