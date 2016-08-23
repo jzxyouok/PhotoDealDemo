@@ -144,7 +144,7 @@ public class ActionImageView extends ImageView {
 			//旋转底片
 			canvas.save();
 			canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-			canvas.drawBitmap(masicBitmap,null,getRotatedmRect(),null);
+			canvas.drawBitmap(masicBitmap,null,getScalemRect(),null);
 			//canvas.drawBitmap(originBitmap,null,getRotatedmRect(),null);
 			canvas.restore();
 
@@ -152,7 +152,7 @@ public class ActionImageView extends ImageView {
 				drawActions(canvas,mForeCanvas);
 				canvas.save();
 				canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-				canvas.drawBitmap(mForeBackground,null,getRotatedmRect(),null);
+				canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
 				canvas.restore();
 			}
 
@@ -191,7 +191,6 @@ public class ActionImageView extends ImageView {
 				continue;
 			}
 			if(lastRotateAction!=null) {//至少一次旋转
-				Log.i("cky",lastRotateAction.getmAngle()+"");
 				foreCanvas.save();
 				foreCanvas.rotate(lastRotateAction.getmAngle() - startAngle - mCurrentAngle,mWidth/2,mHeight/2);
 				action.execute(foreCanvas);
@@ -283,31 +282,35 @@ public class ActionImageView extends ImageView {
 	 * 裁剪
 	 * @param rectf
      */
-	public void crop(RectF rectf){
+	public Bitmap crop(RectF rectf){
 		isCrop = true;
+		RectF newbmpRect = getRotatedmRect();
+		Log.i("cky","范围="+newbmpRect.toString());
+		Log.i("cky","裁剪="+rectf.toString());
 		Bitmap newbmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		Canvas cv = new Canvas(newbmp);
 		//draw bg into
 		cv.save();
 		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		cv.drawBitmap(masicBitmap, null, getRotatedmRect(), null);//在 0，0坐标开始画入bg
+		cv.drawBitmap(masicBitmap, null, getScalemRect(), null);//在 0，0坐标开始画入bg
 		//draw fg into
-		cv.drawBitmap(mForeBackground, null, getmRect(), null);//在 0，0坐标开始画入fg ，可以从任意位置画入
+		cv.drawBitmap(mForeBackground, null, getScalemRect(), null);//在 0，0坐标开始画入fg ，可以从任意位置画入
 		cv.restore();
 		//save all clip
 		cv.save(Canvas.ALL_SAVE_FLAG);//保存
 		//store
 		cv.restore();//存储
 		Bitmap resultBit = Bitmap.createBitmap(newbmp,
-				(int) rectf.left, (int) rectf.top,
+				(int) (rectf.left), (int) (rectf.top),
 				(int) rectf.width(), (int) rectf.height());
 		mCurrentAction = new CropAction(rectf,getmRect(),resultBit);
 		try {
-			SaveBitmap2File.saveFile(resultBit, "aa.jpg", Environment.getExternalStorageDirectory().getAbsolutePath());
+			SaveBitmap2File.saveFile(newbmp, "aa.jpg", Environment.getExternalStorageDirectory().getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		actions.add(mCurrentAction);
+		return resultBit;
 	}
 
 	/**
@@ -333,13 +336,24 @@ public class ActionImageView extends ImageView {
 	 * 获取按w/h比例缩小的矩阵
 	 * @return
      */
-	private RectF getRotatedmRect(){
+	public RectF getScalemRect(){
 		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
 		float scale = 1.0f * mWidth/mHeight;
 		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
 		Matrix m = new Matrix();
 		m.setRotate(mCurrentAngle,mWidth/2,mHeight/2);
 		m.mapRect(r);
+		return r;
+	}
+
+	/**
+	 * 获取按w/h比例缩小,并且旋转的矩阵
+	 * @return
+	 */
+	public RectF getRotatedmRect(){
+		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
+		float scale = 1.0f * mWidth/mHeight;
+		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
 		return r;
 	}
 

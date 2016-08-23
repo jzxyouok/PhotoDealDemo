@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("cky","com");
                 guaKa.produceMasicPhoto();
                 guaKa.invalidate();
-                cropImageView.setCropRect(guaKa.getmRect());
                 //cropImageView.setRatioCropRect(guaKa.getmRect(),0.2f);
             }
 
@@ -117,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             guaKa.setMode(guaKa.getMode()+1);
             if(guaKa.getMode()==3){
                 cropImageView.setVisibility(View.VISIBLE);
+                cropImageView.setCropRect(guaKa.getRotatedmRect());
                 guaKa.setEnabled(false);
             }
         }
