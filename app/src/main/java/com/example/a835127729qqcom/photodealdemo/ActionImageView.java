@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
@@ -21,11 +23,13 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.Action;
 import com.example.a835127729qqcom.photodealdemo.dealaction.CropAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
+import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 import com.xinlan.imageeditlibrary.editimage.view.imagezoom.easing.Bounce;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -54,7 +58,7 @@ public class ActionImageView extends ImageView {
 	/**
 	 * 是否裁剪状态
 	 */
-	private boolean isCrop;
+	private boolean isCrop = false;
 	//Mark画笔
 	private Paint mMarkPaint = new Paint();
 	//Masic画笔
@@ -75,6 +79,14 @@ public class ActionImageView extends ImageView {
 	 * 控件长宽
 	 */
 	private int mWidth,mHeight;
+	/**
+	 * 当前旋转角度
+	 */
+	float mCurrentAngle = 0;
+	/**
+	 * 当前RotateAction应该插入的位置
+	 */
+	int mCurrentHeaderIndex = 0;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -130,16 +142,18 @@ public class ActionImageView extends ImageView {
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null) {
-			canvas.rotate(mAngle,mWidth/2,mHeight/2);
 			if(isCrop){//裁剪
-				canvas.drawBitmap(((CropAction)actions.getLast()).getmCropBitmap(),0,0,null);
+				canvas.drawBitmap(((CropAction)actions.getLast()).getmCropBitmap(),null,getmRect(),null);
 				return;
 			}
+			//旋转底片
+			canvas.save();
+			canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
 			canvas.drawBitmap(masicBitmap,null,getmRect(),null);
-			//canvas.drawBitmap(masicBitmap, 0, 0, null);
+			canvas.restore();
+
 			if (!isComplete) {
-				//mForeCanvas.rotate(mAngle,mWidth/2,mHeight/2);
-				drawActions(mForeCanvas);
+				drawActions(canvas,mForeCanvas);
 				canvas.drawBitmap(mForeBackground,null,getmRect(),null);
 			}
 		}else{
@@ -147,10 +161,45 @@ public class ActionImageView extends ImageView {
 		}
 	}
 
-	private void drawActions(Canvas canvas){
-		for(Action action:actions){
-			action.execute(canvas);
+	private void drawActions(Canvas masicCanvas,Canvas foreCanvas){
+		//清屏
+		Paint p = new Paint();
+		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		foreCanvas.drawPaint(p);
+		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+
+		foreCanvas.save();
+		foreCanvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
+		foreCanvas.restore();
+
+
+		//找到最后一个旋转角度,可能不存在
+		RotateAction lastRotateAction = null;
+		for(int i=actions.size()-1;i>=0;i--){
+			if(actions.get(i) instanceof RotateAction){
+				lastRotateAction = (RotateAction)actions.get(i);
+				break;
+			}
 		}
+		//开始绘制
+		float startAngle = 0;
+		for(Action action:actions){
+			if(action instanceof RotateAction){
+				startAngle = ((RotateAction) action).getmAngle();
+				continue;
+			}
+			if(lastRotateAction!=null) {//至少一次旋转
+				Log.i("cky",lastRotateAction.getmAngle()+"");
+				foreCanvas.save();
+				foreCanvas.rotate(lastRotateAction.getmAngle() - startAngle,mWidth/2,mHeight/2);
+				action.execute(foreCanvas);
+				foreCanvas.restore();
+			}else{
+				action.execute(foreCanvas);
+			}
+		}
+
 	}
 
 	@Override
@@ -200,9 +249,12 @@ public class ActionImageView extends ImageView {
 		return action;
 	}
 
+	/**
+	 * 撤销
+	 */
 	public void back(){
 		if(actions.size()==0) return;
-		actions.removeLast();
+		Action action = actions.removeLast();
 		post(new Runnable() {
 			@Override
 			public void run() {
@@ -212,11 +264,16 @@ public class ActionImageView extends ImageView {
 		});
 	}
 
+	/**
+	 * 裁剪
+	 * @param rectf
+     */
 	public void crop(RectF rectf){
-		//Log.i("cky","masic w="+masicBitmap.getWidth()+",h="+masicBitmap.getHeight());
+		isCrop = true;
 		Bitmap newbmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		Canvas cv = new Canvas(newbmp);
-		cv.rotate(mAngle);
+		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		Log.i("cky","cur="+mCurrentAngle);
 		//draw bg into
 		cv.drawBitmap(masicBitmap, null, getmRect(), null);//在 0，0坐标开始画入bg
 		//draw fg into
@@ -237,9 +294,14 @@ public class ActionImageView extends ImageView {
 		actions.add(mCurrentAction);
 	}
 
-	float mAngle;
+	/**
+	 * 旋转
+	 * @param angle
+     */
 	public void rotate(float angle){
-		mAngle = mAngle+angle;
+		mCurrentAction = new RotateAction(angle);
+		mCurrentAngle = angle;
+		actions.add(mCurrentAction);
 		postInvalidate();
 	}
 

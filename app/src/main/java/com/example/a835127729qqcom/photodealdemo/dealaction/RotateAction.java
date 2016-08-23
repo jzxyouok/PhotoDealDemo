@@ -7,10 +7,18 @@ import android.graphics.Paint;
  * Created by 835127729qq.com on 16/8/22.
  */
 public class RotateAction implements Action{
+    public float getmAngle() {
+        return mAngle;
+    }
+
+    private float mAngle;
+
+    public RotateAction(float angle){
+        mAngle = angle;
+    }
 
     @Override
     public void execute(Canvas canvas) {
-
     }
 
     @Override

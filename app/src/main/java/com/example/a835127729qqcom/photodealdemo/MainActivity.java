@@ -30,7 +30,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
     ActionImageView guaKa;
-    String testurl = "http://img3.duitang.com/uploads/item/201406/18/20140618204206_J3yFZ.jpeg";
+    String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-
+                Log.i("cky",failReason.toString());
             }
 
             @Override
@@ -141,6 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void rotate(View view){
         Log.i("tag","rotate");
-        guaKa.rotate(90);
+        guaKa.rotate(guaKa.mCurrentAngle+90);
     }
 }
