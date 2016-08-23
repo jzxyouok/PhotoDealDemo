@@ -254,11 +254,23 @@ public class ActionImageView extends ImageView {
 	 */
 	public void back(){
 		if(actions.size()==0) return;
-		Action action = actions.removeLast();
+		final Action action = actions.removeLast();
 		post(new Runnable() {
 			@Override
 			public void run() {
-				mForeCanvas.drawBitmap(masicBitmap,null,getmRect(),null);
+				if(action instanceof RotateAction){
+					//找到最后一个旋转角度,可能不存在
+					int i = actions.size()-1;
+					for(i=actions.size()-1;i>=0;i--){
+						if(actions.get(i) instanceof RotateAction){
+							mCurrentAngle = ((RotateAction) actions.get(i)).getmAngle();
+							break;
+						}
+					}
+					if(i<0){
+						mCurrentAngle = 0;
+					}
+				}
 				postInvalidate();
 			}
 		});
@@ -272,10 +284,11 @@ public class ActionImageView extends ImageView {
 		isCrop = true;
 		Bitmap newbmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		Canvas cv = new Canvas(newbmp);
-		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		Log.i("cky","cur="+mCurrentAngle);
 		//draw bg into
+		cv.save();
+		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
 		cv.drawBitmap(masicBitmap, null, getmRect(), null);//在 0，0坐标开始画入bg
+		cv.restore();
 		//draw fg into
 		cv.drawBitmap(mForeBackground, null, getmRect(), null);//在 0，0坐标开始画入fg ，可以从任意位置画入
 		//save all clip

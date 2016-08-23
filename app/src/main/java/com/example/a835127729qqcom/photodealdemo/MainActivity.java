@@ -107,21 +107,6 @@ public class MainActivity extends AppCompatActivity {
     public void crop(View view){
         Log.i("cky","crop="+cropImageView.getCropRect().toString());
         guaKa.crop(cropImageView.getCropRect());
-        /*
-        try {
-            Bitmap resultBit = Bitmap.createBitmap(guaKa.masicBitmap,
-                    (int) cropImageView.getCropRect().left, (int) cropImageView.getCropRect().top,
-                   (int) cropImageView.getCropRect().width(), (int) cropImageView.getCropRect().height());
-
-
-
-
-            SaveBitmap2File.saveFile(resultBit, "aa.jpg", Environment.getExternalStorageDirectory().getAbsolutePath());
-            //SaveBitmap2File.saveFile(((BitmapDrawable) guaKa.getDrawable()).getBitmap(),"aa.jpg", Environment.getExternalStorageDirectory().getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
     public void change(View view){
