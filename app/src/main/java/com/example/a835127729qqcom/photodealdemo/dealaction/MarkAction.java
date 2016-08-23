@@ -21,6 +21,7 @@ public class MarkAction implements Action{
     @Override
     public void execute(Canvas canvas) {
         canvas.drawPath(mPath,mPaint);
+        //canvas.drawPath(mPath,mPaint);
     }
 
     @Override

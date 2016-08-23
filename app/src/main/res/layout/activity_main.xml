@@ -23,21 +23,49 @@
         android:layout_height="60dp"
         android:text="返回"/>
          -->
-    <com.example.a835127729qqcom.photodealdemo.GuaGuaKa
-        android:id="@+id/guagua"
-        android:layout_width="400dp"
-        android:layout_height="400dp" />
+
+    <FrameLayout
+        android:id="@+id/work_space"
+        android:layout_width="fill_parent"
+        android:layout_height="400dp">
+        <com.example.a835127729qqcom.photodealdemo.ActionImageView
+            android:src="@drawable/testicon"
+            android:id="@+id/guagua"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
+        <com.xinlan.imageeditlibrary.editimage.view.CropImageView
+            android:id="@+id/crop"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </FrameLayout>
     <Button
-        android:layout_below="@id/guagua"
+        android:layout_below="@id/work_space"
         android:onClick="change"
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:text="模式"/>
     <Button
         android:layout_marginLeft="110dp"
-        android:layout_below="@id/guagua"
+        android:layout_below="@id/work_space"
         android:onClick="back"
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:text="返回"/>
+    <Button
+        android:layout_marginLeft="220dp"
+        android:layout_below="@id/work_space"
+        android:onClick="crop"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="裁剪"/>
+    <Button
+        android:layout_marginTop="70dp"
+        android:layout_below="@id/work_space"
+        android:onClick="rotate"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="旋转"/>
 </RelativeLayout>
