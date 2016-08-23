@@ -290,10 +290,10 @@ public class ActionImageView extends ImageView {
 		//draw bg into
 		cv.save();
 		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		cv.drawBitmap(masicBitmap, null, getmRect(), null);//在 0，0坐标开始画入bg
-		cv.restore();
+		cv.drawBitmap(masicBitmap, null, getRotatedmRect(), null);//在 0，0坐标开始画入bg
 		//draw fg into
 		cv.drawBitmap(mForeBackground, null, getmRect(), null);//在 0，0坐标开始画入fg ，可以从任意位置画入
+		cv.restore();
 		//save all clip
 		cv.save(Canvas.ALL_SAVE_FLAG);//保存
 		//store
@@ -329,21 +329,10 @@ public class ActionImageView extends ImageView {
 		return new RectF(getLeft(),getTop(),getRight(),getBottom());
 	}
 
-	private RectF getScalemRect(){
-		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
-		float scale = 1.0f * mWidth/mHeight;
-		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
-		return r;
-	}
-
-	private RectF getSpmRect(){
-		RectF r = new RectF(getLeft(),getTop(),getRight(),getBottom());
-		Matrix m = new Matrix();
-		m.setRotate(90,mWidth/2,mHeight/2);
-		m.mapRect(r);
-		return r;
-	}
-
+	/**
+	 * 获取按w/h比例缩小的矩阵
+	 * @return
+     */
 	private RectF getRotatedmRect(){
 		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
 		float scale = 1.0f * mWidth/mHeight;
@@ -351,18 +340,6 @@ public class ActionImageView extends ImageView {
 		Matrix m = new Matrix();
 		m.setRotate(mCurrentAngle,mWidth/2,mHeight/2);
 		m.mapRect(r);
-		Log.i("before",r.toString());
-		/*
-		if(mCurrentAngle/90%2==0) return r;
-		Matrix m = new Matrix();
-		float scale = 1.0f * mWidth/mHeight;
-		m.setScale(1,scale*scale);
-
-		m.setTranslate(0,(1-scale*scale)*mHeight/2);
-		//m.setRotate(mCurrentAngle,mWidth/2,mHeight/2);
-		m.mapRect(r);
-		*/
-		Log.i("after",r.toString());
 		return r;
 	}
 
