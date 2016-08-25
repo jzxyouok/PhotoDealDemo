@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:id="@+id/text_layout"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:padding="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#abcdef" >
+
+        <TextView
+            android:id="@+id/rotate_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="点击输入文字"
+            android:maxLines="2"
+            android:maxLength="24"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:visibility="visible"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/rotate_edittext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="点击输入文字"
+            android:imeOptions="actionDone"
+            android:maxLength="24"
+            android:maxEms="20"
+            android:maxLines="2"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="20sp"
+            android:visibility="gone" />
+    </RelativeLayout>
+    <ImageButton
+        android:background="@null"
+        android:id="@+id/delete_btn"
+        android:src="@drawable/sticker_delete"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+    <ImageButton
+        android:id="@+id/rotate_btn"
+        android:layout_toRightOf="@id/text_layout"
+        android:background="@null"
+        android:layout_below="@id/text_layout"
+        android:layout_marginLeft="-15dp"
+        android:layout_marginTop="-15dp"
+        android:src="@drawable/sticker_rotate"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+</RelativeLayout>

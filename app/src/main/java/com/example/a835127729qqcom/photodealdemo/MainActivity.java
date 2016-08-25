@@ -2,11 +2,13 @@ package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
@@ -26,6 +28,8 @@ import com.xinlan.imageeditlibrary.editimage.view.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     /**
@@ -131,5 +137,26 @@ public class MainActivity extends AppCompatActivity {
     public void text(View view){
         Log.i("tag","text");
         guaKa.rotate(guaKa.mCurrentAngle+90);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        pin((TextView) findViewById(R.id.text1),1);
+        pin((TextView) findViewById(R.id.text2),2);
+        pin((TextView) findViewById(R.id.text3),3);
+    }
+
+    void pin(TextView text,int i){
+        Log.i("text"+i,"left="+text.getLeft()+",top="+text.getTop()+",right="+text.getRight()+",bottom="+text.getBottom());
+        int[] location = new int[2];
+        text.getLocationOnScreen(location);
+        Log.i("text"+i,"location="+ Arrays.toString(location));
+        Rect r = new Rect();
+        text.getGlobalVisibleRect(r);
+        Log.i("text"+i,"GlobalVisibleRect="+ r.toString());
+        Rect r2 = new Rect();
+        text.getLocalVisibleRect(r2);
+        Log.i("text"+i,"LocalVisibleRect="+ r2.toString());
     }
 }
