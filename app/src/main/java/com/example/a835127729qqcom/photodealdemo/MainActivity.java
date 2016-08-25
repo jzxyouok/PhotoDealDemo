@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void crop(View view){
+        if(guaKa.getMode()!=3) return;
         Log.i("cky","crop="+cropImageView.getCropRect().toString());
         guaKa.crop(cropImageView.getCropRect());
     }
