@@ -232,7 +232,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             (RotatableEditText.this).getGlobalVisibleRect(r);
         }
 
-        private double rotate(float x,float y){
+        private void rotate(float x,float y){
             double angle = 0;
             float dx = x - centerX;
             float dy = y -centerY;
@@ -256,15 +256,48 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                     angle = 360-Math.toDegrees(Math.atan(dy/dx));
                 }
             }
-            //Log.i("cky","angle="+angle);
-            //Log.i("cky","startangle="+(startAngle));
             currentAngle = angle - startAngle;
             Log.i("cky","deangle="+currentAngle);
-            //Log.i("cky","pivotX="+RotatableEditText.this.getPivotX()+",pivotY="+RotatableEditText.this.getPivotY());
-            //RotatableEditText.this.setPivotX(pivotX);
-            //RotatableEditText.this.setPivotY(pivotY);
             RotatableEditText.this.setRotation(-(float) (currentAngle));
-            return currentAngle;
+        }
+
+        private void scale(float x,float y){
+            if(Math.abs(x-lastX)<touchSlop||Math.abs(y-lastY)<touchSlop){
+                return;
+            }
+            float mw = lastRect.width()/2 - rotateBtn.getWidth()/2;
+            float mh = lastRect.width()/2 - rotateBtn.getHeight()/2;
+
+            double halfSrcLen = Math.sqrt(mw*mw+mh*mh);
+
+            double srcLen = 2 * halfSrcLen;
+            float xa = x - lastRect.centerX();
+            float ya = y - lastRect.centerY();
+            double destLen = Math.sqrt(xa*xa + ya*ya)+halfSrcLen;
+            float scaleX = (float) (destLen/srcLen);
+            float scaleY = scaleX;
+            if(scaleX < 0.5) return;
+            rotateTextView.setWidth((int) (mWidth*scaleX));
+            rotateTextView.setHeight((int) (mHeight*scaleX));
+            //rotateTextView.setTextSize(textSize*scaleX);
+            rotateEditText.setWidth((int) (mWidth*scaleX));
+            rotateEditText.setHeight((int) (mHeight*scaleX));
+
+            //旋转
+            PointF lt = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.left,lastRect.top),currentAngle);
+            PointF lb = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.left,lastRect.bottom),currentAngle);
+            PointF rt = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.right,lastRect.top),currentAngle);
+            PointF rb = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.right,lastRect.bottom),currentAngle);
+
+            PointF rt2 = new PointF(scaleX * (rt.x - lt.x) + lt.x,scaleY * (rt.y - lt.y) + lt.y);
+            PointF lb2 = new PointF(scaleX * (lb.x - rb.x) + rb.x,scaleY * (lb.y - rb.y) + rb.y);
+            PointF nc = new PointF((rt2.x+lb2.x)/2,(rt2.y+lb2.y)/2);
+
+            //平移
+            RelativeLayout.LayoutParams params = (LayoutParams) getLayoutParams();
+            params = (LayoutParams) getLayoutParams();
+            params.setMargins((int)(lastLeftMargin-(nc.x-lastRect.centerX())),(int)(lastTopMargin-(nc.y-lastRect.centerY())),
+                    params.rightMargin,params.bottomMargin);
         }
 
         public void handleTouchRotateBtn(View view, MotionEvent motionEvent){
@@ -289,67 +322,14 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                     break;
                 case MotionEvent.ACTION_MOVE:
                     //rotate
-                    double angle = -rotate(x,y);
-
+                    rotate(x,y);
                     //scale
-
-                    if(Math.abs(x-lastX)<touchSlop||Math.abs(y-lastY)<touchSlop){
-                        return;
-                    }
-
-                    float mw = lastRect.width()/2 - rotateBtn.getWidth()/2;
-                    float mh = lastRect.width()/2 - rotateBtn.getHeight()/2;
-
-                    double halfSrcLen = Math.sqrt(mw*mw+mh*mh);
-
-                    double srcLen = 2 * halfSrcLen;
-                    float xa = x - lastRect.centerX();
-                    float ya = y - lastRect.centerY();
-                    double destLen = Math.sqrt(xa*xa + ya*ya)+halfSrcLen;
-                    float scaleX = (float) (destLen/srcLen);
-                    float scaleY = scaleX;
-                    if(scaleX < 0.5) break;
-                    rotateTextView.setWidth((int) (mWidth*scaleX));
-                    rotateTextView.setHeight((int) (mHeight*scaleX));
-                    //rotateTextView.setTextSize(textSize*scaleX);
-                    rotateEditText.setWidth((int) (mWidth*scaleX));
-                    rotateEditText.setHeight((int) (mHeight*scaleX));
-
-                    //旋转
-                    PointF lt = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.left,lastRect.top),currentAngle);
-                    PointF lb = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.left,lastRect.bottom),currentAngle);
-                    PointF rt = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.right,lastRect.top),currentAngle);
-                    PointF rb = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.right,lastRect.bottom),currentAngle);
-
-                    PointF rt2 = new PointF(scaleX * (rt.x - lt.x) + lt.x,scaleY * (rt.y - lt.y) + lt.y);
-                    PointF lb2 = new PointF(scaleX * (lb.x - rb.x) + rb.x,scaleY * (lb.y - rb.y) + rb.y);
-                    PointF nc = new PointF((rt2.x+lb2.x)/2,(rt2.y+lb2.y)/2);
-
-                    //平移
-                    params = (LayoutParams) getLayoutParams();
-                    params.setMargins((int)(lastLeftMargin-(nc.x-lastRect.centerX())),(int)(lastTopMargin-(nc.y-lastRect.centerY())),
-                            params.rightMargin,params.bottomMargin);
-                    /*
-                        params = (LayoutParams) getLayoutParams();
-                        params.setMargins((int)(lastLeftMargin-mWidth/2*(scaleX-1)),(int)(lastTopMargin-mHeight/2*(scaleX-1)),
-                                params.rightMargin,params.bottomMargin);
-                   */
-                        /*
-                        rotateTextView.setScaleX(scaleX);
-                        rotateTextView.setScaleY(scaleY);
-                        rotateEditText.setScaleX(scaleX);
-                        rotateEditText.setScaleY(scaleY);
-                        */
-                        /*
-                        rotateTextView.setWidth(newWidth);
-                        rotateEditText.setWidth(newWidth);
-                        rotateTextView.setHeight(newHeight);
-                        rotateEditText.setHeight(newHeight);
-                        */
+                    scale(x,y);
                     invalidate();
                     break;
                 case MotionEvent.ACTION_UP:
-                    //rotate(x,y);
+                    rotate(x,y);
+                    scale(x,y);
                     lastRect = rect;
                     lastAngle = currentAngle;
                     stage = 0;
