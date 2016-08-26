@@ -18,6 +18,7 @@
             android:src="@drawable/testicon"
             android:id="@+id/guagua"
             android:scaleType="fitXY"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="400dp" />
         <com.xinlan.imageeditlibrary.editimage.view.CropImageView
@@ -27,6 +28,7 @@
             android:layout_height="match_parent"
             />
         <com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout
+            android:id="@+id/cloud"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>

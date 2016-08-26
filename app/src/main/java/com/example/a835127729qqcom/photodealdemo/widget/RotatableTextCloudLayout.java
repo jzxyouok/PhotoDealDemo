@@ -1,11 +1,21 @@
 package com.example.a835127729qqcom.photodealdemo.widget;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
 
 import java.util.ArrayList;
 
@@ -36,6 +46,32 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
         mContext = context;
         setOnTouchListener(this);
     }
+
+    /*
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Paint p = new Paint();
+        p.setColor(Color.RED);
+        p.setStyle(Paint.Style.FILL);
+
+        RectF r1 = new RectF(100,100,200,200);
+        canvas.drawRect(r1,p);
+
+        //m.setScale(2,2,r1.centerX(),r1.centerY());
+        p.setColor(Color.GREEN);
+        p.setStyle(Paint.Style.STROKE);
+        //p.setStrokeWidth(50);
+        PointF p1 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.left,r1.top),45);
+        PointF p2 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.left,r1.bottom),45);
+        PointF p3 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.right,r1.top),45);
+        PointF p4 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.right,r1.bottom),45);
+        canvas.drawLine(p1.x,p1.y,p2.x,p2.y,p);
+        canvas.drawLine(p1.x,p1.y,p3.x,p3.y,p);
+        canvas.drawLine(p2.x,p2.y,p3.x,p3.y,p);
+        canvas.drawLine(p3.x,p3.y,p4.x,p4.y,p);
+        RectF r2 = new RectF(100,100,300,200);
+    }
+    */
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

@@ -2,7 +2,9 @@ package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
         cropImageView = (CropImageView) findViewById(R.id.crop);
 
         guaKa = (ActionImageView) findViewById(R.id.guagua);
+        findViewById(R.id.cloud).setWillNotDraw(false);
         //guaKa.setEnabled(false);
+        /*
         ImageLoader.getInstance().displayImage(testurl,guaKa,new ImageLoadingListener(){
 
             @Override
@@ -70,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        */
 
     }
 
