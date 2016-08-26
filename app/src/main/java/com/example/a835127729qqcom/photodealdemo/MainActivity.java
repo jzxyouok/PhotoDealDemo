@@ -75,7 +75,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
-
+        Matrix m = new Matrix();
+        RectF r = new RectF(0,0,100,100);
+        m.setScale(2,2,r.centerX(),r.centerY());
+        m.mapRect(r);
+        RectF r2 = new RectF(0,0,100,100);
     }
 
     /**

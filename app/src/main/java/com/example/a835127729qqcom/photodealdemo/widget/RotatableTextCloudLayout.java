@@ -45,33 +45,27 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
     private void init(Context context){
         mContext = context;
         setOnTouchListener(this);
+        setWillNotDraw(false);
     }
 
-    /*
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        /*
+        use to test,you must change class TouchRotateBtnHandler into public
         Paint p = new Paint();
-        p.setColor(Color.RED);
+        p.setColor(Color.GREEN);
         p.setStyle(Paint.Style.FILL);
 
-        RectF r1 = new RectF(100,100,200,200);
-        canvas.drawRect(r1,p);
-
-        //m.setScale(2,2,r1.centerX(),r1.centerY());
-        p.setColor(Color.GREEN);
-        p.setStyle(Paint.Style.STROKE);
-        //p.setStrokeWidth(50);
-        PointF p1 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.left,r1.top),45);
-        PointF p2 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.left,r1.bottom),45);
-        PointF p3 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.right,r1.top),45);
-        PointF p4 = RotateUtil.roationPoint(new PointF(r1.centerX(),r1.centerY()),new PointF(r1.right,r1.bottom),45);
-        canvas.drawLine(p1.x,p1.y,p2.x,p2.y,p);
-        canvas.drawLine(p1.x,p1.y,p3.x,p3.y,p);
-        canvas.drawLine(p2.x,p2.y,p3.x,p3.y,p);
-        canvas.drawLine(p3.x,p3.y,p4.x,p4.y,p);
-        RectF r2 = new RectF(100,100,300,200);
+        for(int i=rotatableEditTexts.size()-1;i>=0;i--){
+            if(rotatableEditTexts.get(i).mTouchRotateBtnHandler.rect!=null) {
+                canvas.drawRect(rotatableEditTexts.get(i).mTouchRotateBtnHandler.rect, p);
+                p.setColor(Color.BLUE);
+                canvas.drawRect(rotatableEditTexts.get(i).mTouchRotateBtnHandler.lastRect, p);
+            }
+        }
+        */
     }
-    */
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -127,7 +121,7 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
 
     private void createRotatableEditText(float x, float y) {
         RotatableEditText currentRotatableEditText = new RotatableEditText(mContext,getWidth(),getHeight());
-
+        currentRotatableEditText.setWillNotDraw(false);
         RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
         currentRotatableEditText.setLayoutParams(params);
         params.leftMargin = (int)x;

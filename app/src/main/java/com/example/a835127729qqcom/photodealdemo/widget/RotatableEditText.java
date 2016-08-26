@@ -2,7 +2,9 @@ package com.example.a835127729qqcom.photodealdemo.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -148,7 +150,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             case MotionEvent.ACTION_MOVE:
                 int newLeftMargin = (int) (lastLeftMargin + rawX - lastX);
                 int newTopMargin = (int) (lastTopMargin + rawY - lastY);
-                if(isOutOfParent(newLeftMargin,newTopMargin)) break;
+                //if(isOutOfParent(newLeftMargin,newTopMargin)) break;
                 //Log.i("cky","移动 x="+rawX+",y="+rawY);
                 params.setMargins(newLeftMargin,newTopMargin, params.rightMargin,params.bottomMargin);
                 mTouchRotateBtnHandler.changeRect((int)(rawX - lastX),(int)(rawY - lastY));
@@ -157,7 +159,8 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                 view.postInvalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                /*
+                mTouchRotateBtnHandler.changeLastRect();
+                view.postInvalidate();
                 if(lastX==rawX&&lastY==rawY&&isTouchTextLayout((int)rawX,(int)rawY)) {
                     rotateTextView.setVisibility(GONE);
                     rotateEditText.setVisibility(VISIBLE);
@@ -165,16 +168,27 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                     ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(rotateEditText, 0);
                     return false;
                 }
-                */
                 break;
         }
+
         return true;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        /*
+        Paint p = new Paint();
+        p.setColor(Color.RED);
+        p.setStyle(Paint.Style.FILL);
+        if(mTouchRotateBtnHandler.rect!=null)
+            canvas.drawRect(mTouchRotateBtnHandler.rect,p);
+            */
     }
 
     /**
      * 处理旋和转拉
      */
-    private class TouchRotateBtnHandler{
+    public class TouchRotateBtnHandler{
         //是否初始化
         boolean isInit = false;
         int mWidth,mHeight;
@@ -182,13 +196,14 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
         //缩放前的范围矩形
         Rect lastRect;
         //当前的范围矩形
-        Rect rect;
+        public Rect rect;
         float textSize = 0;
         //当前旋转到角度
         double currentAngle = 0;
         //起始角度,因为旋转按钮和中心本来就存在一定角度
         double startAngle = 0;
-
+        //四个点,表示旋转和拉伸以后的矩形
+        //PointF lt,lb,rt,rb;
         /**
          * 只初始化一次
          */
@@ -198,12 +213,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             mHeight = rotateTextView.getMeasuredHeight();
             rect = new Rect();
             lastRect = rect;
-            //(RotatableEditText.this).getLocalVisibleRect(rect);
-            //Log.i("cky","rect1="+rect);
-            //((RotatableTextCloudLayout)RotatableEditText.this.getParent()).getChildVisibleRect(RotatableEditText.this,rect,null);
-            //Log.i("cky","rect2="+rect);
             (RotatableEditText.this).getGlobalVisibleRect(rect);
-            //Log.i("cky","rect3="+rect);
             centerX = rect.centerX();
             centerY = rect.centerY();
             startAngle = Math.toDegrees(Math.atan(1.0d*(centerY-rect.bottom)/(rect.right-centerX)));
@@ -263,22 +273,28 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                 return;
             }
             float mw = lastRect.width()/2 - rotateBtn.getWidth()/2;
-            float mh = lastRect.width()/2 - rotateBtn.getHeight()/2;
-
+            float mh = lastRect.height()/2 - rotateBtn.getHeight()/2;
+            Log.i("cky1","rotatebtn w="+mw+",h="+mh);
             double halfSrcLen = Math.sqrt(mw*mw+mh*mh);
 
-            double srcLen = 2 * halfSrcLen;
+            double srcLen = halfSrcLen;
             float xa = x - lastRect.centerX();
             float ya = y - lastRect.centerY();
-            double destLen = Math.sqrt(xa*xa + ya*ya)+halfSrcLen;
+            double destLen = Math.sqrt(xa*xa + ya*ya);//+halfSrcLen;
             float scaleX = (float) (destLen/srcLen);
             float scaleY = scaleX;
+
             if(scaleX < 0.5) return;
-            rotateTextView.setWidth((int) (mWidth*scaleX));
-            rotateTextView.setHeight((int) (mHeight*scaleX));
+
+            int newWidth = (int) (mWidth*scaleX)/2*2;
+            int newHeight = (int) (mHeight*scaleX)/2*2;
+            int delWidth = (newWidth - mWidth)/2*2;
+            int delHeight = (newHeight-mHeight)/2*2;
+
+            newWidth = delWidth + mWidth;
+            newHeight = delHeight + mHeight;
+
             //rotateTextView.setTextSize(textSize*scaleX);
-            rotateEditText.setWidth((int) (mWidth*scaleX));
-            rotateEditText.setHeight((int) (mHeight*scaleX));
 
             //旋转
             PointF lt = RotateUtil.roationPoint(new PointF(lastRect.centerX(),lastRect.centerY()),new PointF(lastRect.left,lastRect.top),currentAngle);
@@ -290,10 +306,26 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             PointF lb2 = new PointF(scaleX * (lb.x - rb.x) + rb.x,scaleY * (lb.y - rb.y) + rb.y);
             PointF nc = new PointF((rt2.x+lb2.x)/2,(rt2.y+lb2.y)/2);
 
+            //缩放rect
+            rect = new Rect(lastRect.left-delWidth/2,lastRect.top-delHeight/2,lastRect.right+delWidth/2,lastRect.bottom+delHeight/2);
+
             //平移
             RelativeLayout.LayoutParams params = (LayoutParams) getLayoutParams();
+            /*
             params.setMargins((int)(lastLeftMargin-(nc.x-lastRect.centerX())),(int)(lastTopMargin-(nc.y-lastRect.centerY())),
                     params.rightMargin,params.bottomMargin);
+                    */
+            rotateTextView.setWidth(newWidth);
+            rotateTextView.setHeight(newHeight);
+            rotateEditText.setWidth(newWidth);
+            rotateEditText.setHeight(newHeight);
+            /*
+            params.setMargins((int)(lastLeftMargin-(nc.x-lastRect.centerX())),(int)(lastTopMargin-(nc.y-lastRect.centerY())),
+                    params.rightMargin,params.bottomMargin);
+                    */
+            params.setMargins(lastLeftMargin-delWidth/2,lastTopMargin-delHeight/2,
+                    params.rightMargin,params.bottomMargin);
+            setLayoutParams(params);
         }
 
         public void handleTouchRotateBtn(View view, MotionEvent motionEvent){
@@ -309,13 +341,14 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                     RelativeLayout.LayoutParams params = (LayoutParams) getLayoutParams();
                     lastLeftMargin = params.leftMargin;
                     lastTopMargin = params.topMargin;
+                    mWidth = rotateTextView.getMeasuredWidth();
+                    mHeight = rotateTextView.getMeasuredHeight();
                     break;
                 case MotionEvent.ACTION_MOVE:
                     //rotate
                     rotate(x,y);
                     //scale
                     scale(x,y);
-                    invalidate();
                     break;
                 case MotionEvent.ACTION_UP:
                     rotate(x,y);
@@ -324,6 +357,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
                     stage = 0;
                     break;
             }
+            postInvalidate();
         }
     }
 
