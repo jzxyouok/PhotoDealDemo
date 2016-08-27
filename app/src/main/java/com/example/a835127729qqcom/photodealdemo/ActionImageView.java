@@ -25,14 +25,17 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.CropAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
+import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
+import com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
-public class ActionImageView extends ImageView {
+public class ActionImageView extends ImageView implements RotatableTextCloudLayout.FinshAddTextListener{
 	/**
 	 * 当前操作
 	 */
@@ -119,6 +122,7 @@ public class ActionImageView extends ImageView {
 	}
 
 	public void produceMasicPhoto(){
+		setVisibility(VISIBLE);
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
 		//originBitmap = Bitmap.createBitmap(((BitmapDrawable) getDrawable()).getBitmap(),0,0,mWidth,mHeight);
 		// 初始化bitmap
@@ -363,5 +367,11 @@ public class ActionImageView extends ImageView {
 
 	public int getMode(){
 		return mode;
+	}
+
+	@Override
+	public void onFinish(ArrayList<TextAction> rotatbleTextActions) {
+		actions.addAll(rotatbleTextActions);
+		postInvalidate();
 	}
 }

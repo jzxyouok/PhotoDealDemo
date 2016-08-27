@@ -15,7 +15,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -25,7 +28,10 @@ import java.util.ArrayList;
 public class RotatableTextCloudLayout extends RelativeLayout implements View.OnTouchListener,RotatableEditText.DeleteBtnClickListener {
     private Context mContext;
     ArrayList<RotatableEditText> rotatableEditTexts = new ArrayList<RotatableEditText>();
+    ArrayList<TextAction> rotatbleTextActions = new ArrayList<TextAction>();
     private float lastDownX,lastDownY;
+    private Rect globalRect = null;
+    private FinshAddTextListener mFinshAddTextListener;
 
     public RotatableTextCloudLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -50,27 +56,26 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        /*
-        use to test,you must change class TouchRotateBtnHandler into public
+        //super.onDraw(canvas);
+        //use to test,you must change class TouchRotateBtnHandler into public
         Paint p = new Paint();
         p.setColor(Color.GREEN);
         p.setStyle(Paint.Style.FILL);
 
         for(int i=rotatableEditTexts.size()-1;i>=0;i--){
             if(rotatableEditTexts.get(i).mTouchRotateBtnHandler.rect!=null) {
-                canvas.drawRect(rotatableEditTexts.get(i).mTouchRotateBtnHandler.rect, p);
-                p.setColor(Color.BLUE);
-                canvas.drawRect(rotatableEditTexts.get(i).mTouchRotateBtnHandler.lastRect, p);
+                Rect r = new Rect(rotatableEditTexts.get(i).mTouchRotateBtnHandler.rect);
+                r.offset(0,-globalRect.top);
+                canvas.drawRect(r, p);
+                rotatableEditTexts.get(i).refreshTextAction();
+                rotatableEditTexts.get(i).mTextAction.execute(canvas);
             }
         }
-        */
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //Log.i("ontouch","left="+getLeft()+",top="+getTop());
     }
 
     @Override
@@ -79,56 +84,58 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
         float y = motionEvent.getY();
         Log.i("cky","0");
 
+        boolean isChildBeSelected = false;
         //是否点击了子控件
-        RotatableEditText currentRotatableEditText = null;
-        for(int i=rotatableEditTexts.size()-1;i>=0;i--){
-            if(rotatableEditTexts.get(i).containXY(x,y)){
-                currentRotatableEditText = rotatableEditTexts.get(i);
+        for(RotatableEditText r:rotatableEditTexts){
+            isChildBeSelected = isChildBeSelected || r.isSelected();
+            r.hideControlBtn();
+        }
+
+        if(isChildBeSelected) return true;
+        //判断是否点击事件
+        switch (motionEvent.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                lastDownX = x;
+                lastDownY = y;
                 break;
-            }
-        }
-        if(currentRotatableEditText==null){//如果不是,新建一个
-            boolean isAble2Clear = false;
-            //清除edittext状态
-            for(RotatableEditText rotatableEditText:rotatableEditTexts){
-                isAble2Clear = isAble2Clear || rotatableEditText.clearEditFocus();
-            }
-            if(isAble2Clear) return true;
-            //判断是否点击事件
-            switch (motionEvent.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    lastDownX = x;
-                    lastDownY = y;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if(lastDownX == x && lastDownY == y){//点击
-                        createRotatableEditText(x,y);
-                    }
-                    break;
-            }
-
-            return true;
+            case MotionEvent.ACTION_UP:
+                if(lastDownX == x && lastDownY == y){//点击
+                    createRotatableEditText(x,y);
+                }
+                break;
         }
 
-        //如果不是,新建一个{
-            //设置移动边界
-        //}
-        //如果是,交给RotatableEditText自己处理
-        //currentRotatableEditText.handleOnTouch(this,motionEvent);
-        //return true;
         return true;
+
     }
 
+    /**
+     * 获取在屏幕的位置
+     */
+    private void getGlobalTop(){
+        if(globalRect!=null) return;
+        globalRect = new Rect();
+        getGlobalVisibleRect(globalRect);
+    }
+
+    /**
+     * 创建子控件
+     * @param x
+     * @param y
+     */
     private void createRotatableEditText(float x, float y) {
-        RotatableEditText currentRotatableEditText = new RotatableEditText(mContext,getWidth(),getHeight());
-        currentRotatableEditText.setWillNotDraw(false);
+        getGlobalTop();
+        //创建控件
+        TextAction textAction = new TextAction(globalRect.left,globalRect.top);
+        rotatbleTextActions.add(textAction);
+        RotatableEditText currentRotatableEditText = new RotatableEditText(mContext,globalRect,textAction,rotatableEditTexts);
         RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
         currentRotatableEditText.setLayoutParams(params);
         params.leftMargin = (int)x;
         params.topMargin = (int)y;
-
+        //删除通知
         currentRotatableEditText.setDeleteBtnClickListener(this);
-
+        //添加控件
         rotatableEditTexts.add(currentRotatableEditText);
         addView(currentRotatableEditText);
     }
@@ -137,5 +144,28 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
     public void onClick(RotatableEditText rotatableEditText) {
         rotatableEditTexts.remove(rotatableEditText);
         removeView(rotatableEditText);
+    }
+
+    /**
+     * 开始
+     */
+    public void startAddText(){
+        setVisibility(VISIBLE);
+    }
+
+    /**
+     * 结束
+     */
+    public void finishAddtext(){
+        setVisibility(GONE);
+        mFinshAddTextListener.onFinish(rotatbleTextActions);
+    }
+
+    public interface FinshAddTextListener{
+        void onFinish(ArrayList<TextAction> rotatbleTextActions);
+    }
+
+    public void setFinshAddTextListener(FinshAddTextListener finshAddTextListener){
+        mFinshAddTextListener = finshAddTextListener;
     }
 }
