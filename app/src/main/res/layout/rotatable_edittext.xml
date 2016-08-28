@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="#ff0000"
     android:orientation="horizontal" >
 
     <RelativeLayout
@@ -11,10 +10,10 @@
         android:layout_marginTop="15dp"
         android:padding="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#abcdef" >
+        android:layout_height="wrap_content">
 
         <TextView
+            android:textAlignment="center"
             android:id="@+id/rotate_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,6 +28,7 @@
             android:textSize="20sp" />
 
         <EditText
+            android:textAlignment="center"
             android:id="@+id/rotate_edittext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

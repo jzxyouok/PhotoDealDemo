@@ -477,16 +477,26 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
         pf1 = new PointF(textRect.centerX(),textRect.centerY());
         pf2.set(textRect.left,textRect.top);
         PointF lt = RotateUtil.roationPoint(pf1,pf2,-mTouchRotateBtnHandler.currentAngle);
+        //lt.offset(0,rotateTextView.getTextSize()/2);
         pf2.set(textRect.left,textRect.bottom);
         PointF lb = RotateUtil.roationPoint(pf1,pf2,-mTouchRotateBtnHandler.currentAngle);
+//        lb.offset(0,rotateTextView.getTextSize()/2);
         pf2.set(textRect.right,textRect.top);
         PointF rt = RotateUtil.roationPoint(pf1,pf2,-mTouchRotateBtnHandler.currentAngle);
+        //rt.offset(0,rotateTextView.getTextSize()/2);
         pf2.set(textRect.right,textRect.bottom);
         PointF rb = RotateUtil.roationPoint(pf1,pf2,-mTouchRotateBtnHandler.currentAngle);
+        //rb.offset(0,rotateTextView.getTextSize()/2);
         //text起始坐标
         PointF leftP = new PointF((lt.x+lb.x)/2,(lt.y+lb.y)/2);
         PointF rightP = new PointF((rt.x+rb.x)/2,(rt.y+rb.y)/2);
-        mTextAction.setmPath(leftP.x,leftP.y,rightP.x,rightP.y);
+        //计算数字大小引起的偏移
+        float moveLeft = (float)(mTextAction.getTextSize()/2*Math.sin(Math.toRadians(mTouchRotateBtnHandler.currentAngle)));
+        float moveTop = (float)(mTextAction.getTextSize()/2*Math.cos(Math.toRadians(mTouchRotateBtnHandler.currentAngle)));
+        mTextAction.setmPath(leftP.x+moveLeft, leftP.y+moveTop,
+                rightP.x+moveLeft,
+                rightP.y+moveTop);
+
     }
 
     public void hideControlBtn(){
