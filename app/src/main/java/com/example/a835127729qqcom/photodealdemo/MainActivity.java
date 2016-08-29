@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 Log.i("cky","com");
-                guaKa.produceMasicPhoto();
+                guaKa.init();
                 guaKa.invalidate();
                 //cropImageView.setRatioCropRect(guaKa.getmRect(),0.2f);
             }

@@ -1,11 +1,6 @@
 package com.example.a835127729qqcom.photodealdemo.widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -13,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -207,6 +203,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
 
     private void setUpRotateEditText(){
         rotateEditText.addTextChangedListener(new TextWatcher() {
+            boolean isDelete = false;
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -214,12 +211,47 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                if(i2==0){
+                    isDelete = true;
+                }else{
+                    isDelete = false;
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                rotateTextView.setText(editable.toString());
+                Log.i("cky","len="+editable.length());
+                //rotateTextView.setText(content);
+                String content = editable.toString();
+                StringBuilder sb = new StringBuilder(content);
+                if(!isDelete&&content.length()>=11){
+                    if(content.length()==11){
+                        editable.insert(11,"\n");
+                        sb.append("\n");
+                        content = content+"\n";
+                    }else{
+                        if(!"\n".equals(content.charAt(11))){
+                            editable.insert(11,"\n");
+                            sb.insert(11,"\n");
+                        }
+                    }
+                }
+                content = sb.toString();
+                //String content = editable.toString();
+                /*
+                if(content.length()>12){
+                    String preStr = content.substring(0,12);
+                    String lastStr = content.substring(12);
+                    content = preStr+"\n"+lastStr;
+                }
+                */
+                rotateTextView.setText(content);
+                //// TODO: 16/8/28 6 is odd
+                int more = content.length()>6? (int) ((content.length()-6>=6?6:content.length()-6) * mTouchRotateBtnHandler.currentTextSize) :0;
+                mTouchRotateBtnHandler.rect = new Rect(mTouchRotateBtnHandler.lastRect.left,
+                        mTouchRotateBtnHandler.lastRect.top,
+                        (int) (mTouchRotateBtnHandler.lastRect.right+more),
+                        mTouchRotateBtnHandler.lastRect.bottom);
             }
         });
     }
@@ -264,11 +296,6 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
         return flag;
     }
 
-    public boolean containXY(float x, float y){
-        RectF rectF = new RectF(getLeft(), getTop(), getRight(), getBottom());
-        return rectF.contains(x,y);
-    }
-
     /**
      * 处理旋和转拉
      */
@@ -288,6 +315,11 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
         double startAngle = 0;
         //四个点,表示旋转和拉伸以后的矩形
         PointF[] points = new PointF[4];
+        //
+        float lastTextSize;
+        float currentTextSize;
+
+
         /**
          * 只初始化一次
          */
@@ -301,7 +333,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             centerX = rect.centerX();
             centerY = rect.centerY();
             startAngle = Math.toDegrees(Math.atan(1.0d*(centerY-rect.bottom)/(rect.right-centerX)));
-            textSize = rotateTextView.getTextSize();
+            currentTextSize = lastTextSize = rotateTextView.getTextSize();
             //初始化一次
             points[0] = new PointF(rect.left,rect.top);
             points[1] = new PointF(rect.left,rect.bottom);
@@ -314,6 +346,7 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
          */
         private void changeLastRect(){
             lastRect = rect;
+            lastTextSize = currentTextSize;
         }
 
         /**
@@ -325,7 +358,6 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             rect = new Rect(lastRect.left+leftOffset,lastRect.top+topOffset,lastRect.right+leftOffset,lastRect.bottom+topOffset);
             centerX = rect.centerX();
             centerY = rect.centerY();
-            textSize = rotateTextView.getTextSize();
         }
 
         private void rotate(float x,float y){
@@ -402,7 +434,9 @@ public class RotatableEditText extends RelativeLayout implements View.OnTouchLis
             rotateEditText.setWidth(newWidth);
             rotateEditText.setHeight(newHeight);
             //todo 字体大小变化
-            //rotateTextView.setTextSize(textSize*scaleX);
+            currentTextSize = lastTextSize*scaleX;
+            rotateTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,currentTextSize);
+            rotateEditText.setTextSize(TypedValue.COMPLEX_UNIT_PX,currentTextSize);
 
             RelativeLayout.LayoutParams params = (LayoutParams) getLayoutParams();
             params.setMargins(lastLeftMargin-delWidth/2,lastTopMargin-delHeight/2,

@@ -96,10 +96,10 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 
 	public ActionImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		init();
+		initPaint();
 	}
 
-	private void init() {
+	private void initPaint() {
 		setUpMarkPaint();
 		setUpMasicPaint();
 	}
@@ -121,10 +121,9 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 		mMasicPaint.setStrokeWidth(60);
 	}
 
-	public void produceMasicPhoto(){
+	public void init(){
 		setVisibility(VISIBLE);
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
-		//originBitmap = Bitmap.createBitmap(((BitmapDrawable) getDrawable()).getBitmap(),0,0,mWidth,mHeight);
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mForeCanvas = new Canvas(mForeBackground);
