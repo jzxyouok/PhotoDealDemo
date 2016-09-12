@@ -51,6 +51,7 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
     private void init(Context context){
         mContext = context;
         setOnTouchListener(this);
+        setClipChildren(true);
         setWillNotDraw(false);
     }
 

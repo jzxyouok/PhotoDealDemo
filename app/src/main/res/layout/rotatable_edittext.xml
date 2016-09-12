@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:clipChildren="true"
     android:orientation="horizontal" >
 
     <RelativeLayout
@@ -9,9 +10,12 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
         android:padding="20dp"
+        android:clipChildren="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
+        <com.example.a835127729qqcom.photodealdemo.widget.InnerTextView
+            android:layout_width="100dp"
+            android:layout_height="30dp" />
         <TextView
             android:textAlignment="center"
             android:id="@+id/rotate_textview"
@@ -20,12 +24,12 @@
             android:background="@null"
             android:gravity="center"
             android:hint="点击输入文字"
-            android:maxLines="2"
-            android:lines="2"
             android:maxLength="24"
+            android:width="100dp"
+            android:height="22dp"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:visibility="visible"
+            android:visibility="gone"
             android:textSize="20sp" />
 
         <EditText
@@ -35,11 +39,11 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:gravity="center"
+            android:width="100dp"
+            android:height="22dp"
             android:hint="点击输入文字"
-            android:lines="2"
             android:imeOptions="actionDone"
             android:maxLength="24"
-            android:maxLines="2"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="20sp"

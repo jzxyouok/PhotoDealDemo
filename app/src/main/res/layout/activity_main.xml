@@ -23,9 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
-        <com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout
-            android:id="@+id/cloud"
-            android:visibility="gone"
+        <com.example.a835127729qqcom.photodealdemo.widget.StickerView
+            android:id="@+id/stick"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>

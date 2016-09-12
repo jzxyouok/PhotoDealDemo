@@ -1,6 +1,7 @@
 package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout;
+import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -38,20 +40,14 @@ public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
     ActionImageView guaKa;
     String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
-    RotatableTextCloudLayout mRotatableTextCloudLayout;
-
+    StickerView stickerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initImageLoader();
         cropImageView = (CropImageView) findViewById(R.id.crop);
-        mRotatableTextCloudLayout = (RotatableTextCloudLayout) findViewById(R.id.cloud);
         guaKa = (ActionImageView) findViewById(R.id.guagua);
-
-        mRotatableTextCloudLayout.setFinshAddTextListener(guaKa);
-
-        findViewById(R.id.cloud).setWillNotDraw(false);
 
         ImageLoader.getInstance().displayImage(testurl,guaKa,new ImageLoadingListener(){
 
@@ -78,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        stickerView = (StickerView) findViewById(R.id.stick);
     }
 
     /**
@@ -141,16 +139,8 @@ public class MainActivity extends AppCompatActivity {
         guaKa.rotate(guaKa.mCurrentAngle+90);
     }
 
-    boolean isText = false;
     public void text(View view){
-        Log.i("tag","text");
-        if(!isText){
-            mRotatableTextCloudLayout.startAddText();
-        }else{
-            mRotatableTextCloudLayout.finishAddtext();
-        }
-        isText = !isText;
-
+        stickerView.addBitImage(new Rect(0,0,300,200));
     }
 
     @Override

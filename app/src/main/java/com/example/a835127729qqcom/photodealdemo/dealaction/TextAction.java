@@ -11,7 +11,7 @@ import android.graphics.RectF;
  */
 public class TextAction implements Action{
     private String mContent = "";
-    private int color = Color.BLUE;
+    private int color = Color.WHITE;
     private Path mPath = new Path();
     private float textSize = 10;
     private float offsetTop = 0;
