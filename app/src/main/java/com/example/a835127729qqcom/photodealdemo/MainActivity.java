@@ -76,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         stickerView = (StickerView) findViewById(R.id.stick);
+
+        guaKa.setmBackTextActionListener(stickerView);
+        stickerView.setmTextsControlListener(guaKa);
     }
 
     /**
@@ -84,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private void initImageLoader() {
         File cacheDir = StorageUtils.getCacheDirectory(this);
         int MAXMEMONRY = (int) (Runtime.getRuntime().maxMemory());
-        // System.out.println("dsa-->"+MAXMEMONRY+"   "+(MAXMEMONRY/5));//.memoryCache(new
-        // LruMemoryCache(50 * 1024 * 1024))
+
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
@@ -121,14 +123,21 @@ public class MainActivity extends AppCompatActivity {
     public void change(View view){
         guaKa.setEnabled(true);
         cropImageView.setVisibility(View.GONE);
-        if(guaKa.getMode()==3){
+        stickerView.setVisibility(View.GONE);
+        if(guaKa.getMode()==4){
             guaKa.setMode(1);
         }else{
             guaKa.setMode(guaKa.getMode()+1);
-            if(guaKa.getMode()==3){
+            if(guaKa.getMode()==3) {
+                stickerView.setVisibility(View.VISIBLE);
+                guaKa.setEnabled(false);
+            }
+            if(guaKa.getMode()==4){
                 cropImageView.setVisibility(View.VISIBLE);
                 cropImageView.setCropRect(guaKa.getRotatedmRect());
                 guaKa.setEnabled(false);
+
+                //stickerView.onFinishAddText();
             }
         }
         Toast.makeText(this,guaKa.getMode()+"",Toast.LENGTH_SHORT).show();
@@ -139,28 +148,9 @@ public class MainActivity extends AppCompatActivity {
         guaKa.rotate(guaKa.mCurrentAngle+90);
     }
 
-    public void text(View view){
-        stickerView.addBitImage(new Rect(0,0,300,200));
-    }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-//        pin((TextView) findViewById(R.id.text1),1);
-        //pin((TextView) findViewById(R.id.text2),2);
-        //pin((TextView) findViewById(R.id.text3),3);
     }
 
-    void pin(TextView text,int i){
-        Log.i("text"+i,"left="+text.getLeft()+",top="+text.getTop()+",right="+text.getRight()+",bottom="+text.getBottom());
-        int[] location = new int[2];
-        text.getLocationOnScreen(location);
-        Log.i("text"+i,"location="+ Arrays.toString(location));
-        Rect r = new Rect();
-        text.getGlobalVisibleRect(r);
-        Log.i("text"+i,"GlobalVisibleRect="+ r.toString());
-        Rect r2 = new Rect();
-        text.getLocalVisibleRect(r2);
-        Log.i("text"+i,"LocalVisibleRect="+ r2.toString());
-    }
 }

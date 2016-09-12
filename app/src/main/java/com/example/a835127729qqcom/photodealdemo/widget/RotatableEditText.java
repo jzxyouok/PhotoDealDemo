@@ -32,6 +32,7 @@ import java.util.Arrays;
 /**
  * Created by 835127729qq.com on 16/8/24.
  */
+@Deprecated
 public class RotatableEditText extends RelativeLayout implements View.OnTouchListener{
     private Context mContext;
     private ImageButton deleteBtn,rotateBtn;

@@ -12,7 +12,10 @@ import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 import android.view.View;
+
+import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 
 import java.util.ArrayList;
 
@@ -21,11 +24,17 @@ import java.util.ArrayList;
  * @author panyi
  */
 public class StickerItem {
+    /**
+     * 最小缩放比例
+     */
     private static final float MIN_SCALE = 0.15f;
+    //帮助工具间距
     private static final int HELP_BOX_PAD = 25;
+    //帮助按钮大小
     private static final int BUTTON_WIDTH = 25;
+    public static final int defaultStickerItemWidth = 350;
+    public static final int defaultStickerItemHeight = 200;
 
-    public Rect srcRect;// 原始图片坐标
     private Rect helpToolsRect; //编辑工具位置
 
     public RectF dstRect;// 绘制目标坐标
@@ -55,9 +64,13 @@ public class StickerItem {
     private float textSize = 40;
     //文字间距大小
     private float lineMargin = 5;
+    /**
+     * 文字编辑抽象
+     */
+    private TextAction mTextAction;
 
-    public StickerItem(Context context) {
-
+    public StickerItem(Context context,TextAction textAction) {
+        mTextAction = textAction;
         helpBoxPaint.setColor(Color.BLACK);
         helpBoxPaint.setStyle(Style.STROKE);
         helpBoxPaint.setAntiAlias(true);
@@ -82,22 +95,22 @@ public class StickerItem {
         }// end if
     }
 
-    public void init(Rect addBit, View parentView) {
-        //this.bitmap = addBit;
-        this.srcRect = new Rect(0, 0, addBit.width(), addBit.height());
-        int bitWidth = Math.min(addBit.width(), parentView.getWidth() >> 1);
-        int bitHeight = (int) bitWidth * addBit.height() / addBit.width();
-        int left = (parentView.getWidth() >> 1) - (bitWidth >> 1);
-        int top = (parentView.getHeight() >> 1) - (bitHeight >> 1);
-        this.dstRect = new RectF(left, top, left + bitWidth, top + bitHeight);
+    public void init(@Nullable Rect addBit, View parentView) {
+        if(addBit==null) {
+            addBit = new Rect(0,0,defaultStickerItemWidth,defaultStickerItemHeight);
+            int bitWidth = Math.min(addBit.width(), parentView.getWidth() >> 1);
+            int bitHeight = (int) bitWidth * addBit.height() / addBit.width();
+            int left = (parentView.getWidth() >> 1) - (bitWidth >> 1);
+            int top = (parentView.getHeight() >> 1) - (bitHeight >> 1);
+            this.dstRect = new RectF(left, top, left + bitWidth, top + bitHeight);
+        }else{
+            dstRect = new RectF(addBit.left,addBit.top,addBit.right,addBit.bottom);
+        }
         this.matrix = new Matrix();
         this.matrix.postTranslate(this.dstRect.left, this.dstRect.top);
-        this.matrix.postScale((float) bitWidth / addBit.width(),
-                (float) bitHeight / addBit.height(), this.dstRect.left,
-                this.dstRect.top);
+
         initWidth = this.dstRect.width();// 记录原始宽度
-        // item.matrix.setScale((float)bitWidth/addBit.getWidth(),
-        // (float)bitHeight/addBit.getHeight());
+
         this.isDrawHelpTool = true;
         this.helpBox = new RectF(this.dstRect);
         updateHelpBoxRect();
@@ -258,13 +271,19 @@ public class StickerItem {
         drawText(arr,canvas);
     }
 
+    /**
+     * 绘制文字
+     * @param texts
+     * @param canvas
+     */
     private void drawText(ArrayList<String> texts,Canvas canvas){
         int numOfTextLine = texts.size();
         if(numOfTextLine==0) return;
+        reCaculteTextSize(numOfTextLine);
+        mTextAction.getTextPaths().clear();
+        mTextAction.getTexts().clear();
         canvas.save();
         canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
-
-        reCaculteTextSize(numOfTextLine);
         //绘制文字
         greenPaint.setTextAlign(Paint.Align.CENTER);
         greenPaint.setColor(Color.BLACK);
@@ -297,6 +316,8 @@ public class StickerItem {
             path.moveTo(left,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
             path.lineTo(right,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
             canvas.drawTextOnPath(texts.get(topIndex),path,0,0,greenPaint);
+            mTextAction.getTextPaths().add(new Path(path));
+            mTextAction.getTexts().add(texts.get(topIndex));
             topIndex--;
         }
         int bottomIndex = bottomOfCenterLineNum;
@@ -305,9 +326,15 @@ public class StickerItem {
             path.moveTo(left,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
             path.lineTo(right,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
             canvas.drawTextOnPath(texts.get(bottomIndex),path,0,0,greenPaint);
+            mTextAction.getTextPaths().add(new Path(path));
+            mTextAction.getTexts().add(texts.get(bottomIndex));
             bottomIndex++;
         }
         canvas.restore();
+        mTextAction.setTextSize(textSize);
+        mTextAction.setRoatetAngle(roatetAngle);
+        mTextAction.setRotateCenterX(helpBox.centerX());
+        mTextAction.setRotateCenterY(helpBox.centerY());
     }
 
     /**
@@ -364,12 +391,9 @@ public class StickerItem {
         float dy = newY - y;
 
         rect.offset(dx, dy);
-
-        // float w = rect.width();
-        // float h = rect.height();
-        // rect.left = newX;
-        // rect.top = newY;
-        // rect.right = newX + w;
-        // rect.bottom = newY + h;
     }
-}// end class
+
+    public TextAction getmTextAction() {
+        return mTextAction;
+    }
+}

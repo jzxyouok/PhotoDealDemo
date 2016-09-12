@@ -8,6 +8,7 @@ import android.view.View;
 /**
  * Created by 835127729qq.com on 16/8/30.
  */
+@Deprecated
 public class InnerTextView extends View {
 
     public InnerTextView(Context context) {

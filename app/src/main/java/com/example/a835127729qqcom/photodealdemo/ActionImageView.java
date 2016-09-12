@@ -28,14 +28,21 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout;
+import com.example.a835127729qqcom.photodealdemo.widget.StickerItem;
+import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
+import com.example.a835127729qqcom.photodealdemo.widget.TextsControlListener;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 
-public class ActionImageView extends ImageView implements RotatableTextCloudLayout.FinshAddTextListener{
+public class ActionImageView extends ImageView implements TextsControlListener {
+	public static final int MODE_MARK = 1;
+	public static final int MODE_MASIC = 2;
+	public static final int MODE_TEXT = 3;
 	/**
 	 * 当前操作
 	 */
@@ -85,6 +92,10 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 	 * 当前旋转角度
 	 */
 	float mCurrentAngle = 0;
+	/**
+	 * 监听文字撤销
+	 */
+	private BackTextActionListener mBackTextActionListener;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -172,7 +183,6 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		foreCanvas.save();
-		//foreCanvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
 		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
 		foreCanvas.restore();
 
@@ -191,6 +201,10 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 		for(Action action:actions){
 			if(action instanceof RotateAction){
 				startAngle = ((RotateAction) action).getmAngle();
+				continue;
+			}
+			//在文字编辑模式下,不显示文字
+			if(action instanceof TextAction && mode==MODE_TEXT){
 				continue;
 			}
 			if(lastRotateAction!=null) {//至少一次旋转
@@ -220,7 +234,7 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 		switch (action){
 			case MotionEvent.ACTION_DOWN:
 				Log.i("tag","down");
-				mCurrentAction = produceAction();
+				mCurrentAction = produceMarkActionOrMasicAction();
 				mCurrentAction.start(event.getX(),event.getY());
 				actions.add(mCurrentAction);
 				return true;
@@ -238,13 +252,13 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 		return true;
 	}
 
-	private Action produceAction(){
+	private Action produceMarkActionOrMasicAction(){
 		Action action = null;
 		switch (mode){
-			case 1:
+			case MODE_MARK:
 				action = new MarkAction(new Path(),mMarkPaint);
 				break;
-			case 2:
+			case MODE_MASIC:
 				action = new MasicAction(new Path(),mMasicPaint);
 				break;
 		}
@@ -263,7 +277,7 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 				if(action instanceof RotateAction){
 					//找到最后一个旋转角度,可能不存在
 					int i = actions.size()-1;
-					for(i=actions.size()-1;i>=0;i--){
+					for(;i>=0;i--){
 						if(actions.get(i) instanceof RotateAction){
 							mCurrentAngle = ((RotateAction) actions.get(i)).getmAngle();
 							break;
@@ -275,6 +289,8 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 				}else if(action instanceof CropAction){
 					isCrop = false;
 					action.stop();
+				}else if(action instanceof TextAction){
+					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
 				}
 				postInvalidate();
 			}
@@ -369,8 +385,22 @@ public class ActionImageView extends ImageView implements RotatableTextCloudLayo
 	}
 
 	@Override
-	public void onFinish(ArrayList<TextAction> rotatbleTextActions) {
-		actions.addAll(rotatbleTextActions);
+	public void onFinishAddText(TextAction textAction) {
+		actions.add(textAction);
 		postInvalidate();
+	}
+
+	@Override
+	public void onDeleteText(TextAction textAction) {
+		actions.remove(textAction);
+		postInvalidate();
+	}
+
+	public interface BackTextActionListener{
+		public void onBackTextAction(TextAction action);
+	}
+
+	public void setmBackTextActionListener(BackTextActionListener mBackTextActionListener) {
+		this.mBackTextActionListener = mBackTextActionListener;
 	}
 }

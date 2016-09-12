@@ -24,6 +24,7 @@
             android:layout_height="match_parent"
             />
         <com.example.a835127729qqcom.photodealdemo.widget.StickerView
+            android:visibility="gone"
             android:id="@+id/stick"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -55,35 +56,4 @@
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:text="旋转"/>
-    <Button
-        android:layout_marginLeft="110dp"
-        android:layout_marginTop="70dp"
-        android:layout_below="@id/work_space"
-        android:onClick="text"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:text="文本"/>
-    <TextView
-        android:id="@+id/text1"
-        android:layout_centerInParent="true"
-        android:text="1000000"
-        android:textSize="20sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/text2"
-        android:layout_centerInParent="true"
-        android:text="1000000"
-        android:textSize="20sp"
-        android:rotation="90"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/text3"
-        android:layout_centerInParent="true"
-        android:text="1000000"
-        android:textSize="20sp"
-        android:rotation="270"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 </RelativeLayout>

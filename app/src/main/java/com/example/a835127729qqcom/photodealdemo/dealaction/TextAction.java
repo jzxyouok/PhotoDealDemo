@@ -6,30 +6,40 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 
+import java.util.ArrayList;
+
 /**
  * Created by 835127729qq.com on 16/8/22.
  */
 public class TextAction implements Action{
-    private String mContent = "";
-    private int color = Color.WHITE;
-    private Path mPath = new Path();
-    private float textSize = 10;
-    private float offsetTop = 0;
-    private float offsetLeft = 0;
-    private static Paint paint = new Paint();
 
-    public TextAction(int left, int top) {
-        offsetLeft = left;
-        offsetTop = top;
+    private ArrayList<Path> textPaths = new ArrayList<Path>();
+    private ArrayList<String> texts = new ArrayList<String>();
+    private static Paint paint = new Paint();
+    static {
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setTextAlign(Paint.Align.CENTER);
     }
 
+    //旋转角度
+    private float roatetAngle = 0;
+    //旋转中心
+    private float rotateCenterX,rotateCenterY;
+    //字体大小
+    float textSize;
+    //画笔颜色
+    private int color = Color.WHITE;
 
     @Override
     public void execute(Canvas canvas) {
-        paint.setTextSize(textSize);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setColor(color);
-        canvas.drawTextOnPath(mContent,mPath, 0,0,paint);
+        canvas.save();
+        canvas.rotate(roatetAngle,rotateCenterX,rotateCenterY);
+        for(int i=0;i<textPaths.size();i++){
+            paint.setTextSize(textSize);
+            paint.setColor(color);
+            canvas.drawTextOnPath(texts.get(i),textPaths.get(i),0,0,paint);
+        }
+        canvas.restore();
     }
 
     @Override
@@ -47,22 +57,32 @@ public class TextAction implements Action{
 
     }
 
-    public void setmContent(String mContent) {
-        this.mContent = mContent;
-    }
-
-    public void setmPath(float sx,float sy,float ex,float ey) {
-        mPath.reset();
-        mPath.moveTo(sx-offsetLeft,sy-offsetTop);
-        mPath.lineTo(ex-offsetLeft,ey-offsetTop);
-    }
-
     public void setTextSize(float textSize) {
         this.textSize = textSize;
     }
 
-    public float getTextSize() {
-        return textSize;
+    public void setColor(int color) {
+        this.color = color;
     }
 
+
+    public ArrayList<Path> getTextPaths() {
+        return textPaths;
+    }
+
+    public ArrayList<String> getTexts() {
+        return texts;
+    }
+
+    public void setRoatetAngle(float roatetAngle) {
+        this.roatetAngle = roatetAngle;
+    }
+
+    public void setRotateCenterX(float rotateCenterX) {
+        this.rotateCenterX = rotateCenterX;
+    }
+
+    public void setRotateCenterY(float rotateCenterY) {
+        this.rotateCenterY = rotateCenterY;
+    }
 }

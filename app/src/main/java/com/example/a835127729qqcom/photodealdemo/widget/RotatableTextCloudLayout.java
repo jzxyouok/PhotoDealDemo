@@ -25,6 +25,7 @@ import java.util.ArrayList;
 /**
  * Created by 835127729qq.com on 16/8/24.
  */
+@Deprecated
 public class RotatableTextCloudLayout extends RelativeLayout implements View.OnTouchListener,RotatableEditText.DeleteBtnClickListener {
     private Context mContext;
     ArrayList<RotatableEditText> rotatableEditTexts = new ArrayList<RotatableEditText>();
@@ -127,7 +128,7 @@ public class RotatableTextCloudLayout extends RelativeLayout implements View.OnT
     private void createRotatableEditText(float x, float y) {
         getGlobalTop();
         //创建控件
-        TextAction textAction = new TextAction(globalRect.left,globalRect.top);
+        TextAction textAction = new TextAction();
         rotatbleTextActions.add(textAction);
         RotatableEditText currentRotatableEditText = new RotatableEditText(mContext,globalRect,textAction,rotatableEditTexts);
         RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);

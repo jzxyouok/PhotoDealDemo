@@ -2,16 +2,18 @@ package com.example.a835127729qqcom.photodealdemo.widget;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 
+import com.example.a835127729qqcom.photodealdemo.ActionImageView.BackTextActionListener;
+import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
@@ -19,22 +21,27 @@ import java.util.LinkedHashMap;
  *
  * @author panyi
  */
-public class StickerView extends View {
+public class StickerView extends View implements BackTextActionListener{
     private static int STATUS_IDLE = 0;
     private static int STATUS_MOVE = 1;// 移动状态
     private static int STATUS_DELETE = 2;// 删除状态
     private static int STATUS_ROTATE = 3;// 图片旋转状态
 
-    private int imageCount;// 已加入照片的数量
+    private int itemCount;// 已加入照片的数量
     private Context mContext;
     private int currentStatus;// 当前状态
     private StickerItem currentItem;// 当前操作的贴图数据
     private float oldx, oldy;
 
-    private Paint rectPaint = new Paint();
-    private Paint boxPaint = new Paint();
-
     private LinkedHashMap<Integer, StickerItem> bank = new LinkedHashMap<Integer, StickerItem>();// 存贮每层贴图数据
+    private LinkedHashMap<TextAction, StickerItem> textActionStickItemMap = new LinkedHashMap<TextAction, StickerItem>();// 存贮每层贴图数据
+
+    private float lastDownX, lastDownY;
+    private boolean isDown = false;
+    /**
+     * 图片编辑完成
+     */
+    private TextsControlListener mTextsControlListener;
 
     public StickerView(Context context) {
         super(context);
@@ -54,20 +61,6 @@ public class StickerView extends View {
     private void init(Context context) {
         this.mContext = context;
         currentStatus = STATUS_IDLE;
-
-        rectPaint.setColor(Color.RED);
-        rectPaint.setAlpha(100);
-
-    }
-
-    public void addBitImage(final Rect addBit) {
-        StickerItem item = new StickerItem(this.getContext());
-        item.init(addBit, this);
-        if (currentItem != null) {
-            currentItem.isDrawHelpTool = false;
-        }
-        bank.put(++imageCount, item);
-        this.invalidate();// 重绘视图
     }
 
     /**
@@ -76,17 +69,18 @@ public class StickerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        // System.out.println("on draw!!~");
         for (Integer id : bank.keySet()) {
             StickerItem item = bank.get(id);
             item.draw(canvas);
-        }// end for each
+        }
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        // System.out.println(w + "   " + h + "    " + oldw + "   " + oldh);
+        if(bank.size()==0){
+            addTextRect(null);
+        }
     }
 
     @Override
@@ -98,12 +92,12 @@ public class StickerView extends View {
         float y = event.getY();
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-
+                lastDownX = x;
+                lastDownY = y;
                 int deleteId = -1;
                 for (Integer id : bank.keySet()) {
                     StickerItem item = bank.get(id);
                     if (item.detectDeleteRect.contains(x, y)) {// 删除模式
-                        // ret = true;
                         deleteId = id;
                         currentStatus = STATUS_DELETE;
                     } else if (item.detectRotateRect.contains(x, y)) {// 点击了旋转按钮
@@ -127,31 +121,39 @@ public class StickerView extends View {
                         currentStatus = STATUS_MOVE;
                         oldx = x;
                         oldy = y;
-                    }// end if
+                    }
                 }// end for each
+
+                if(currentItem==null){
+                    isDown = true;
+                }
 
                 if (!ret && currentItem != null && currentStatus == STATUS_IDLE) {// 没有贴图被选择
                     currentItem.isDrawHelpTool = false;
+                    ret = true;
                     currentItem = null;
                     invalidate();
                 }
 
                 if (deleteId > 0 && currentStatus == STATUS_DELETE) {// 删除选定贴图
-                    bank.remove(deleteId);
+                    StickerItem item = bank.remove(deleteId);
+                    textActionStickItemMap.values().remove(item);
+                    mTextsControlListener.onDeleteText(item.getmTextAction());
                     currentStatus = STATUS_IDLE;// 返回空闲状态
                     invalidate();
-                }// end if
+                }
 
                 break;
             case MotionEvent.ACTION_MOVE:
                 ret = true;
+                //isDown = false;
                 if (currentStatus == STATUS_MOVE) {// 移动贴图
                     float dx = x - oldx;
                     float dy = y - oldy;
                     if (currentItem != null) {
                         currentItem.updatePos(dx, dy);
                         invalidate();
-                    }// end if
+                    }
                     oldx = x;
                     oldy = y;
                 } else if (currentStatus == STATUS_ROTATE) {// 旋转 缩放图片操作
@@ -161,26 +163,55 @@ public class StickerView extends View {
                     if (currentItem != null) {
                         currentItem.updateRotateAndScale(oldx, oldy, dx, dy);// 旋转
                         invalidate();
-                    }// end if
+                    }
                     oldx = x;
                     oldy = y;
                 }
                 break;
-            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                ret = false;
+                if(isDown && lastDownX ==x && lastDownY ==y){//判断是点击事件
+                    addTextRect(new Rect((int) (x-StickerItem.defaultStickerItemWidth/2), (int) (y-StickerItem.defaultStickerItemHeight/2),
+                            (int) (StickerItem.defaultStickerItemWidth/2+x), (int) (StickerItem.defaultStickerItemHeight/2+y)));
+                    isDown = false;
+                }
+                ret = true;
                 currentStatus = STATUS_IDLE;
                 break;
-        }// end switch
-        return ret;
+        }
+        return true;
     }
 
-    public LinkedHashMap<Integer, StickerItem> getBank() {
-        return bank;
+    /**
+     * 添加文字矩形
+     * @param textRect
+     */
+    public void addTextRect(@Nullable final Rect textRect) {
+        TextAction textAction = new TextAction();
+        StickerItem item = new StickerItem(this.getContext(),textAction);
+        textActionStickItemMap.put(textAction,item);
+        item.init(textRect, this);
+        if (currentItem != null) {
+            currentItem.isDrawHelpTool = false;
+        }
+        currentItem = item;
+        bank.put(++itemCount, item);
+        onFinishAddText(textAction);
+        this.invalidate();// 重绘视图
     }
 
-    public void clear() {
-        bank.clear();
-        this.invalidate();
+    @Override
+    public void onBackTextAction(TextAction action) {
+        StickerItem item = textActionStickItemMap.remove(action);
+        bank.values().remove(item);
+        postInvalidate();
     }
+
+    public void onFinishAddText(TextAction textAction){
+        mTextsControlListener.onFinishAddText(textAction);
+    }
+
+    public void setmTextsControlListener(TextsControlListener mTextsControlListener) {
+        this.mTextsControlListener = mTextsControlListener;
+    }
+
 }// end class
