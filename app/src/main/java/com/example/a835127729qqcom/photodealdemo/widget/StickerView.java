@@ -13,7 +13,6 @@ import android.view.View;
 import com.example.a835127729qqcom.photodealdemo.ActionImageView.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
@@ -207,7 +206,7 @@ public class StickerView extends View implements BackTextActionListener{
     }
 
     public void onFinishAddText(TextAction textAction){
-        mTextsControlListener.onFinishAddText(textAction);
+        mTextsControlListener.onAddText(textAction);
     }
 
     public void setmTextsControlListener(TextsControlListener mTextsControlListener) {

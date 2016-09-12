@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 cropImageView.setCropRect(guaKa.getRotatedmRect());
                 guaKa.setEnabled(false);
 
-                //stickerView.onFinishAddText();
+                //stickerView.onAddText();
             }
         }
         Toast.makeText(this,guaKa.getMode()+"",Toast.LENGTH_SHORT).show();

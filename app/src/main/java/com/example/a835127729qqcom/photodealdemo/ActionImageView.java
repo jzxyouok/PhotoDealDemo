@@ -385,7 +385,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	}
 
 	@Override
-	public void onFinishAddText(TextAction textAction) {
+	public void onAddText(TextAction textAction) {
 		actions.add(textAction);
 		postInvalidate();
 	}

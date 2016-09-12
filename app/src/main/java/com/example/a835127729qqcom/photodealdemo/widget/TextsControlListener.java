@@ -8,6 +8,6 @@ import java.util.ArrayList;
  * Created by 835127729qq.com on 16/9/12.
  */
 public interface TextsControlListener{
-    public void onFinishAddText(TextAction textAction);
+    public void onAddText(TextAction textAction);
     public void onDeleteText(TextAction textAction);
 }
