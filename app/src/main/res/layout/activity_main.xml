@@ -17,17 +17,17 @@
             android:scaleType="fitXY"
             android:layout_width="match_parent"
             android:layout_height="400dp" />
+        <com.example.a835127729qqcom.photodealdemo.widget.StickerView
+            android:visibility="gone"
+            android:id="@+id/stick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <com.xinlan.imageeditlibrary.editimage.view.CropImageView
             android:id="@+id/crop"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
-        <com.example.a835127729qqcom.photodealdemo.widget.StickerView
-            android:visibility="gone"
-            android:id="@+id/stick"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </FrameLayout>
     <Button
         android:layout_below="@id/work_space"

@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("cky","com");
                 guaKa.init();
                 guaKa.invalidate();
-                //cropImageView.setRatioCropRect(guaKa.getmRect(),0.2f);
+                cropImageView.setRatioCropRect(guaKa.getmRect(),1);
             }
 
             @Override
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void crop(View view){
-        if(guaKa.getMode()!=3) return;
+        if(guaKa.getMode()!=4) return;
         Log.i("cky","crop="+cropImageView.getCropRect().toString());
         guaKa.crop(cropImageView.getCropRect());
     }
@@ -136,8 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 cropImageView.setVisibility(View.VISIBLE);
                 cropImageView.setCropRect(guaKa.getRotatedmRect());
                 guaKa.setEnabled(false);
-
-                //stickerView.onAddText();
             }
         }
         Toast.makeText(this,guaKa.getMode()+"",Toast.LENGTH_SHORT).show();

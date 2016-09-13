@@ -47,7 +47,8 @@ public class StickerItem {
 
     private Paint dstPaint = new Paint();
     private Paint helpBoxPaint = new Paint();
-    private Paint greenPaint = new Paint();
+    private Paint toolPaint = new Paint();
+    private Paint textPaint = new Paint();
 
     private static Bitmap deleteBit;
     private static Bitmap rotateBit;
@@ -80,9 +81,14 @@ public class StickerItem {
         dstPaint.setColor(Color.RED);
         dstPaint.setAlpha(120);
 
-        greenPaint = new Paint();
-        greenPaint.setColor(Color.GREEN);
-        greenPaint.setAlpha(120);
+        toolPaint = new Paint();
+        toolPaint.setColor(Color.GREEN);
+        toolPaint.setAlpha(120);
+
+        textPaint = new Paint();
+        textPaint.setStyle(Style.FILL_AND_STROKE);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setColor(Color.WHITE);
 
         // 导入工具按钮位图
         if (deleteBit == null) {
@@ -251,8 +257,8 @@ public class StickerItem {
 
             // canvas.drawRect(deleteRect, dstPaint);
             // canvas.drawRect(rotateRect, dstPaint);
-            canvas.drawRect(detectRotateRect, this.greenPaint);
-            canvas.drawRect(detectDeleteRect, this.greenPaint);
+            canvas.drawRect(detectRotateRect, this.toolPaint);
+            canvas.drawRect(detectDeleteRect, this.toolPaint);
         }// end if
 
         ArrayList<String> arr = new ArrayList<>();
@@ -285,10 +291,7 @@ public class StickerItem {
         canvas.save();
         canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
         //绘制文字
-        greenPaint.setTextAlign(Paint.Align.CENTER);
-        greenPaint.setColor(Color.BLACK);
-        greenPaint.setStyle(Style.STROKE);
-        greenPaint.setTextSize(textSize);
+        textPaint.setTextSize(textSize);
         float left = dstRect.centerX()-dstRect.width()/2;
         float right = dstRect.centerX()+dstRect.width()/2;
         float centerY = dstRect.centerY() + textSize/2;
@@ -315,7 +318,7 @@ public class StickerItem {
             path.reset();
             path.moveTo(left,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
             path.lineTo(right,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
-            canvas.drawTextOnPath(texts.get(topIndex),path,0,0,greenPaint);
+            canvas.drawTextOnPath(texts.get(topIndex),path,0,0, textPaint);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(topIndex));
             topIndex--;
@@ -325,7 +328,7 @@ public class StickerItem {
             path.reset();
             path.moveTo(left,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
             path.lineTo(right,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
-            canvas.drawTextOnPath(texts.get(bottomIndex),path,0,0,greenPaint);
+            canvas.drawTextOnPath(texts.get(bottomIndex),path,0,0, textPaint);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(bottomIndex));
             bottomIndex++;
