@@ -74,6 +74,8 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	private Paint mMarkPaint = new Paint();
 	//Masic画笔
 	private Paint mMasicPaint = new Paint();
+	//清屏画笔
+	private Paint mClearPaint = new Paint();
 	/**
 	 * 马赛克图
 	 */
@@ -83,9 +85,6 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 原背景图
 	 */
 	Bitmap originBitmap;
-	/**
-	 * mCanvas绘制内容在其上
-	 */
 	public Bitmap mForeBackground,cropBitmap;
 	/**
 	 * 控件长宽
@@ -161,34 +160,30 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
-		if(masicBitmap!=null) {
+		if(masicBitmap!=null && isComplete) {
 			drawBehindBackground(canvas);
-//			if (!isComplete) {
-//				drawActions(canvas,mForeCanvas);
-//				canvas.save();
-//				canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-//				canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
-//				canvas.restore();
-//			}
-
+			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
 		}
 	}
 
+	/**
+	 * 绘制底片
+	 * @param canvas
+     */
 	private void drawBehindBackground(Canvas canvas){
 		//清屏
-		Paint p = new Paint();
-		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-		mBehindCanvas.drawPaint(p);
-		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		mBehindCanvas.drawPaint(mClearPaint);
+		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null,getmRect(),null);
 		mBehindCanvas.restore();
 		for(Action action:actions){
 			if(action instanceof CropAction){
-				action.start(mBehindCanvas);
+				action.start(mBehindCanvas,mCurrentAngle);
 			}
 		}
 		//旋转底片
@@ -198,12 +193,23 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		canvas.restore();
 	}
 
-	private void drawActions(Canvas masicCanvas,Canvas foreCanvas){
+	/**
+	 * 绘制前景
+	 * @param canvas
+     */
+	private void drawForeBackground(Canvas canvas) {
+		drawActions(mForeCanvas);
+		canvas.save();
+		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
+		canvas.restore();
+	}
+
+	private void drawActions(Canvas foreCanvas){
 		//清屏
-		Paint p = new Paint();
-		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-		foreCanvas.drawPaint(p);
-		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		foreCanvas.drawPaint(mClearPaint);
+		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		foreCanvas.save();
 		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
@@ -333,7 +339,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	public void crop(RectF rectf){
 		mCurrentAction = new CropAction(rectf,getRotatedmRect(),
 				cropBitmap,mForeBackground,mCropCanvas,
-				cropMasicBitmap,mBehindBackground,mCropMasicCanvas);
+				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
 		postInvalidate();
 	}

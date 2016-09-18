@@ -14,8 +14,8 @@
             android:enabled="false"
             android:src="@drawable/testicon"
             android:id="@+id/guagua"
-            android:scaleType="fitXY"
             android:layout_width="match_parent"
+            android:scaleType="fitCenter"
             android:layout_height="400dp" />
         <com.example.a835127729qqcom.photodealdemo.widget.StickerView
             android:visibility="gone"

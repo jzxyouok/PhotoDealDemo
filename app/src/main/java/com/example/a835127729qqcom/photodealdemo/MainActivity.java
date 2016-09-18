@@ -39,7 +39,8 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
     ActionImageView guaKa;
-    String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
+    String testurl = "http://pic.sc.chinaz.com/files/pic/pic9/201508/apic14052.jpg";
+    //String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
     StickerView stickerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
