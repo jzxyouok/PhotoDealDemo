@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -13,41 +15,66 @@ import android.graphics.RectF;
  * Created by 835127729qq.com on 16/8/23.
  */
 public class CropAction implements Action{
-    public RectF mRect;
+    public RectF mCropRect;
     public RectF mDestRect;
     private Bitmap mCropBitmap;
     private Bitmap mforeBitmap;
-    private Canvas mCanvas;
+    private Canvas mCropCanvas;
+    private Bitmap mCropMasicBitmap;
+    private Bitmap mBehindBitmap;
+    private Canvas mCropMasicCanvas;
+    private static Paint paint = new Paint();
+    static {
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+    }
 
-    public CropAction(RectF rect,RectF destRect,Bitmap bitmap,Bitmap foreBitmap,Canvas canvas){
-        mRect = rect;
+    public CropAction(RectF cropRect,RectF destRect,Bitmap cropBitmap,Bitmap foreBitmap,Canvas croprCanvas,
+                      Bitmap cropMasicBitmap,Bitmap behindBitmap,Canvas cropMasicCanvas){
+        mCropRect = cropRect;
         mDestRect = destRect;
-        mCropBitmap = bitmap;
+        mCropBitmap = cropBitmap;
         mforeBitmap = foreBitmap;
-        mCanvas = canvas;
+        mCropCanvas = croprCanvas;
+        mCropMasicBitmap = cropMasicBitmap;
+        mBehindBitmap = behindBitmap;
+        mCropMasicCanvas = cropMasicCanvas;
     }
 
     @Override
     public void execute(Canvas canvas) {
-        //canvas.save();
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        Rect r = new Rect((int) mCropRect.left,(int) mCropRect.top,(int) mCropRect.right,(int) mCropRect.bottom);
+        //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        mCropCanvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //将foreBitmap内容绘制到mCropBitmap上
+        mCropCanvas.drawBitmap(mforeBitmap,r,mDestRect,null);
 
-        Rect r = new Rect((int) mRect.left,(int) mRect.top,(int) mRect.right,(int) mRect.bottom);
-        mCanvas.drawBitmap(mforeBitmap,r,mDestRect,null);
+        //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //绘制裁剪图片
         canvas.drawBitmap(mCropBitmap,null,mDestRect,null);
-        //canvas.drawBitmap(mCropBitmap,r,r,null);
-        //paint.setColor(Color.YELLOW);
-        //canvas.drawRect(mDestRect,paint);
-        //paint.setColor(Color.GREEN);
-        //canvas.drawRect(mRect,paint);
-        //canvas.restore();
-        //canvas.clipRect();
     }
 
     @Override
     public void start(Object... params) {
+        Canvas canvas = (Canvas) params[0];
+        Rect r = new Rect((int) mCropRect.left,(int) mCropRect.top,(int) mCropRect.right,(int) mCropRect.bottom);
+        //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        mCropMasicCanvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //将foreBitmap内容绘制到mCropBitmap上
+        mCropMasicCanvas.drawBitmap(mBehindBitmap,r,mDestRect,null);
 
+        //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //绘制裁剪图片
+        canvas.drawBitmap(mCropMasicBitmap,null,mDestRect,null);
     }
 
     @Override

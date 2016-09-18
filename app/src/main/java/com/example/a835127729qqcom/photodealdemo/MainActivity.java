@@ -63,10 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                Log.i("cky","com");
                 guaKa.init();
                 guaKa.invalidate();
-                cropImageView.setRatioCropRect(guaKa.getmRect(),1);
+                //cropImageView.setRatioCropRect(guaKa.getRotatedmRect(),1);
             }
 
             @Override
@@ -108,42 +107,59 @@ public class MainActivity extends AppCompatActivity {
         ImageLoader.getInstance().init(config);
     }
 
+    private void perHide(){
+        stickerView.setVisibility(View.GONE);
+        cropImageView.setVisibility(View.GONE);
+        guaKa.setEnabled(true);
+        guaKa.setMode(ActionImageView.MODE_IDLE);
+    }
+
+    public void mark(View view){
+        Log.i("tag","mark");
+        perHide();
+        guaKa.setMode(ActionImageView.MODE_MARK);
+    }
+
+    public void masic(View view){
+        Log.i("tag","masic");
+        perHide();
+        guaKa.setMode(ActionImageView.MODE_MASIC);
+    }
+
+    public void text(View view){
+        Log.i("tag","text");
+        perHide();
+        guaKa.setMode(ActionImageView.MODE_TEXT);
+        stickerView.setVisibility(View.VISIBLE);
+        guaKa.setEnabled(false);
+    }
+
+    public void crop(View view){
+        Log.i("tag","crop");
+        perHide();
+        guaKa.setMode(ActionImageView.MODE_CROP);
+        cropImageView.setCropRect(guaKa.getRotatedmRect());
+        cropImageView.setVisibility(View.VISIBLE);
+    }
+
+    public void rotate(View view){
+        Log.i("tag","rotate");
+        perHide();
+        guaKa.setMode(ActionImageView.MODE_ROTATE);
+        guaKa.rotate(guaKa.mCurrentAngle+90);
+    }
 
     public void back(View view){
         Log.i("tag","back");
         guaKa.back();
     }
 
-    public void crop(View view){
-        if(guaKa.getMode()!=4) return;
-        Log.i("cky","crop="+cropImageView.getCropRect().toString());
+    public void finish(View view){
+        Log.i("tag","finish");
+        if(guaKa.getMode()!=ActionImageView.MODE_CROP) return;
         guaKa.crop(cropImageView.getCropRect());
-    }
-
-    public void change(View view){
-        guaKa.setEnabled(true);
+        guaKa.setMode(ActionImageView.MODE_IDLE);
         cropImageView.setVisibility(View.GONE);
-        stickerView.setVisibility(View.GONE);
-        if(guaKa.getMode()==4){
-            guaKa.setMode(1);
-        }else{
-            guaKa.setMode(guaKa.getMode()+1);
-            if(guaKa.getMode()==3) {
-                stickerView.setVisibility(View.VISIBLE);
-                guaKa.setEnabled(false);
-            }
-            if(guaKa.getMode()==4){
-                cropImageView.setVisibility(View.VISIBLE);
-                cropImageView.setCropRect(guaKa.getRotatedmRect());
-                guaKa.setEnabled(false);
-            }
-        }
-        Toast.makeText(this,guaKa.getMode()+"",Toast.LENGTH_SHORT).show();
-    }
-
-    public void rotate(View view){
-        Log.i("tag","rotate");
-        guaKa.rotate(guaKa.mCurrentAngle+90);
     }
 
     @Override

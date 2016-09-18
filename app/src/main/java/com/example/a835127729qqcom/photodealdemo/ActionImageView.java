@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
@@ -42,10 +43,12 @@ import java.util.ListIterator;
 
 
 public class ActionImageView extends ImageView implements TextsControlListener {
+	public static final int MODE_IDLE = 0;
 	public static final int MODE_MARK = 1;
 	public static final int MODE_MASIC = 2;
 	public static final int MODE_TEXT = 3;
 	public static final int MODE_CROP = 4;
+	public static final int MODE_ROTATE = 5;
 	/**
 	 * 当前操作
 	 */
@@ -53,12 +56,12 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	/**
 	 * 当前模式
 	 */
-	private int mode = 1;
+	private int mode = MODE_IDLE;
 
 	/**
 	 * 内存中创建的Canvas
 	 */
-	private Canvas mForeCanvas,mCropCanvas;
+	private Canvas mForeCanvas,mCropCanvas,mCropMasicCanvas,mBehindCanvas;
 	/**
 	 * Actions操作
 	 */
@@ -67,10 +70,6 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 是否初始化完成,图片是否加载完成
 	 */
 	private boolean isComplete;
-	/**
-	 * 是否裁剪状态
-	 */
-	private boolean isCrop = false;
 	//Mark画笔
 	private Paint mMarkPaint = new Paint();
 	//Masic画笔
@@ -78,7 +77,8 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	/**
 	 * 马赛克图
 	 */
-	Bitmap masicBitmap;
+	private Bitmap masicBitmap;
+	private Bitmap mBehindBackground,cropMasicBitmap;
 	/**
 	 * 原背景图
 	 */
@@ -141,43 +141,61 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mForeCanvas = new Canvas(mForeBackground);
-
+		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
+		//裁剪层
 		cropBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mCropCanvas = new Canvas(cropBitmap);
-		// 绘制遮盖层
-		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
 
-		Bitmap srcBitmap = Bitmap.createBitmap(originBitmap.copy(
-				Bitmap.Config.RGB_565, true));
+		//马赛克层
+		Bitmap srcBitmap = Bitmap.createBitmap(originBitmap.copy(Bitmap.Config.RGB_565, true));
 		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
+		mBehindBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
+		mBehindCanvas = new Canvas(mBehindBackground);
+		mBehindCanvas.drawBitmap(masicBitmap,null,getmRect(),null);
+		//马赛克裁剪层
+		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.RGB_565, true),
+				getMeasuredWidth(),getMeasuredHeight(),false);
+		mCropMasicCanvas = new Canvas(cropMasicBitmap);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null) {
-
-			//旋转底片
-			canvas.save();
-			canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-			canvas.drawBitmap(masicBitmap,null,getScalemRect(),null);
-			//canvas.drawBitmap(originBitmap,null,getRotatedmRect(),null);
-			canvas.restore();
-//			if(isCrop){//裁剪
-//				((CropAction)actions.getLast()).execute(mForeCanvas);
-//				//return;
+			drawBehindBackground(canvas);
+//			if (!isComplete) {
+//				drawActions(canvas,mForeCanvas);
+//				canvas.save();
+//				canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+//				canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
+//				canvas.restore();
 //			}
-			if (!isComplete) {
-				drawActions(canvas,mForeCanvas);
-				canvas.save();
-				canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-				canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
-				canvas.restore();
-			}
 
 		}else{
 			super.onDraw(canvas);
 		}
+	}
+
+	private void drawBehindBackground(Canvas canvas){
+		//清屏
+		Paint p = new Paint();
+		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		mBehindCanvas.drawPaint(p);
+		p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+
+		mBehindCanvas.save();
+		mBehindCanvas.drawBitmap(masicBitmap, null,getmRect(),null);
+		mBehindCanvas.restore();
+		for(Action action:actions){
+			if(action instanceof CropAction){
+				action.start(mBehindCanvas);
+			}
+		}
+		//旋转底片
+		canvas.save();
+		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		canvas.drawBitmap(mBehindBackground,null,getScalemRect(),null);
+		canvas.restore();
 	}
 
 	private void drawActions(Canvas masicCanvas,Canvas foreCanvas){
@@ -213,17 +231,16 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				continue;
 			}
 			if(lastRotateAction!=null) {//至少一次旋转
-				foreCanvas.save();
-				foreCanvas.rotate(lastRotateAction.getmAngle() - startAngle - mCurrentAngle,mWidth/2,mHeight/2);
-				action.execute(foreCanvas);
-				foreCanvas.restore();
-			}else{
 				if(action instanceof CropAction){
 					action.execute(foreCanvas);
-					//masicCanvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
 				}else {
+					foreCanvas.save();
+					foreCanvas.rotate(-startAngle, mWidth / 2, mHeight / 2);
 					action.execute(foreCanvas);
+					foreCanvas.restore();
 				}
+			}else{
+				action.execute(foreCanvas);
 			}
 		}
 	}
@@ -245,16 +262,19 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 			case MotionEvent.ACTION_DOWN:
 				Log.i("tag","down");
 				mCurrentAction = produceMarkActionOrMasicAction();
+				if (mCurrentAction==null) return false;
 				mCurrentAction.start(event.getX(),event.getY());
 				actions.add(mCurrentAction);
 				return true;
 			case MotionEvent.ACTION_MOVE:
 				Log.i("tag","move");
+				if (mCurrentAction==null) return false;
 				mCurrentAction.next(event.getX(),event.getY());
 				invalidate();
 				return true;
 			case MotionEvent.ACTION_UP:
 				Log.i("tag","up");
+				if (mCurrentAction==null) return false;
 				mCurrentAction.stop(event.getX(),event.getY());
 				invalidate();
 				return true;
@@ -297,7 +317,6 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 						mCurrentAngle = 0;
 					}
 				}else if(action instanceof CropAction){
-					isCrop = false;
 					action.stop();
 				}else if(action instanceof TextAction){
 					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
@@ -307,79 +326,16 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		});
 	}
 
-	private RectF lastCropRect;
 	/**
 	 * 裁剪
 	 * @param rectf
      */
 	public void crop(RectF rectf){
-		isCrop = true;
-		//mCropCanvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
-		mCurrentAction = new CropAction(rectf,getScalemRect(),cropBitmap,mForeBackground,mCropCanvas);
+		mCurrentAction = new CropAction(rectf,getRotatedmRect(),
+				cropBitmap,mForeBackground,mCropCanvas,
+				cropMasicBitmap,mBehindBackground,mCropMasicCanvas);
 		actions.add(mCurrentAction);
 		postInvalidate();
-
-//		RectF totalRect = getRotatedmRect();
-//		findLastCropRect();
-//
-//		//计算缩放比例
-//		float leftScale = rectf.left/totalRect.width();
-//		float topScale = rectf.top/totalRect.height();
-//		float heightScale = rectf.height()/totalRect.height();
-//		float widthScale = rectf.width()/totalRect.width();
-//
-//		float realTop = lastCropRect.height()*topScale+lastCropRect.top;
-//		float realLeft = lastCropRect.width()*leftScale+lastCropRect.left;
-//		float realBottom = realTop + lastCropRect.height()*heightScale;
-//		float realRight = realLeft + lastCropRect.width()*widthScale;
-//		RectF realCropRect = new RectF(realLeft,realTop,realRight,realBottom);
-//		lastCropRect = realCropRect;
-//		mCurrentAction = new CropAction(realCropRect,getScalemRect(),cropBitmap);
-//		actions.add(mCurrentAction);
-//		postInvalidate();
-		/*
-		RectF newbmpRect = getRotatedmRect();
-		Log.i("cky","范围="+newbmpRect.toString());
-		Log.i("cky","裁剪="+rectf.toString());
-		Bitmap newbmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		Canvas cv = new Canvas(newbmp);
-		//draw bg into
-		cv.save();
-		cv.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		cv.drawBitmap(masicBitmap, null, getScalemRect(), null);//在 0，0坐标开始画入bg
-		//draw fg into
-		cv.drawBitmap(mForeBackground, null, getScalemRect(), null);//在 0，0坐标开始画入fg ，可以从任意位置画入
-		cv.restore();
-		//save all clip
-		cv.save(Canvas.ALL_SAVE_FLAG);//保存
-		//store
-		cv.restore();//存储
-		Bitmap resultBit = Bitmap.createBitmap(newbmp,
-				(int) (rectf.left), (int) (rectf.top),
-				(int) rectf.width(), (int) rectf.height());
-		//mCurrentAction = new CropAction(rectf,getmRect(),resultBit);
-		//mCurrentAction = new CropAction(rectf,getmRect(),mForeBackground);
-		try {
-			SaveBitmap2File.saveFile(newbmp, "aa.jpg", Environment.getExternalStorageDirectory().getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//actions.add(mCurrentAction);
-		postInvalidate();
-		return resultBit;
-		*/
-	}
-
-	private void findLastCropRect() {
-		lastCropRect = getRotatedmRect();
-		ListIterator<Action> iterator = actions.listIterator();
-		while(iterator.hasPrevious()){
-			Action action = iterator.previous();
-			if(action instanceof CropAction){
-				lastCropRect = ((CropAction) action).mRect;
-				break;
-			}
-		}
 	}
 
 	/**
@@ -447,7 +403,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	}
 
 	public interface BackTextActionListener{
-		public void onBackTextAction(TextAction action);
+		void onBackTextAction(TextAction action);
 	}
 
 	public void setmBackTextActionListener(BackTextActionListener mBackTextActionListener) {

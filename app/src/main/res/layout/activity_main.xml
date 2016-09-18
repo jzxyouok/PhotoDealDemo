@@ -31,29 +31,52 @@
     </FrameLayout>
     <Button
         android:layout_below="@id/work_space"
-        android:onClick="change"
+        android:onClick="mark"
         android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:text="模式"/>
+        android:layout_height="50dp"
+        android:text="标记"/>
     <Button
-        android:layout_marginLeft="110dp"
         android:layout_below="@id/work_space"
-        android:onClick="back"
+        android:onClick="masic"
+        android:layout_marginLeft="110dp"
         android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:text="返回"/>
+        android:layout_height="50dp"
+        android:text="马赛克"/>
     <Button
+        android:layout_below="@id/work_space"
+        android:onClick="text"
         android:layout_marginLeft="220dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="文字"/>
+    <Button
+        android:layout_marginTop="50dp"
         android:layout_below="@id/work_space"
         android:onClick="crop"
         android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:text="裁剪"/>
     <Button
-        android:layout_marginTop="70dp"
+        android:layout_marginLeft="110dp"
+        android:layout_marginTop="50dp"
         android:layout_below="@id/work_space"
         android:onClick="rotate"
         android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:text="旋转"/>
+    <Button
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="220dp"
+        android:layout_below="@id/work_space"
+        android:onClick="back"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="返回"/>
+    <Button
+        android:layout_marginTop="100dp"
+        android:layout_below="@id/work_space"
+        android:onClick="finish"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="完成"/>
 </RelativeLayout>
