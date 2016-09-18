@@ -3,7 +3,6 @@ package com.example.a835127729qqcom.photodealdemo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Paint.Style;
 import android.graphics.Canvas;
@@ -15,7 +14,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Environment;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,18 +26,10 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
-import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
-import com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout;
-import com.example.a835127729qqcom.photodealdemo.widget.StickerItem;
-import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.example.a835127729qqcom.photodealdemo.widget.TextsControlListener;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 
 public class ActionImageView extends ImageView implements TextsControlListener {
@@ -69,7 +59,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	/**
 	 * 是否初始化完成,图片是否加载完成
 	 */
-	private boolean isComplete;
+	private boolean isComplete = true;
 	//Mark画笔
 	private Paint mMarkPaint = new Paint();
 	//Masic画笔
@@ -140,7 +130,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mForeCanvas = new Canvas(mForeBackground);
-		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
+		mForeCanvas.drawBitmap(originBitmap, null, getmRectF(),null);
 		//裁剪层
 		cropBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mCropCanvas = new Canvas(cropBitmap);
@@ -150,7 +140,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
 		mBehindBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mBehindCanvas = new Canvas(mBehindBackground);
-		mBehindCanvas.drawBitmap(masicBitmap,null,getmRect(),null);
+		mBehindCanvas.drawBitmap(masicBitmap,null, getmRectF(),null);
 		//马赛克裁剪层
 		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.RGB_565, true),
 				getMeasuredWidth(),getMeasuredHeight(),false);
@@ -179,7 +169,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		mBehindCanvas.save();
-		mBehindCanvas.drawBitmap(masicBitmap, null,getmRect(),null);
+		mBehindCanvas.drawBitmap(masicBitmap, null, getmRectF(),null);
 		mBehindCanvas.restore();
 		for(Action action:actions){
 			if(action instanceof CropAction){
@@ -189,7 +179,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		//旋转底片
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mBehindBackground,null,getScalemRect(),null);
+		canvas.drawBitmap(mBehindBackground,getScalemRect(), getScalemRectF(),null);
 		canvas.restore();
 	}
 
@@ -201,7 +191,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		drawActions(mForeCanvas);
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mForeBackground,null,getScalemRect(),null);
+		canvas.drawBitmap(mForeBackground,getScalemRect(), getScalemRectF(),null);
 		canvas.restore();
 	}
 
@@ -212,7 +202,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		foreCanvas.save();
-		mForeCanvas.drawBitmap(originBitmap, null,getmRect(),null);
+		mForeCanvas.drawBitmap(originBitmap, null, getmRectF(),null);
 		foreCanvas.restore();
 
 
@@ -337,7 +327,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * @param rectf
      */
 	public void crop(RectF rectf){
-		mCurrentAction = new CropAction(rectf,getRotatedmRect(),
+		mCurrentAction = new CropAction(rectf, getScalemRectF(),
 				cropBitmap,mForeBackground,mCropCanvas,
 				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
@@ -359,15 +349,19 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 返回矩阵
 	 * @return
      */
-	public RectF getmRect(){
+	public RectF getmRectF(){
 		return new RectF(getLeft(),getTop(),getRight(),getBottom());
+	}
+
+	public Rect getmRect(){
+		return new Rect(getLeft(),getTop(),getRight(),getBottom());
 	}
 
 	/**
 	 * 获取按w/h比例缩小的矩阵
 	 * @return
      */
-	public RectF getScalemRect(){
+	public RectF getScalemRectF(){
 		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
 		float scale = 1.0f * mWidth/mHeight;
 		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
@@ -377,15 +371,25 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		return r;
 	}
 
-	/**
+	public Rect getScalemRect(){
+		RectF rf = getScalemRectF();
+		return new Rect((int)rf.left,(int)rf.top,(int)rf.right,(int)rf.bottom);
+	}
+
+	/**`
 	 * 获取按w/h比例缩小,并且旋转的矩阵
 	 * @return
 	 */
-	public RectF getRotatedmRect(){
+	public RectF getRotatedmRectF(){
 		if(mCurrentAngle/90%2==0) return new RectF(getLeft(),getTop(),getRight(),getBottom());
 		float scale = 1.0f * mWidth/mHeight;
 		RectF r = new RectF(getLeft(),getTop()+(1-scale*scale)*mHeight/2,getRight(),getBottom()-(1-scale*scale)*mHeight/2);
 		return r;
+	}
+
+	public Rect getRotatedmRect(){
+		RectF rf = getRotatedmRectF();
+		return new Rect((int)rf.left,(int)rf.top,(int)rf.right,(int)rf.bottom);
 	}
 
 	public void setMode(int mode){

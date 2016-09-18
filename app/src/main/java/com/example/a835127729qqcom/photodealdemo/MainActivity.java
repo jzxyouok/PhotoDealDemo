@@ -1,21 +1,11 @@
 package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
-import com.example.a835127729qqcom.photodealdemo.widget.RotatableTextCloudLayout;
 import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
@@ -32,9 +22,6 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.xinlan.imageeditlibrary.editimage.view.CropImageView;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
@@ -66,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 guaKa.init();
                 guaKa.invalidate();
-                //cropImageView.setRatioCropRect(guaKa.getRotatedmRect(),1);
+                //cropImageView.setRatioCropRect(guaKa.getRotatedmRectF(),1);
             }
 
             @Override
@@ -139,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("tag","crop");
         perHide();
         guaKa.setMode(ActionImageView.MODE_CROP);
-        cropImageView.setCropRect(guaKa.getRotatedmRect());
+        cropImageView.setCropRect(guaKa.getRotatedmRectF());
         cropImageView.setVisibility(View.VISIBLE);
     }
 
