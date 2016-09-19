@@ -312,8 +312,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 					if(i<0){
 						mCurrentAngle = 0;
 					}
-				}else if(action instanceof CropAction){
-					action.stop();
+					action.stop(getRotatedmRectF());
 				}else if(action instanceof TextAction){
 					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
 				}
@@ -338,8 +337,8 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 旋转
 	 * @param angle
      */
-	public void rotate(float angle){
-		mCurrentAction = new RotateAction(angle);
+	public void rotate(float angle,RotateAction.RotateActionBackListener rotateActionBackListener){
+		mCurrentAction = new RotateAction(angle,rotateActionBackListener);
 		mCurrentAngle = angle;
 		actions.add(mCurrentAction);
 		postInvalidate();

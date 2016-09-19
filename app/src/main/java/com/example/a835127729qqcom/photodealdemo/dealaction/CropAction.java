@@ -26,18 +26,17 @@ public class CropAction implements Action{
     private Bitmap mCropMasicBitmap;
     private Bitmap mBehindBitmap;
     private Canvas mCropMasicCanvas;
-    private Canvas mBehindCanvas;
-    private float angle;
     private Rect rect;
     private Rect rect2;
+
     private static Paint paint = new Paint();
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(Color.TRANSPARENT);
     }
 
-    public CropAction(RectF cropRect,RectF destRect,Bitmap cropBitmap,Bitmap foreBitmap,Canvas croprCanvas,
-                      Bitmap cropMasicBitmap,Bitmap behindBitmap,Canvas cropMasicCanvas,float angle){
+    public CropAction(RectF cropRect, RectF destRect, Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
+                      Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas, float angle){
         mCropRect = cropRect;
         mDestRect = destRect;
         mCropBitmap = cropBitmap;
@@ -47,13 +46,11 @@ public class CropAction implements Action{
         mBehindBitmap = behindBitmap;
         mCropMasicCanvas = cropMasicCanvas;
         //mBehindCanvas = behindCanvas;
-        this.angle = angle;
         RectF rf = new RectF(mCropRect);
         Matrix m = new Matrix();
         m.postRotate(-angle,mDestRect.centerX(),mDestRect.centerY());
         m.mapRect(rf);
         rect = new Rect((int) rf.left,(int) rf.top,(int) rf.right,(int) rf.bottom);
-
         rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
     }
 
@@ -99,5 +96,4 @@ public class CropAction implements Action{
     @Override
     public void stop(Object... params) {
     }
-
 }

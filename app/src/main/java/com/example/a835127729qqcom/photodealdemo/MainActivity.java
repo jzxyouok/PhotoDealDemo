@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.a835127729qqcom.photodealdemo.widget.CropImageView;
 import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
@@ -19,13 +20,12 @@ import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.utils.StorageUtils;
-import com.xinlan.imageeditlibrary.editimage.view.CropImageView;
 
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
-    ActionImageView guaKa;
+    ActionImageView actionImageView;
     String testurl = "http://pic.sc.chinaz.com/files/pic/pic9/201508/apic14052.jpg";
     //String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
     StickerView stickerView;
@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initImageLoader();
         cropImageView = (CropImageView) findViewById(R.id.crop);
-        guaKa = (ActionImageView) findViewById(R.id.guagua);
+        actionImageView = (ActionImageView) findViewById(R.id.main_image);
 
-        ImageLoader.getInstance().displayImage(testurl,guaKa,new ImageLoadingListener(){
+        ImageLoader.getInstance().displayImage(testurl, actionImageView,new ImageLoadingListener(){
 
             @Override
             public void onLoadingStarted(String imageUri, View view) {
@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                guaKa.init();
-                guaKa.invalidate();
-                //cropImageView.setRatioCropRect(guaKa.getRotatedmRectF(),1);
+                actionImageView.init();
+                actionImageView.invalidate();
+                //cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
             }
 
             @Override
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
         stickerView = (StickerView) findViewById(R.id.stick);
 
-        guaKa.setmBackTextActionListener(stickerView);
-        stickerView.setmTextsControlListener(guaKa);
+        actionImageView.setmBackTextActionListener(stickerView);
+        stickerView.setmTextsControlListener(actionImageView);
     }
 
     /**
@@ -98,55 +98,55 @@ public class MainActivity extends AppCompatActivity {
     private void perHide(){
         stickerView.setVisibility(View.GONE);
         cropImageView.setVisibility(View.GONE);
-        guaKa.setEnabled(true);
-        guaKa.setMode(ActionImageView.MODE_IDLE);
+        actionImageView.setEnabled(true);
+        actionImageView.setMode(ActionImageView.MODE_IDLE);
     }
 
     public void mark(View view){
         Log.i("tag","mark");
         perHide();
-        guaKa.setMode(ActionImageView.MODE_MARK);
+        actionImageView.setMode(ActionImageView.MODE_MARK);
     }
 
     public void masic(View view){
         Log.i("tag","masic");
         perHide();
-        guaKa.setMode(ActionImageView.MODE_MASIC);
+        actionImageView.setMode(ActionImageView.MODE_MASIC);
     }
 
     public void text(View view){
         Log.i("tag","text");
         perHide();
-        guaKa.setMode(ActionImageView.MODE_TEXT);
+        actionImageView.setMode(ActionImageView.MODE_TEXT);
         stickerView.setVisibility(View.VISIBLE);
-        guaKa.setEnabled(false);
+        actionImageView.setEnabled(false);
     }
 
     public void crop(View view){
         Log.i("tag","crop");
         perHide();
-        guaKa.setMode(ActionImageView.MODE_CROP);
-        cropImageView.setCropRect(guaKa.getRotatedmRectF());
+        actionImageView.setMode(ActionImageView.MODE_CROP);
+        cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
         cropImageView.setVisibility(View.VISIBLE);
     }
 
     public void rotate(View view){
         Log.i("tag","rotate");
         perHide();
-        guaKa.setMode(ActionImageView.MODE_ROTATE);
-        guaKa.rotate(guaKa.mCurrentAngle+90);
+        actionImageView.setMode(ActionImageView.MODE_ROTATE);
+        actionImageView.rotate(actionImageView.mCurrentAngle+90,cropImageView);
     }
 
     public void back(View view){
         Log.i("tag","back");
-        guaKa.back();
+        actionImageView.back();
     }
 
     public void finish(View view){
         Log.i("tag","finish");
-        if(guaKa.getMode()!=ActionImageView.MODE_CROP) return;
-        guaKa.crop(cropImageView.getCropRect());
-        guaKa.setMode(ActionImageView.MODE_IDLE);
+        if(actionImageView.getMode()!=ActionImageView.MODE_CROP) return;
+        actionImageView.crop(cropImageView.getCropRect());
+        actionImageView.setMode(ActionImageView.MODE_IDLE);
         cropImageView.setVisibility(View.GONE);
     }
 
