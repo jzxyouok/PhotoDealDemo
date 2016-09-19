@@ -3,16 +3,25 @@ package com.example.a835127729qqcom.photodealdemo.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView.BackTextActionListener;
+import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 /**
@@ -20,7 +29,7 @@ import java.util.LinkedHashMap;
  *
  * @author panyi
  */
-public class StickerView extends View implements BackTextActionListener{
+public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener {
     private static int STATUS_IDLE = 0;
     private static int STATUS_MOVE = 1;// 移动状态
     private static int STATUS_DELETE = 2;// 删除状态
@@ -41,6 +50,11 @@ public class StickerView extends View implements BackTextActionListener{
      * 图片编辑完成
      */
     private TextsControlListener mTextsControlListener;
+    /**
+     * 修改文字内容
+     * @param context
+     */
+    private BeginAddTextListener mBeginAddTextListener;
 
     public StickerView(Context context) {
         super(context);
@@ -123,7 +137,7 @@ public class StickerView extends View implements BackTextActionListener{
                     }
                 }// end for each
 
-                if(currentItem==null){
+                if(currentItem==null){//上一次没有贴图被选中
                     isDown = true;
                 }
 
@@ -168,10 +182,15 @@ public class StickerView extends View implements BackTextActionListener{
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if(isDown && lastDownX ==x && lastDownY ==y){//判断是点击事件
-                    addTextRect(new Rect((int) (x-StickerItem.defaultStickerItemWidth/2), (int) (y-StickerItem.defaultStickerItemHeight/2),
-                            (int) (StickerItem.defaultStickerItemWidth/2+x), (int) (StickerItem.defaultStickerItemHeight/2+y)));
-                    isDown = false;
+                if(lastDownX ==x && lastDownY ==y){
+                    if(isDown){//判断是点击事件,点击空白
+                        addTextRect(new Rect((int) (x-StickerItem.defaultStickerItemWidth/2), (int) (y-StickerItem.defaultStickerItemHeight/2),
+                                (int) (StickerItem.defaultStickerItemWidth/2+x), (int) (StickerItem.defaultStickerItemHeight/2+y)));
+                        isDown = false;
+                    }else if(currentItem!=null && currentItem.dstRect.contains(x,y)){
+                        setVisibility(GONE);
+                        mBeginAddTextListener.onStartEditText(currentItem.getContents());
+                    }
                 }
                 ret = true;
                 currentStatus = STATUS_IDLE;
@@ -213,4 +232,50 @@ public class StickerView extends View implements BackTextActionListener{
         this.mTextsControlListener = mTextsControlListener;
     }
 
+    @Override
+    public void onStopEditText(String text) {
+        setVisibility(VISIBLE);
+        ArrayList<String> arr = new ArrayList<String>();
+        if(!TextUtils.isEmpty(text.trim())){
+            arr.addAll(Arrays.asList(text.split("\n")));
+        }
+        currentItem.refreshTextContent(arr);
+        postInvalidate();
+    }
+
+    @Override
+    public void onRotate(float angle) {
+        Matrix m = new Matrix();
+        for(StickerItem item :bank.values()){
+            m.reset();
+            m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+            float[] res = new float[2];
+            m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
+            item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
+                    res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
+        }
+        postInvalidate();
+    }
+
+    @Override
+    public void onRotateBack(float angle) {
+        Matrix m = new Matrix();
+        for(StickerItem item :bank.values()){
+            m.reset();
+            m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+            float[] res = new float[2];
+            m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
+            item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
+                    res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
+        }
+        postInvalidate();
+    }
+
+    public interface BeginAddTextListener{
+        void onStartEditText(String text);
+    }
+
+    public void setmBeginAddTextListener(BeginAddTextListener mBeginAddTextListener) {
+        this.mBeginAddTextListener = mBeginAddTextListener;
+    }
 }// end class

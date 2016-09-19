@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by 835127729qq.com on 16/8/22.
  */
 public class TextAction implements Action{
-
+    private float delAngle;
     private ArrayList<Path> textPaths = new ArrayList<Path>();
     private ArrayList<String> texts = new ArrayList<String>();
     private static Paint paint = new Paint();
@@ -44,7 +44,7 @@ public class TextAction implements Action{
 
     @Override
     public void start(Object... params) {
-
+        delAngle = (float) params[0];
     }
 
     @Override

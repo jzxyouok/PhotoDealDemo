@@ -28,6 +28,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
+        <com.example.a835127729qqcom.photodealdemo.widget.EditTextActionLayout
+            android:id="@+id/edit"
+            android:visibility="gone"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            />
     </FrameLayout>
     <Button
         android:layout_below="@id/work_space"

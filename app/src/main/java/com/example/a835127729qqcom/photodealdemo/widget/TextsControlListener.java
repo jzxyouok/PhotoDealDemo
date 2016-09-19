@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Created by 835127729qq.com on 16/9/12.
+ * 监听文字修改
  */
 public interface TextsControlListener{
     public void onAddText(TextAction textAction);

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.widget.CropImageView;
+import com.example.a835127729qqcom.photodealdemo.widget.EditTextActionLayout;
 import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     String testurl = "http://pic.sc.chinaz.com/files/pic/pic9/201508/apic14052.jpg";
     //String testurl = "http://www.iteye.com/upload/logo/user/254048/1468917d-4784-3baa-a365-68315ed82ebb.jpg?1274705681";
     StickerView stickerView;
+    EditTextActionLayout editView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         initImageLoader();
         cropImageView = (CropImageView) findViewById(R.id.crop);
         actionImageView = (ActionImageView) findViewById(R.id.main_image);
+        editView = (EditTextActionLayout) findViewById(R.id.edit);
+        stickerView = (StickerView) findViewById(R.id.stick);
 
         ImageLoader.getInstance().displayImage(testurl, actionImageView,new ImageLoadingListener(){
 
@@ -61,11 +65,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        stickerView = (StickerView) findViewById(R.id.stick);
-
         actionImageView.setmBackTextActionListener(stickerView);
         stickerView.setmTextsControlListener(actionImageView);
+        stickerView.setmBeginAddTextListener(editView);
+        editView.setmStopAddTextListener(stickerView);
     }
 
     /**
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void perHide(){
-        stickerView.setVisibility(View.GONE);
+        //stickerView.setVisibility(View.GONE);
         cropImageView.setVisibility(View.GONE);
         actionImageView.setEnabled(true);
         actionImageView.setMode(ActionImageView.MODE_IDLE);
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("tag","rotate");
         perHide();
         actionImageView.setMode(ActionImageView.MODE_ROTATE);
-        actionImageView.rotate(actionImageView.mCurrentAngle+90,cropImageView);
+        actionImageView.rotate(actionImageView.mCurrentAngle+90,cropImageView,stickerView);
     }
 
     public void back(View view){

@@ -13,11 +13,13 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -69,6 +71,8 @@ public class StickerItem {
      * 文字编辑抽象
      */
     private TextAction mTextAction;
+    private ArrayList<String> textContents  = new ArrayList<>();
+    private ArrayList<String> tipContents  = new ArrayList<>();
 
     public StickerItem(Context context,TextAction textAction) {
         mTextAction = textAction;
@@ -99,6 +103,7 @@ public class StickerItem {
             rotateBit = BitmapFactory.decodeResource(context.getResources(),
                     com.xinlan.imageeditlibrary.R.drawable.sticker_rotate);
         }// end if
+        tipContents.add("请输入文字");
     }
 
     public void init(@Nullable Rect addBit, View parentView) {
@@ -244,8 +249,7 @@ public class StickerItem {
     }
 
     public void draw(Canvas canvas) {
-        canvas.drawRect(this.dstRect, dstPaint);
-
+        //canvas.drawRect(this.dstRect, dstPaint);
         if (this.isDrawHelpTool) {// 绘制辅助工具线
             canvas.save();
             canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
@@ -257,24 +261,14 @@ public class StickerItem {
 
             // canvas.drawRect(deleteRect, dstPaint);
             // canvas.drawRect(rotateRect, dstPaint);
-            canvas.drawRect(detectRotateRect, this.toolPaint);
-            canvas.drawRect(detectDeleteRect, this.toolPaint);
+            //canvas.drawRect(detectRotateRect, this.toolPaint);
+            //canvas.drawRect(detectDeleteRect, this.toolPaint);
         }// end if
-
-        ArrayList<String> arr = new ArrayList<>();
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        arr.add("请输入文字");
-        drawText(arr,canvas);
+        if(textContents.isEmpty()) {
+            drawText(tipContents, canvas);
+        }else{
+            drawText(textContents, canvas);
+        }
     }
 
     /**
@@ -285,7 +279,7 @@ public class StickerItem {
     private void drawText(ArrayList<String> texts,Canvas canvas){
         int numOfTextLine = texts.size();
         if(numOfTextLine==0) return;
-        reCaculteTextSize(numOfTextLine);
+        reCaculteTextSize(numOfTextLine,texts);
         mTextAction.getTextPaths().clear();
         mTextAction.getTexts().clear();
         canvas.save();
@@ -296,8 +290,8 @@ public class StickerItem {
         float right = dstRect.centerX()+dstRect.width()/2;
         float centerY = dstRect.centerY() + textSize/2;
 
-        int topOfCenterLineNum = 0;
-        int bottomOfCenterLineNum = 0;
+        int topOfCenterLineNum;
+        int bottomOfCenterLineNum;
         float topCenterY = centerY;
         float bottomCenterY = centerY;
         if(numOfTextLine%2==1){
@@ -344,12 +338,21 @@ public class StickerItem {
      * 计算字体大小
      * @param numOfTextLine
      */
-    private void reCaculteTextSize(int numOfTextLine){
+    private void reCaculteTextSize(int numOfTextLine,ArrayList<String> texts){
         if(numOfTextLine<=0) return;
+        //根据高度,计算字体
         float percent = lineMargin / textSize;
         if(textSize * numOfTextLine + lineMargin*(numOfTextLine-1) > dstRect.height()){
             textSize = dstRect.height() / (numOfTextLine + percent*numOfTextLine - percent);
             lineMargin = textSize*percent;
+        }
+        //根据宽度计算字体
+        int maxlen = 0;
+        for(String text : texts){
+            maxlen = Math.max(text.length(),maxlen);
+        }
+        if(textSize*maxlen>dstRect.width()){
+            textSize = dstRect.width()/maxlen;
         }
     }
 
@@ -398,5 +401,25 @@ public class StickerItem {
 
     public TextAction getmTextAction() {
         return mTextAction;
+    }
+
+    /**
+     * 改变文字内容
+     * @param con
+     */
+    public void refreshTextContent(List<String> con){
+        textContents.clear();
+        textContents.addAll(con);
+    }
+
+    public String getContents(){
+        StringBuilder sb = new StringBuilder();
+        for(String con : textContents){
+            sb.append(con).append("\n");
+        }
+        if(!TextUtils.isEmpty(sb.toString())) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
     }
 }

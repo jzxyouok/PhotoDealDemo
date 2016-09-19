@@ -26,6 +26,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+import com.example.a835127729qqcom.photodealdemo.widget.RotateActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.TextsControlListener;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
@@ -88,6 +89,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 监听文字撤销
 	 */
 	private BackTextActionListener mBackTextActionListener;
+	private RotateActionListener mRotateActionListener;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -229,7 +231,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 			if(lastRotateAction!=null) {//至少一次旋转
 				if(action instanceof CropAction){
 					action.execute(foreCanvas);
-				}else {
+				}else{
 					foreCanvas.save();
 					foreCanvas.rotate(-startAngle, mWidth / 2, mHeight / 2);
 					action.execute(foreCanvas);
@@ -312,6 +314,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 					if(i<0){
 						mCurrentAngle = 0;
 					}
+					//mRotateActionListener.onRotateBack(mCurrentAngle-((RotateAction) action).getmAngle());
 					action.stop(getRotatedmRectF());
 				}else if(action instanceof TextAction){
 					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
@@ -337,8 +340,10 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 * 旋转
 	 * @param angle
      */
-	public void rotate(float angle,RotateAction.RotateActionBackListener rotateActionBackListener){
+	public void rotate(float angle, RotateAction.RotateActionBackListener rotateActionBackListener, RotateActionListener rotateActionListener){
 		mCurrentAction = new RotateAction(angle,rotateActionBackListener);
+		mRotateActionListener = rotateActionListener;
+		//mRotateActionListener.onRotate(angle-mCurrentAngle);
 		mCurrentAngle = angle;
 		actions.add(mCurrentAction);
 		postInvalidate();
@@ -411,6 +416,9 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		postInvalidate();
 	}
 
+	/**
+	 * 监听文字撤销
+	 */
 	public interface BackTextActionListener{
 		void onBackTextAction(TextAction action);
 	}
