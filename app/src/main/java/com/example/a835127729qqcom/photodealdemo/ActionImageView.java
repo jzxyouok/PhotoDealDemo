@@ -77,8 +77,6 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 */
 	Bitmap originBitmap;
 	public Bitmap mForeBackground,cropBitmap;
-
-	private Bitmap textBitmap;
 	/**
 	 * 控件长宽
 	 */
@@ -149,8 +147,6 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.RGB_565, true),
 				getMeasuredWidth(),getMeasuredHeight(),false);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
-
-		textBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 	}
 
 	@Override
@@ -236,7 +232,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				if(action instanceof CropAction){
 					action.execute(foreCanvas);
 				}else if(action instanceof TextAction){
-					action.start(mCurrentAngle,textBitmap,mForeBackground,mWidth/2.0f,mHeight/2.0f);
+					action.start(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
 					action.execute(foreCanvas);
 				}else{
 					foreCanvas.save();

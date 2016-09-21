@@ -21,7 +21,6 @@ public class TextAction implements Action{
     private ArrayList<Path> textPaths = new ArrayList<Path>();
     private ArrayList<String> texts = new ArrayList<String>();
     private static Paint paint = new Paint();
-    private Bitmap textBitmap,forBitmap;
     private float rectCenterX,rectCenterY;
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -58,10 +57,8 @@ public class TextAction implements Action{
     @Override
     public void start(Object... params) {
         delAngle = (float) params[0];
-        textBitmap = (Bitmap) params[1];
-        forBitmap = (Bitmap) params[2];
-        rectCenterX = (float) params[3];
-        rectCenterY = (float) params[4];
+        rectCenterX = (float) params[1];
+        rectCenterY = (float) params[2];
     }
 
     @Override
