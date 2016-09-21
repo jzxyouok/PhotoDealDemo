@@ -244,17 +244,26 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
-    public void onRotate(float angle) {
+    public void onRotate(float angle,View view) {
         Matrix m = new Matrix();
         for(StickerItem item :bank.values()){
             m.reset();
+            //计算新的中心点
+            float newCenter[] = new float[2];
             m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+            m.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
+            //平移
+            item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
+            //旋转
+            m.reset();
+            m.postRotate(angle,newCenter[0],newCenter[1]);
             float[] res = new float[2];
             m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
             item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
                     res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
+            //item.calculateTextAction();
         }
-        postInvalidate();
+        invalidate();
     }
 
     @Override
@@ -262,13 +271,22 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         Matrix m = new Matrix();
         for(StickerItem item :bank.values()){
             m.reset();
+            //计算新的中心点
+            float newCenter[] = new float[2];
             m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+            m.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
+            //平移
+            item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
+            //旋转
+            m.reset();
+            m.postRotate(angle,newCenter[0],newCenter[1]);
             float[] res = new float[2];
             m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
             item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
                     res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
+            //item.calculateTextAction();
         }
-        postInvalidate();
+        invalidate();
     }
 
     public interface BeginAddTextListener{

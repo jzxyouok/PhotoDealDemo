@@ -165,6 +165,7 @@ public class StickerItem {
 
         this.detectRotateRect.offset(dx, dy);
         this.detectDeleteRect.offset(dx, dy);
+        //calculateTextAction();
     }
 
     /**
@@ -246,6 +247,7 @@ public class StickerItem {
                 this.dstRect.centerY(), roatetAngle);
         rotateRect(this.detectDeleteRect, this.dstRect.centerX(),
                 this.dstRect.centerY(), roatetAngle);
+        //calculateTextAction();
     }
 
     public void draw(Canvas canvas) {
@@ -264,28 +266,33 @@ public class StickerItem {
             //canvas.drawRect(detectRotateRect, this.toolPaint);
             //canvas.drawRect(detectDeleteRect, this.toolPaint);
         }// end if
-        if(textContents.isEmpty()) {
-            drawText(tipContents, canvas);
-        }else{
-            drawText(textContents, canvas);
-        }
+        drawText(canvas);
     }
 
     /**
      * 绘制文字
-     * @param texts
      * @param canvas
      */
-    private void drawText(ArrayList<String> texts,Canvas canvas){
-        int numOfTextLine = texts.size();
-        if(numOfTextLine==0) return;
-        reCaculteTextSize(numOfTextLine,texts);
+    private void drawText(Canvas canvas){
+        calculateTextAction();
+        realDrawText(canvas);
+    }
+
+    public void calculateTextAction(){
+        ArrayList<String> texts = null;
+        if(textContents.isEmpty()) {
+            texts = tipContents;
+        }else{
+            texts = textContents;
+        }
         mTextAction.getTextPaths().clear();
         mTextAction.getTexts().clear();
-        canvas.save();
-        canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
+        int numOfTextLine = texts.size();
+        if(numOfTextLine==0){
+            return;
+        }
+        reCalculteTextSize(numOfTextLine,texts);
         //绘制文字
-        textPaint.setTextSize(textSize);
         float left = dstRect.centerX()-dstRect.width()/2;
         float right = dstRect.centerX()+dstRect.width()/2;
         float centerY = dstRect.centerY() + textSize/2;
@@ -312,7 +319,6 @@ public class StickerItem {
             path.reset();
             path.moveTo(left,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
             path.lineTo(right,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
-            canvas.drawTextOnPath(texts.get(topIndex),path,0,0, textPaint);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(topIndex));
             topIndex--;
@@ -322,23 +328,31 @@ public class StickerItem {
             path.reset();
             path.moveTo(left,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
             path.lineTo(right,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
-            canvas.drawTextOnPath(texts.get(bottomIndex),path,0,0, textPaint);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(bottomIndex));
             bottomIndex++;
         }
-        canvas.restore();
         mTextAction.setTextSize(textSize);
         mTextAction.setRoatetAngle(roatetAngle);
         mTextAction.setRotateCenterX(helpBox.centerX());
         mTextAction.setRotateCenterY(helpBox.centerY());
     }
 
+    public void realDrawText(Canvas canvas){
+        textPaint.setTextSize(textSize);
+        canvas.save();
+        canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
+        for(int i=0;i<mTextAction.getTextPaths().size();i++){
+            canvas.drawTextOnPath(mTextAction.getTexts().get(i),mTextAction.getTextPaths().get(i),0,0,textPaint);
+        }
+        canvas.restore();
+    }
+
     /**
      * 计算字体大小
      * @param numOfTextLine
      */
-    private void reCaculteTextSize(int numOfTextLine,ArrayList<String> texts){
+    private void reCalculteTextSize(int numOfTextLine, ArrayList<String> texts){
         if(numOfTextLine<=0) return;
         //根据高度,计算字体
         float percent = lineMargin / textSize;
