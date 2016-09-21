@@ -74,7 +74,7 @@ public class TextAction implements Action{
         canvas.save();
         canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
         //canvas.translate(res[0],res[1]);
-        canvas.rotate(roatetAngle,res[0],res[0]);
+        canvas.rotate(roatetAngle,res[0],res[1]);
         for(int i=0;i<textPaths.size();i++){
             paint.setTextSize(textSize);
             paint.setColor(color);
