@@ -261,7 +261,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
             m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
             item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
                     res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
-            //item.calculateTextAction();
+            item.calculateTextAction();
         }
         invalidate();
     }
@@ -284,7 +284,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
             m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
             item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
                     res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
-            //item.calculateTextAction();
+            item.calculateTextAction();
         }
         invalidate();
     }

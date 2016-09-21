@@ -236,11 +236,11 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				if(action instanceof CropAction){
 					action.execute(foreCanvas);
 				}else if(action instanceof TextAction){
-					action.start(startAngle,textBitmap,mForeBackground,getmRectF());
+					action.start(mCurrentAngle,textBitmap,mForeBackground,mWidth/2.0f,mHeight/2.0f);
 					action.execute(foreCanvas);
 				}else{
 					foreCanvas.save();
-					foreCanvas.rotate(-startAngle, mWidth / 2, mHeight / 2);
+					foreCanvas.rotate(-startAngle, mWidth / 2.0f, mHeight / 2.0f);
 					action.execute(foreCanvas);
 					foreCanvas.restore();
 				}
