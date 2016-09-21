@@ -4,44 +4,43 @@ package com.example.a835127729qqcom.photodealdemo.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-
-import com.example.a835127729qqcom.photodealdemo.ActionImageView.BackTextActionListener;
-import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.BeginAddTextListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.StopAddTextListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 贴图操作控件
  *
  * @author panyi
  */
-public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener {
+public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener,CropActionListener {
     private static int STATUS_IDLE = 0;
     private static int STATUS_MOVE = 1;// 移动状态
     private static int STATUS_DELETE = 2;// 删除状态
     private static int STATUS_ROTATE = 3;// 图片旋转状态
 
-    private int itemCount;// 已加入照片的数量
+    private int itemCount;// 已加入text的数量
     private Context mContext;
     private int currentStatus;// 当前状态
     private StickerItem currentItem;// 当前操作的贴图数据
     private float oldx, oldy;
 
-    private LinkedHashMap<Integer, StickerItem> bank = new LinkedHashMap<Integer, StickerItem>();// 存贮每层贴图数据
+    private LinkedHashMap<Integer, StickerItem> stickerItemMap = new LinkedHashMap<Integer, StickerItem>();// 存贮每层贴图数据
     private LinkedHashMap<TextAction, StickerItem> textActionStickItemMap = new LinkedHashMap<TextAction, StickerItem>();// 存贮每层贴图数据
 
     private float lastDownX, lastDownY;
@@ -55,6 +54,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
      * @param context
      */
     private BeginAddTextListener mBeginAddTextListener;
+    private Matrix rotateMatrix = new Matrix();
 
     public StickerView(Context context) {
         super(context);
@@ -82,8 +82,13 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (Integer id : bank.keySet()) {
-            StickerItem item = bank.get(id);
+        for(ArrayList<TextData> datas:textActionCache){
+            for(TextData data:datas){
+                data.item.draw(canvas);
+            }
+        }
+        for (Integer id : stickerItemMap.keySet()) {
+            StickerItem item = stickerItemMap.get(id);
             item.draw(canvas);
         }
     }
@@ -91,7 +96,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        if(bank.size()==0){
+        if(stickerItemMap.size()==0){
             addTextRect(null);
         }
     }
@@ -108,8 +113,8 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
                 lastDownX = x;
                 lastDownY = y;
                 int deleteId = -1;
-                for (Integer id : bank.keySet()) {
-                    StickerItem item = bank.get(id);
+                for (Integer id : stickerItemMap.keySet()) {
+                    StickerItem item = stickerItemMap.get(id);
                     if (item.detectDeleteRect.contains(x, y)) {// 删除模式
                         deleteId = id;
                         currentStatus = STATUS_DELETE;
@@ -149,7 +154,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
                 }
 
                 if (deleteId > 0 && currentStatus == STATUS_DELETE) {// 删除选定贴图
-                    StickerItem item = bank.remove(deleteId);
+                    StickerItem item = stickerItemMap.remove(deleteId);
                     textActionStickItemMap.values().remove(item);
                     mTextsControlListener.onDeleteText(item.getmTextAction());
                     currentStatus = STATUS_IDLE;// 返回空闲状态
@@ -212,7 +217,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
             currentItem.isDrawHelpTool = false;
         }
         currentItem = item;
-        bank.put(++itemCount, item);
+        stickerItemMap.put(++itemCount, item);
         onFinishAddText(textAction);
         this.invalidate();// 重绘视图
     }
@@ -220,7 +225,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     public void onBackTextAction(TextAction action) {
         StickerItem item = textActionStickItemMap.remove(action);
-        bank.values().remove(item);
+        stickerItemMap.values().remove(item);
         postInvalidate();
     }
 
@@ -245,55 +250,92 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
 
     @Override
     public void onRotate(float angle,View view) {
-        Matrix m = new Matrix();
-        for(StickerItem item :bank.values()){
-            m.reset();
-            //计算新的中心点
-            float newCenter[] = new float[2];
-            m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
-            m.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
-            //平移
-            item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
-            //旋转
-            m.reset();
-            m.postRotate(angle,newCenter[0],newCenter[1]);
-            float[] res = new float[2];
-            m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
-            item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
-                    res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
-            item.calculateTextAction();
+
+        for(StickerItem item : stickerItemMap.values()){
+            calculateRotateInfluences(angle, item);
+        }
+        for(ArrayList<TextData> datas:textActionCache){
+            for(TextData data:datas){
+                calculateRotateInfluences(angle, data.item);
+            }
         }
         invalidate();
     }
 
     @Override
     public void onRotateBack(float angle) {
-        Matrix m = new Matrix();
-        for(StickerItem item :bank.values()){
-            m.reset();
-            //计算新的中心点
-            float newCenter[] = new float[2];
-            m.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
-            m.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
-            //平移
-            item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
-            //旋转
-            m.reset();
-            m.postRotate(angle,newCenter[0],newCenter[1]);
-            float[] res = new float[2];
-            m.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
-            item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
-                    res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
-            item.calculateTextAction();
+        for(StickerItem item : stickerItemMap.values()){
+            calculateRotateInfluences(angle, item);
+        }
+        for(ArrayList<TextData> datas:textActionCache){
+            for(TextData data:datas){
+                calculateRotateInfluences(angle, data.item);
+            }
         }
         invalidate();
     }
 
-    public interface BeginAddTextListener{
-        void onStartEditText(String text);
+    private void calculateRotateInfluences(float angle, StickerItem item) {
+        rotateMatrix.reset();
+        //计算新的中心点
+        float newCenter[] = new float[2];
+        rotateMatrix.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+        rotateMatrix.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
+        //平移
+        item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
+        //旋转
+        rotateMatrix.reset();
+        rotateMatrix.postRotate(angle,newCenter[0],newCenter[1]);
+        float[] res = new float[2];
+        rotateMatrix.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
+        item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
+                res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
+        item.calculateTextAction();
     }
 
     public void setmBeginAddTextListener(BeginAddTextListener mBeginAddTextListener) {
         this.mBeginAddTextListener = mBeginAddTextListener;
+    }
+
+    private ArrayList<ArrayList<TextData>> textActionCache = new ArrayList<ArrayList<TextData>>();
+    @Override
+    public void onCrop() {
+        ArrayList<TextData> datas = new ArrayList<TextData>();
+        for(Map.Entry<Integer,StickerItem> entry:stickerItemMap.entrySet()){
+            datas.add(new TextData(entry.getKey(),entry.getValue().getmTextAction(),entry.getValue()));
+        }
+        textActionCache.add(datas);
+        stickerItemMap.clear();
+        textActionStickItemMap.clear();
+        postInvalidate();
+    }
+
+    @Override
+    public void onCropBack() {
+        if(textActionCache.isEmpty()) return;
+        ArrayList<TextData> datas = textActionCache.remove(textActionCache.size()-1);
+        if(datas.isEmpty()) return;
+        LinkedHashMap<Integer,StickerItem> temp = new LinkedHashMap<Integer,StickerItem>();
+        temp.putAll(stickerItemMap);//保证原理的插入顺序
+        stickerItemMap.clear();
+        for(TextData data:datas){
+            stickerItemMap.put(data.integer,data.item);
+            textActionStickItemMap.put(data.textAction,data.item);
+        }
+        stickerItemMap.putAll(temp);
+        temp.clear();
+        postInvalidate();
+    }
+
+    private class TextData{
+        public TextData(Integer integer, TextAction textAction, StickerItem item) {
+            this.integer = integer;
+            this.textAction = textAction;
+            this.item = item;
+        }
+
+        Integer integer;
+        TextAction textAction;
+        StickerItem item;
     }
 }// end class

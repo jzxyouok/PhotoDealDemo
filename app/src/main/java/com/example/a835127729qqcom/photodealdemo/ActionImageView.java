@@ -26,8 +26,10 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
-import com.example.a835127729qqcom.photodealdemo.widget.RotateActionListener;
-import com.example.a835127729qqcom.photodealdemo.widget.TextsControlListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
 import java.util.LinkedList;
@@ -90,6 +92,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	 */
 	private BackTextActionListener mBackTextActionListener;
 	private RotateActionListener mRotateActionListener;
+	private CropActionListener mCropActionListener;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -321,6 +324,9 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 					action.stop(getRotatedmRectF());
 				}else if(action instanceof TextAction){
 					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
+				}else if(action instanceof CropAction){
+					//恢复之前的textAction
+					mCropActionListener.onCropBack();
 				}
 				postInvalidate();
 			}
@@ -337,6 +343,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
 		postInvalidate();
+		mCropActionListener.onCrop();
 	}
 
 	/**
@@ -419,14 +426,11 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		postInvalidate();
 	}
 
-	/**
-	 * 监听文字撤销
-	 */
-	public interface BackTextActionListener{
-		void onBackTextAction(TextAction action);
-	}
-
 	public void setmBackTextActionListener(BackTextActionListener mBackTextActionListener) {
 		this.mBackTextActionListener = mBackTextActionListener;
+	}
+
+	public void setmCropActionListener(CropActionListener mCropActionListener) {
+		this.mCropActionListener = mCropActionListener;
 	}
 }

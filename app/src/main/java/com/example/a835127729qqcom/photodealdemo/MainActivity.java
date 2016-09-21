@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         stickerView.setmTextsControlListener(actionImageView);
         stickerView.setmBeginAddTextListener(editView);
         editView.setmStopAddTextListener(stickerView);
+        actionImageView.setmCropActionListener(stickerView);
     }
 
     /**

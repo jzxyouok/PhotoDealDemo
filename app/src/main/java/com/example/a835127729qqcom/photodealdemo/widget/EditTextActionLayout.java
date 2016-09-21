@@ -8,18 +8,19 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.a835127729qqcom.photodealdemo.R;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.BeginAddTextListener;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.StopAddTextListener;
 
 /**
  * Created by 835127729qq.com on 16/9/19.
  */
-public class EditTextActionLayout extends FrameLayout implements StickerView.BeginAddTextListener {
+public class EditTextActionLayout extends FrameLayout implements BeginAddTextListener {
     private RelativeLayout mBlackLayout;
     private EditText mEditText;
     private TextView mTextCount;
