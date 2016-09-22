@@ -14,6 +14,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.util.LruCache;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -178,9 +179,13 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null, getmRectF(),null);
 		mBehindCanvas.restore();
-		for(Action action:actions){
-			if(action instanceof CropAction){
-				action.start(mBehindCanvas,mCurrentAngle);
+		if(cropSnapshot.cropAction!=null){
+			cropSnapshot.cropAction.start(mBehindCanvas,mCurrentAngle);
+		}else {
+			for (Action action : actions) {
+				if (action instanceof CropAction) {
+					action.start(mBehindCanvas, mCurrentAngle);
+				}
 			}
 		}
 		//旋转底片
@@ -222,9 +227,22 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 			}
 		}
 
-		//开始绘制
 		float startAngle = 0;
-		for(Action action:actions){
+		int actionIndex = 0;
+		//先从快照中取最后一次crop操作
+		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
+			actionIndex = actions.indexOf(cropSnapshot.cropAction);
+			for(int i=actionIndex-1;i>=0;i--){//查找上次startAngles
+				if(actions.get(i) instanceof RotateAction){
+					startAngle = ((RotateAction) actions.get(i)).getmAngle();
+					break;
+				}
+			}
+		}
+
+		//开始绘制
+		for(;actionIndex<actions.size();actionIndex++){
+			Action action = actions.get(actionIndex);
 			if(action instanceof RotateAction){
 				startAngle = ((RotateAction) action).getmAngle();
 				continue;
@@ -233,22 +251,39 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 			if(action instanceof TextAction && mode==MODE_TEXT && mTextActionCacheQuery.query((TextAction) action)){
 				continue;
 			}
-			if(lastRotateAction!=null) {//至少一次旋转
-				if(action instanceof CropAction){
+			if(action instanceof CropAction){
+				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
+					cropSnapshot.cropAction.drawBitmapDirectly(foreCanvas);
+				}else {
 					action.execute(foreCanvas);
-				}else if(action instanceof TextAction){
-					action.start(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
-					action.execute(foreCanvas);
-				}else{
+				}
+				action.next(cropSnapshot);
+			}else if(action instanceof TextAction){
+				action.start(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
+				action.execute(foreCanvas);
+			}else {
+				if (lastRotateAction != null) {//至少一次旋转
 					foreCanvas.save();
 					foreCanvas.rotate(-startAngle, mWidth / 2.0f, mHeight / 2.0f);
 					action.execute(foreCanvas);
 					foreCanvas.restore();
+				} else {
+					action.execute(foreCanvas);
 				}
-			}else{
-				action.execute(foreCanvas);
 			}
 		}
+	}
+
+	private CropSnapshot cropSnapshot = new CropSnapshot();
+	/**
+	 * 裁剪后的快照
+	 */
+	public class CropSnapshot{
+		public void setCropAction(CropAction cropAction) {
+			this.cropAction = cropAction;
+		}
+
+		CropAction cropAction;
 	}
 
 	@Override
@@ -329,6 +364,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				}else if(action instanceof CropAction){
 					//恢复之前的textAction
 					mCropActionListener.onCropBack();
+					cropSnapshot.setCropAction(null);
 				}
 				postInvalidate();
 			}
@@ -344,6 +380,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				cropBitmap,mForeBackground,mCropCanvas,
 				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
+		cropSnapshot.setCropAction(null);
 		postInvalidate();
 		mCropActionListener.onCrop();
 	}

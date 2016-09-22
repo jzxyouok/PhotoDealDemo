@@ -11,6 +11,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.example.a835127729qqcom.photodealdemo.ActionImageView;
 import com.example.a835127729qqcom.photodealdemo.R;
 import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
 
@@ -67,9 +68,14 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        drawBitmapDirectly(canvas);
+    }
+
+    public void drawBitmapDirectly(Canvas canvas) {
         //绘制裁剪图片
         canvas.drawBitmap(mCropBitmap,rect2,mDestRect,null);
     }
+
 
     @Override
     public void start(Object... params) {
@@ -90,10 +96,11 @@ public class CropAction implements Action{
 
     @Override
     public void next(Object... params) {
-
+        ((ActionImageView.CropSnapshot)params[0]).setCropAction(this);
     }
 
     @Override
     public void stop(Object... params) {
+
     }
 }
