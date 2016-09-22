@@ -5,15 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
-import com.example.a835127729qqcom.photodealdemo.R;
-import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
 
 /**
  * Created by 835127729qq.com on 16/8/23.
@@ -63,15 +60,14 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //将foreBitmap内容绘制到mCropBitmap上
         mCropCanvas.drawBitmap(mforeBitmap,rect,mDestRect,null);
+        drawCropBitmapDirectly(canvas);
+    }
 
+    public void drawCropBitmapDirectly(Canvas canvas) {
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        drawBitmapDirectly(canvas);
-    }
-
-    public void drawBitmapDirectly(Canvas canvas) {
         //绘制裁剪图片
         canvas.drawBitmap(mCropBitmap,rect2,mDestRect,null);
     }
@@ -86,6 +82,10 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //将mBehindBitmap内容绘制到mCropMasicBitmap上
         mCropMasicCanvas.drawBitmap(mBehindBitmap,rect,mDestRect,null);
+        drawCropMasicBitmapDirectly(canvas);
+    }
+
+    public void drawCropMasicBitmapDirectly(Canvas canvas) {
         //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);

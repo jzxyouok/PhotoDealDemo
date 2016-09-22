@@ -14,7 +14,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.v4.util.LruCache;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -179,8 +178,8 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null, getmRectF(),null);
 		mBehindCanvas.restore();
-		if(cropSnapshot.cropAction!=null){
-			cropSnapshot.cropAction.start(mBehindCanvas,mCurrentAngle);
+		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
+			cropSnapshot.cropAction.drawCropMasicBitmapDirectly(mBehindCanvas);
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
@@ -253,7 +252,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 			}
 			if(action instanceof CropAction){
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
-					cropSnapshot.cropAction.drawBitmapDirectly(foreCanvas);
+					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
 				}else {
 					action.execute(foreCanvas);
 				}
