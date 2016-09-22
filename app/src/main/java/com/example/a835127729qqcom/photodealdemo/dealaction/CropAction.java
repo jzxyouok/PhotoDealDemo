@@ -26,8 +26,9 @@ public class CropAction implements Action{
     private Canvas mCropMasicCanvas;
     private Rect rect;
     private Rect rect2;
-
+    private RectF rotateRectf;
     private static Paint paint = new Paint();
+    private float currentAngle = 0;
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(Color.TRANSPARENT);
@@ -69,12 +70,37 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
-        canvas.drawBitmap(mCropBitmap,rect2,mDestRect,null);
+        canvas.drawRect(rect2,paint);
+        //canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
+        if(currentAngle/90%2==0){
+            canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
+        }else {
+            canvas.drawBitmap(mCropBitmap, rect2, mDestRect, null);
+        }
     }
 
 
     @Override
     public void start(Object... params) {
+        rotateRectf = (RectF) params[0];
+        currentAngle = (float) params[1];
+    }
+
+    public void drawCropMasicBitmapDirectly(Canvas canvas) {
+        //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //绘制裁剪图片
+        if(currentAngle/90%2==0){
+            canvas.drawBitmap(mCropMasicBitmap,rect2,rotateRectf,null);
+        }else {
+            canvas.drawBitmap(mCropMasicBitmap, rect2, mDestRect, null);
+        }
+    }
+
+    @Override
+    public void next(Object... params) {
         Canvas canvas = (Canvas) params[0];
         //清屏,清除mCropMasicBitmap之前上的绘制,因为新的绘制,有当前mBehindBitmap决定
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -85,22 +111,8 @@ public class CropAction implements Action{
         drawCropMasicBitmapDirectly(canvas);
     }
 
-    public void drawCropMasicBitmapDirectly(Canvas canvas) {
-        //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        //绘制裁剪图片
-        canvas.drawBitmap(mCropMasicBitmap,rect2,mDestRect,null);
-    }
-
-    @Override
-    public void next(Object... params) {
-        ((ActionImageView.CropSnapshot)params[0]).setCropAction(this);
-    }
-
     @Override
     public void stop(Object... params) {
-
+        ((ActionImageView.CropSnapshot)params[0]).setCropAction(this);
     }
 }
