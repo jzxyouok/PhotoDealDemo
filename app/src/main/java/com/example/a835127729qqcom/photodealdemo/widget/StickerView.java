@@ -17,6 +17,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListe
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.StopAddTextListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
+import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +29,8 @@ import java.util.Map;
  *
  * @author panyi
  */
-public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener,CropActionListener {
+public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener,
+        CropActionListener,TextActionCacheQuery {
     private static int STATUS_IDLE = 0;
     private static int STATUS_MOVE = 1;// 移动状态
     private static int STATUS_DELETE = 2;// 删除状态
@@ -82,11 +84,6 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for(ArrayList<TextData> datas:textActionCache){
-            for(TextData data:datas){
-                data.item.draw(canvas);
-            }
-        }
         for (Integer id : stickerItemMap.keySet()) {
             StickerItem item = stickerItemMap.get(id);
             item.draw(canvas);
@@ -325,6 +322,11 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         stickerItemMap.putAll(temp);
         temp.clear();
         postInvalidate();
+    }
+
+    @Override
+    public boolean query(TextAction textAction) {
+        return textActionStickItemMap.keySet().contains(textAction);
     }
 
     private class TextData{

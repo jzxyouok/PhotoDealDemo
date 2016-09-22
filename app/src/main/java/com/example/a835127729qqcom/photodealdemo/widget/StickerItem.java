@@ -138,6 +138,7 @@ public class StickerItem {
 
         detectRotateRect = new RectF(rotateRect);
         detectDeleteRect = new RectF(deleteRect);
+        calculateTextAction();
     }
 
     private void updateHelpBoxRect() {
@@ -165,7 +166,7 @@ public class StickerItem {
 
         this.detectRotateRect.offset(dx, dy);
         this.detectDeleteRect.offset(dx, dy);
-        //calculateTextAction();
+        calculateTextAction();
     }
 
     /**
@@ -247,7 +248,7 @@ public class StickerItem {
                 this.dstRect.centerY(), roatetAngle);
         rotateRect(this.detectDeleteRect, this.dstRect.centerX(),
                 this.dstRect.centerY(), roatetAngle);
-        //calculateTextAction();
+        calculateTextAction();
     }
 
     public void draw(Canvas canvas) {
@@ -274,7 +275,6 @@ public class StickerItem {
      * @param canvas
      */
     private void drawText(Canvas canvas){
-        calculateTextAction();
         realDrawText(canvas);
     }
 
@@ -424,6 +424,7 @@ public class StickerItem {
     public void refreshTextContent(List<String> con){
         textContents.clear();
         textContents.addAll(con);
+        calculateTextAction();
     }
 
     public String getContents(){

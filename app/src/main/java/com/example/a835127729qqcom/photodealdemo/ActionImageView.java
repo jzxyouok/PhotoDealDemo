@@ -30,6 +30,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionL
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
+import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
 import java.util.LinkedList;
@@ -93,6 +94,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	private BackTextActionListener mBackTextActionListener;
 	private RotateActionListener mRotateActionListener;
 	private CropActionListener mCropActionListener;
+	private TextActionCacheQuery mTextActionCacheQuery;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -228,7 +230,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 				continue;
 			}
 			//在文字编辑模式下,不显示文字
-			if(action instanceof TextAction && mode==MODE_TEXT){
+			if(action instanceof TextAction && mode==MODE_TEXT && mTextActionCacheQuery.query((TextAction) action)){
 				continue;
 			}
 			if(lastRotateAction!=null) {//至少一次旋转
@@ -432,5 +434,9 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 
 	public void setmCropActionListener(CropActionListener mCropActionListener) {
 		this.mCropActionListener = mCropActionListener;
+	}
+
+	public void setmTextActionCacheQuery(TextActionCacheQuery mTextActionCacheQuery) {
+		this.mTextActionCacheQuery = mTextActionCacheQuery;
 	}
 }
