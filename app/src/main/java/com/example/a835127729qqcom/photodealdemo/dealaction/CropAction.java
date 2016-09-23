@@ -69,8 +69,6 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
         Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
-        canvas.drawRect(rect2,paint);
-        //canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
         if(currentAngle/90%2==0){
             canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
         }else {
@@ -92,6 +90,7 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
+        Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
         if(currentAngle/90%2==0){
             canvas.drawBitmap(mCropMasicBitmap,rect2,rotateRectf,null);
         }else {

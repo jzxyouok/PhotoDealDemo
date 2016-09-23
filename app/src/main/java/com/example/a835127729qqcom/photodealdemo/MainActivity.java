@@ -28,13 +28,13 @@ public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
     ActionImageView actionImageView;
     //长图w=2000,h=600
-    //String testurl = "http://oss.xlyprint.cn/79e6b1fc-9c28-4d03-b53e-3191f9b96060.jpg";
+    String testurl = "http://oss.xlyprint.cn/79e6b1fc-9c28-4d03-b53e-3191f9b96060.jpg";
     //长图w=600,h=2000
     //String testurl = "http://www.qqkubao.com/uploadfile/2016/07/2/20160726094926525.jpg";
     //小图w=50,h=50
     //String testurl = "http://www.xuanbird.com/wp-content/uploads/avatars/1/0d845f23b2a61342e7f9b79e97c5ba3c-bpthumb.jpg";
     //普通图片
-    String testurl = "http://img05.tooopen.com/images/20141101/sy_73835537934.jpg";
+    //String testurl = "http://img05.tooopen.com/images/20141101/sy_73835537934.jpg";
     StickerView stickerView;
     EditTextActionLayout editView;
     @Override
