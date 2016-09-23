@@ -27,6 +27,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
@@ -35,6 +36,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.query.CurrentRotateRectQ
 import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -459,6 +461,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mCurrentAngle = angle;
 		actions.add(mCurrentAction);
 		invalidate();
+	}
+
+	/**
+	 * 生成图片文件
+     */
+	public void output(){
+		final Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		draw(new Canvas(bitmap));
+		new Thread(){
+			@Override
+			public void run() {
+				SaveBitmap2File.saveImageToGallery(ActionImageView.this.getContext(),bitmap);
+			}
+		}.start();
 	}
 
 

@@ -85,4 +85,12 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:text="完成"/>
+    <Button
+        android:layout_marginTop="100dp"
+        android:layout_below="@id/work_space"
+        android:onClick="output"
+        android:layout_marginLeft="110dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="导出"/>
 </RelativeLayout>

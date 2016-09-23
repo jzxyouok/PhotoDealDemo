@@ -23,6 +23,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
@@ -161,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
         actionImageView.crop(cropImageView.getCropRect());
         actionImageView.setMode(ActionImageView.MODE_IDLE);
         cropImageView.setVisibility(View.GONE);
+    }
+
+    public void output(View view){
+        Log.i("tag","output");
+        actionImageView.output();
     }
 
     @Override
