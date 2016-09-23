@@ -131,13 +131,22 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mMasicPaint.setStrokeWidth(60);
 	}
 
+	private RectF normalRectF;
+	private RectF rotateRectF;
+	private RectF scaleRectF;
 	public void init(){
 		setVisibility(VISIBLE);
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
+		RectF rf = new RectF(0,0,originBitmap.getWidth(),originBitmap.getHeight());
+		Rect r = new Rect(0,0,originBitmap.getWidth(),originBitmap.getHeight());
+		normalRectF = generateRectF(rf);
+		rotateRectF = generateRotateRectF(normalRectF);
+		scaleRectF = generateScaleRectF(normalRectF);
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mForeCanvas = new Canvas(mForeBackground);
-		mForeCanvas.drawBitmap(originBitmap, null, getmRectF(),null);
+		mForeCanvas.drawColor(Color.RED);
+		mForeCanvas.drawBitmap(originBitmap, r, normalRectF,null);
 		//裁剪层
 		cropBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mCropCanvas = new Canvas(cropBitmap);
@@ -158,7 +167,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-			drawBehindBackground(canvas);
+			//drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -210,7 +219,7 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		}else{
 			r = getScalemRect();
 		}
-		canvas.drawBitmap(mForeBackground,r, getScalemRectF(),null);
+		canvas.drawBitmap(mForeBackground,getCurrentScaleRect(), getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
 
@@ -410,6 +419,93 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 		mCurrentAngle = angle;
 		actions.add(mCurrentAction);
 		invalidate();
+	}
+
+
+	/**
+	 * 根据长宽缩放到控件大小
+	 * @param rectF
+	 * @return
+     */
+	private RectF generateRectF(RectF rectF){
+		RectF rf = new RectF(rectF);
+		float scale = 1;
+		if(rectF.width()>rectF.height()){
+			scale = mWidth/rectF.width();
+		}else{
+			scale = mHeight/rectF.height();
+		}
+		Matrix matrix = new Matrix();
+		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
+		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.mapRect(rf);
+		return rf;
+	}
+
+	/**
+	 * 旋转后,根据长宽缩放到控件大小
+	 * @param rectF
+	 * @return
+     */
+	private RectF generateRotateRectF(RectF rectF){
+		RectF rf = new RectF(rectF);
+		float scale = 1;
+		if(rectF.width()>rectF.height()){
+			scale = mHeight/rectF.width();
+		}else{
+			scale = mWidth/rectF.height();
+		}
+		Matrix matrix = new Matrix();
+		matrix.postRotate(90,mWidth/2,mHeight/2);
+		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.mapRect(rf);
+		return rf;
+	}
+
+	private RectF generateScaleRectF(RectF rectF){
+		RectF rf = new RectF(rectF);
+		float scale = 1;
+		if(rectF.width()>rectF.height()){
+			scale = mHeight/rectF.width();
+		}else{
+			scale = mWidth/rectF.height();
+		}
+		Matrix matrix = new Matrix();
+		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.mapRect(rf);
+		return rf;
+	}
+
+	private RectF getCurrentRectF(){
+		if(mCurrentAngle/90%2==0){
+			return normalRectF;
+		}else {
+			return rotateRectF;
+		}
+	}
+
+	private Rect getCurrentRect(){
+		if(mCurrentAngle/90%2==0){
+			return new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
+		}else {
+			return new Rect((int)rotateRectF.left,(int)rotateRectF.top,(int)rotateRectF.right,(int)rotateRectF.bottom);
+		}
+	}
+
+	private RectF getCurrentScaleRectF(){
+		if(mCurrentAngle/90%2==0){
+			return normalRectF;
+		}else {
+			return scaleRectF;
+		}
+	}
+
+	private Rect getCurrentScaleRect(){
+		if(mCurrentAngle/90%2==0){
+			return new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
+		}else {
+			return new Rect((int)scaleRectF.left,(int)scaleRectF.top,(int)scaleRectF.right,(int)scaleRectF.bottom);
+		}
 	}
 
 	/**
