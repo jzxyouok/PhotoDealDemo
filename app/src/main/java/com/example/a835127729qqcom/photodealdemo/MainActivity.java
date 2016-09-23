@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                actionImageView.setComplete(true);
                 actionImageView.init();
                 actionImageView.invalidate();
                 //cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
@@ -117,18 +118,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void mark(View view){
         Log.i("tag","mark");
+        if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_MARK);
     }
 
     public void masic(View view){
         Log.i("tag","masic");
+        if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_MASIC);
     }
 
     public void text(View view){
         Log.i("tag","text");
+        if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_TEXT);
         stickerView.setVisibility(View.VISIBLE);
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void crop(View view){
         Log.i("tag","crop");
+        if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_CROP);
         cropImageView.setRatioCropRect(actionImageView.getCurrentRotateRectF(),1);
@@ -145,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void rotate(View view){
         Log.i("tag","rotate");
+        if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_ROTATE);
         actionImageView.rotate(actionImageView.mCurrentAngle+90,cropImageView,stickerView);
@@ -153,11 +159,13 @@ public class MainActivity extends AppCompatActivity {
     public void back(View view){
         preHide();
         Log.i("tag","back");
+        if(!actionImageView.isComplete()) return;
         actionImageView.back();
     }
 
     public void finish(View view){
         Log.i("tag","finish");
+        if(!actionImageView.isComplete()) return;
         if(actionImageView.getMode()!=ActionImageView.MODE_CROP) return;
         actionImageView.crop(cropImageView.getCropRect());
         actionImageView.setMode(ActionImageView.MODE_IDLE);
@@ -166,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void output(View view){
         Log.i("tag","output");
+        if(!actionImageView.isComplete()) return;
         actionImageView.output();
     }
 

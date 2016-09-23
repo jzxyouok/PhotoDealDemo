@@ -69,7 +69,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	/**
 	 * 是否初始化完成,图片是否加载完成
 	 */
-	private boolean isComplete = true;
+	private boolean isComplete = false;
 	//Mark画笔
 	private Paint mMarkPaint = new Paint();
 	//Masic画笔
@@ -617,5 +617,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	public void setmTextActionCacheQuery(TextActionCacheQuery mTextActionCacheQuery) {
 		this.mTextActionCacheQuery = mTextActionCacheQuery;
+	}
+
+	public boolean isComplete() {
+		return isComplete;
+	}
+
+	public void setComplete(boolean complete) {
+		isComplete = complete;
 	}
 }
