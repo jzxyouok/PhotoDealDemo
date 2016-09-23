@@ -34,10 +34,9 @@ public class CropAction implements Action{
         paint.setColor(Color.TRANSPARENT);
     }
 
-    public CropAction(RectF cropRect, RectF destRect, Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
+    public CropAction(RectF cropRect, float centerX,float centerY,Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
                       Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas, float angle){
         mCropRect = cropRect;
-        mDestRect = destRect;
         mCropBitmap = cropBitmap;
         mforeBitmap = foreBitmap;
         mCropCanvas = croprCanvas;
@@ -47,10 +46,9 @@ public class CropAction implements Action{
         //mBehindCanvas = behindCanvas;
         RectF rf = new RectF(mCropRect);
         Matrix m = new Matrix();
-        m.postRotate(-angle,mDestRect.centerX(),mDestRect.centerY());
+        m.postRotate(-angle,centerX,centerY);
         m.mapRect(rf);
         rect = new Rect((int) rf.left,(int) rf.top,(int) rf.right,(int) rf.bottom);
-        rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
     }
 
     @Override
@@ -70,6 +68,7 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
+        Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
         canvas.drawRect(rect2,paint);
         //canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
         if(currentAngle/90%2==0){
@@ -84,6 +83,7 @@ public class CropAction implements Action{
     public void start(Object... params) {
         rotateRectf = (RectF) params[0];
         currentAngle = (float) params[1];
+        mDestRect = (RectF) params[2];
     }
 
     public void drawCropMasicBitmapDirectly(Canvas canvas) {

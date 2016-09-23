@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
+import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.xinlan.imageeditlibrary.R;
 import com.xinlan.imageeditlibrary.editimage.utils.PaintUtil;
 
@@ -21,7 +22,7 @@ import com.xinlan.imageeditlibrary.editimage.utils.PaintUtil;
  * 剪切图片
  *
  */
-public class CropImageView extends View implements RotateAction.RotateActionBackListener {
+public class CropImageView extends View implements RotateAction.RotateActionBackListener,CropActionListener {
 	private static int STATUS_IDLE = 1;// 空闲状态
 	private static int STATUS_MOVE = 2;// 移动状态
 	private static int STATUS_SCALE = 3;// 缩放状态
@@ -433,4 +434,15 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	public void onCropActionBack(RectF destRect) {
 		setRatioCropRect(destRect,1);
 	}
+
+	@Override
+	public void onCrop() {
+
+	}
+
+	@Override
+	public void onCropBack(RectF destRect) {
+		setRatioCropRect(destRect,1);
+	}
+
 }// end class

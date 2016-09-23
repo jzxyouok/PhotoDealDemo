@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -247,7 +248,6 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
 
     @Override
     public void onRotate(float angle,View view) {
-
         for(StickerItem item : stickerItemMap.values()){
             calculateRotateInfluences(angle, item);
         }
@@ -308,7 +308,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
-    public void onCropBack() {
+    public void onCropBack(RectF rectF) {
         if(textActionCache.isEmpty()) return;
         ArrayList<TextData> datas = textActionCache.remove(textActionCache.size()-1);
         if(datas.isEmpty()) return;

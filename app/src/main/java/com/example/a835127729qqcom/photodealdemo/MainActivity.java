@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         ImageLoader.getInstance().init(config);
     }
 
-    private void perHide(){
+    private void preHide(){
         stickerView.setVisibility(View.GONE);
         cropImageView.setVisibility(View.GONE);
         actionImageView.setEnabled(true);
@@ -115,19 +115,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void mark(View view){
         Log.i("tag","mark");
-        perHide();
+        preHide();
         actionImageView.setMode(ActionImageView.MODE_MARK);
     }
 
     public void masic(View view){
         Log.i("tag","masic");
-        perHide();
+        preHide();
         actionImageView.setMode(ActionImageView.MODE_MASIC);
     }
 
     public void text(View view){
         Log.i("tag","text");
-        perHide();
+        preHide();
         actionImageView.setMode(ActionImageView.MODE_TEXT);
         stickerView.setVisibility(View.VISIBLE);
         actionImageView.setEnabled(false);
@@ -135,20 +135,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void crop(View view){
         Log.i("tag","crop");
-        perHide();
+        preHide();
         actionImageView.setMode(ActionImageView.MODE_CROP);
-        cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
+        cropImageView.setRatioCropRect(actionImageView.getCurrentRotateRectF(),1);
         cropImageView.setVisibility(View.VISIBLE);
     }
 
     public void rotate(View view){
         Log.i("tag","rotate");
-        perHide();
+        preHide();
         actionImageView.setMode(ActionImageView.MODE_ROTATE);
         actionImageView.rotate(actionImageView.mCurrentAngle+90,cropImageView,stickerView);
     }
 
     public void back(View view){
+        preHide();
         Log.i("tag","back");
         actionImageView.back();
     }
