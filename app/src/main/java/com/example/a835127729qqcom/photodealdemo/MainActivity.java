@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         editView.setmStopAddTextListener(stickerView);
         actionImageView.setmCropActionListener(stickerView);
         actionImageView.setmTextActionCacheQuery(stickerView);
+        stickerView.setmCurrentRotateRectQuery(actionImageView);
     }
 
     /**

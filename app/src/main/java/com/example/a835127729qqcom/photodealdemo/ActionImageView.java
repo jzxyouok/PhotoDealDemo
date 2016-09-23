@@ -31,6 +31,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionL
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
+import com.example.a835127729qqcom.photodealdemo.widget.query.CurrentRotateRectQuery;
 import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
@@ -39,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class ActionImageView extends ImageView implements TextsControlListener {
+public class ActionImageView extends ImageView implements TextsControlListener,CurrentRotateRectQuery {
 	public static final int MODE_IDLE = 0;
 	public static final int MODE_MARK = 1;
 	public static final int MODE_MASIC = 2;
@@ -308,6 +309,12 @@ public class ActionImageView extends ImageView implements TextsControlListener {
 	}
 
 	private CropSnapshot cropSnapshot = new CropSnapshot();
+
+	@Override
+	public RectF query() {
+		return getCurrentRotateRectF();
+	}
+
 	/**
 	 * 裁剪后的快照
 	 */

@@ -18,6 +18,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListe
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.StopAddTextListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
+import com.example.a835127729qqcom.photodealdemo.widget.query.CurrentRotateRectQuery;
 import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
      * @param context
      */
     private BeginAddTextListener mBeginAddTextListener;
+    private CurrentRotateRectQuery mCurrentRotateRectQuery;
     private Matrix rotateMatrix = new Matrix();
 
     public StickerView(Context context) {
@@ -166,6 +168,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
                 if (currentStatus == STATUS_MOVE) {// 移动贴图
                     float dx = x - oldx;
                     float dy = y - oldy;
+                    if(currentItem != null && isOutOfView(dx, dy)) break;
                     if (currentItem != null) {
                         currentItem.updatePos(dx, dy);
                         invalidate();
@@ -200,6 +203,16 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
                 break;
         }
         return true;
+    }
+
+    /**
+     * 中点是否被拉出看范围
+     * @param dx
+     * @param dy
+     * @return
+     */
+    private boolean isOutOfView(float dx, float dy) {
+        return !mCurrentRotateRectQuery.query().contains(currentItem.dstRect.centerX()+dx,currentItem.dstRect.centerY()+dy);
     }
 
     /**
@@ -339,5 +352,9 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         Integer integer;
         TextAction textAction;
         StickerItem item;
+    }
+
+    public void setmCurrentRotateRectQuery(CurrentRotateRectQuery mCurrentRotateRectQuery) {
+        this.mCurrentRotateRectQuery = mCurrentRotateRectQuery;
     }
 }// end class
