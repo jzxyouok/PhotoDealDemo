@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:background="@android:color/background_dark"
     tools:context="com.example.a835127729qqcom.photodealdemo.MainActivity">
 
     <FrameLayout
@@ -15,6 +15,8 @@
             android:src="@drawable/testicon"
             android:id="@+id/main_image"
             android:layout_width="match_parent"
+            android:padding="0dp"
+            android:background="@null"
             android:scaleType="fitCenter"
             android:layout_height="400dp" />
         <com.example.a835127729qqcom.photodealdemo.widget.StickerView

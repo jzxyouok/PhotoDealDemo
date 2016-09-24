@@ -194,7 +194,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		mBehindCanvas.save();
-		mBehindCanvas.drawBitmap(masicBitmap, null, getmRectF(),null);
+		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
 		mBehindCanvas.restore();
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
 			recaculateRects(cropSnapshot.cropAction.mCropRect);
@@ -209,10 +209,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 			}
 		}
+		Rect rect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		//旋转底片
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mBehindBackground,getCurrentScaleRect(), getCurrentScaleRectF(),null);
+		canvas.drawBitmap(mBehindBackground,rect, getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
 
@@ -223,9 +224,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void drawForeBackground(Canvas canvas) {
 		recaculateRects(originBitmapRectF);
 		drawActions(mForeCanvas);
+		Rect rect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mForeBackground,getCurrentScaleRect(), getCurrentScaleRectF(),null);
+		canvas.drawBitmap(mForeBackground,rect, getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
 
@@ -236,7 +238,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		foreCanvas.save();
-		mForeCanvas.drawBitmap(originBitmap, null, getmRectF(),null);
+		mForeCanvas.drawBitmap(originBitmap, null, normalRectF,null);
 		foreCanvas.restore();
 
 
@@ -467,11 +469,37 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 生成图片文件
      */
 	public void output(){
-		final Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		draw(new Canvas(bitmap));
 		new Thread(){
 			@Override
 			public void run() {
+				Rect srcrect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
+				RectF destrect;// = new RectF(0,0,getCurrentRotateRect().width(),getCurrentRotateRect().height());
+				RectF rotateRect = getCurrentRotateRectF();
+				if(originBitmapRectF.width()<mWidth&&originBitmapRectF.height()<mHeight) {
+					float scale;
+					if(originBitmapRectF.width()<originBitmapRectF.height()){
+						scale = originBitmapRectF.width()/rotateRect.width();
+					}else if(originBitmapRectF.width()==originBitmapRectF.height()){
+						scale = rotateRect.width()<rotateRect.height()?originBitmapRectF.width()/rotateRect.width():originBitmapRectF.height()/rotateRect.height();
+					}else{
+						scale = originBitmapRectF.height()/rotateRect.height();
+					}
+					destrect = new RectF(0,0,rotateRect.width()*scale,rotateRect.height()*scale);
+				}else{
+					destrect = new RectF(0,0,rotateRect.width(),rotateRect.height());
+				}
+				RectF rect1 = new RectF();
+				Matrix matrix = new Matrix();
+				matrix.postRotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
+				matrix.mapRect(rect1,destrect);
+
+				Bitmap bitmap = Bitmap.createBitmap((int)destrect.width(),(int)destrect.height(), Bitmap.Config.ARGB_8888);
+				Canvas canvas = new Canvas(bitmap);
+				canvas.save();
+				canvas.rotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
+				canvas.drawRect(rect1,mMarkPaint);
+				canvas.drawBitmap(mForeBackground,srcrect, rect1,null);
+				canvas.restore();
 				SaveBitmap2File.saveImageToGallery(ActionImageView.this.getContext(),bitmap);
 			}
 		}.start();
@@ -551,7 +579,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		}
 	}
 
-	private Rect getCurrentRect(){
+	private Rect getCurrentRotateRect(){
 		if(mCurrentAngle/90%2==0){
 			return new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		}else {
