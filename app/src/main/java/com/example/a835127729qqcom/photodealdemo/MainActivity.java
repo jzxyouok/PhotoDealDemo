@@ -1,8 +1,10 @@
 package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -16,6 +18,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
@@ -33,22 +36,31 @@ public class MainActivity extends AppCompatActivity {
     //长图w=600,h=2000
     //String testurl = "http://www.qqkubao.com/uploadfile/2016/07/2/20160726094926525.jpg";
     //小图w=50,h=50
-    String testurl = "http://www.xuanbird.com/wp-content/uploads/avatars/1/0d845f23b2a61342e7f9b79e97c5ba3c-bpthumb.jpg";
+    //String testurl = "http://www.xuanbird.com/wp-content/uploads/avatars/1/0d845f23b2a61342e7f9b79e97c5ba3c-bpthumb.jpg";
     //普通图片
     //String testurl = "http://img05.tooopen.com/images/20141101/sy_73835537934.jpg";
     StickerView stickerView;
     EditTextActionLayout editView;
+    String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initImageLoader();
+
+        path = getIntent().getStringExtra("path");;
+        if(TextUtils.isEmpty(path)){
+            finish();
+        }
         cropImageView = (CropImageView) findViewById(R.id.crop);
         actionImageView = (ActionImageView) findViewById(R.id.main_image);
         editView = (EditTextActionLayout) findViewById(R.id.edit);
         stickerView = (StickerView) findViewById(R.id.stick);
-
-        ImageLoader.getInstance().displayImage(testurl, actionImageView,new ImageLoadingListener(){
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .imageScaleType(ImageScaleType.NONE) // default 设置图片以如何的编码方式显示
+                .bitmapConfig(Bitmap.Config.ARGB_8888) // default 设置图片的解码类型
+                .build();
+        ImageLoader.getInstance().displayImage("file://"+path, actionImageView,new ImageLoadingListener(){
 
             @Override
             public void onLoadingStarted(String imageUri, View view) {
@@ -63,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 actionImageView.setComplete(true);
-                actionImageView.init();
+                actionImageView.init(path);
                 actionImageView.invalidate();
                 //cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
             }
@@ -80,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         actionImageView.setmCropActionListener(stickerView);
         actionImageView.setmTextActionCacheQuery(stickerView);
         stickerView.setmCurrentRotateRectQuery(actionImageView);
+
+
     }
 
     /**
@@ -182,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+//        actionImageView.setComplete(true);
+//        actionImageView.init(path);
+//        actionImageView.invalidate();
     }
 
 }

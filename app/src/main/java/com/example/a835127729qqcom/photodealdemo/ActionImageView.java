@@ -3,6 +3,7 @@ package com.example.a835127729qqcom.photodealdemo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Paint.Style;
 import android.graphics.Canvas;
@@ -145,10 +146,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	}
 
 
-	public void init(){
+	public void init(String path){
 		setVisibility(VISIBLE);
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
-		originBitmapRectF = new RectF(0,0,originBitmap.getWidth(),originBitmap.getHeight());
+		originBitmapRectF = decodeBounds(path);
 		recaculateRects(originBitmapRectF);
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
@@ -169,6 +170,14 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.ARGB_8888, true),
 				getMeasuredWidth(),getMeasuredHeight(),false);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
+	}
+
+	private RectF decodeBounds(String path){
+		BitmapFactory.Options opts = new BitmapFactory.Options();
+		opts.inJustDecodeBounds = true;
+		opts.inSampleSize = 1;
+		BitmapFactory.decodeFile(path,opts);
+		return new RectF(0,0,opts.outWidth,opts.outHeight);
 	}
 
 	@Override
@@ -498,6 +507,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				canvas.save();
 				canvas.rotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
 				canvas.drawRect(rect1,mMarkPaint);
+				canvas.drawBitmap(mBehindBackground,srcrect, rect1,null);
 				canvas.drawBitmap(mForeBackground,srcrect, rect1,null);
 				canvas.restore();
 				SaveBitmap2File.saveImageToGallery(ActionImageView.this.getContext(),bitmap);
