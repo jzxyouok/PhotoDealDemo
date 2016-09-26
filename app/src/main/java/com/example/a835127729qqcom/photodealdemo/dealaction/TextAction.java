@@ -25,6 +25,8 @@ public class TextAction implements Action{
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAntiAlias(true);
+        paint.setDither(true);
     }
 
     //旋转角度

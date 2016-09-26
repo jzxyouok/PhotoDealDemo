@@ -132,6 +132,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mMarkPaint.setStyle(Style.STROKE);
 		mMarkPaint.setColor(Color.RED);
 		mMarkPaint.setStrokeWidth(20);
+		mMarkPaint.setAntiAlias(true);
+		mMarkPaint.setDither(true);
 	}
 
 	private void setUpMasicPaint(){
