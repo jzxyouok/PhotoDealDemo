@@ -37,13 +37,14 @@ public class TextAction implements Action{
     float textSize;
     //画笔颜色
     private int color = Color.WHITE;
+    private float[] res = new float[2];
+    private Matrix matrix = new Matrix();
 
     @Override
     public void execute(Canvas canvas) {
-        Matrix m = new Matrix();
-        m.postRotate(-delAngle,rectCenterX,rectCenterY);
-        float[] res = new float[2];
-        m.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
+        matrix.reset();
+        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
 
         canvas.save();
         canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);

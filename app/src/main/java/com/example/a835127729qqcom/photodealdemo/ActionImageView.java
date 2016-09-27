@@ -100,6 +100,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 */
 	private RectF originBitmapRectF;
 	private RectF normalRectF;
+	private Rect normalRect;
 	private RectF rotateRectF;
 	private RectF scaleRectF;
 	/**
@@ -220,11 +221,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 			}
 		}
-		Rect rect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		//旋转底片
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mBehindBackground,rect, getCurrentScaleRectF(),null);
+		canvas.drawBitmap(mBehindBackground,normalRect, getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
 
@@ -235,10 +235,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void drawForeBackground(Canvas canvas) {
 		recaculateRects(originBitmapRectF);
 		drawActions(mForeCanvas);
-		Rect rect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
-		canvas.drawBitmap(mForeBackground,rect, getCurrentScaleRectF(),null);
+		canvas.drawBitmap(mForeBackground,normalRect, getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
 
@@ -319,6 +318,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
      */
 	private void recaculateRects(RectF rectF) {
 		normalRectF = generateRectF(rectF);
+		normalRect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		rotateRectF = generateRotateRectF(normalRectF);
 		scaleRectF = generateScaleRectF(normalRectF);
 	}

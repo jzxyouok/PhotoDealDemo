@@ -25,7 +25,6 @@ public class CropAction implements Action{
     private Bitmap mBehindBitmap;
     private Canvas mCropMasicCanvas;
     private Rect rect;
-    private Rect rect2;
     private RectF rotateRectf;
     private static Paint paint = new Paint();
     private float currentAngle = 0;
