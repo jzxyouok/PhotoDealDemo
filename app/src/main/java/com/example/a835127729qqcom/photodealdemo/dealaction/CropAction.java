@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
+import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
 
 /**
  * Created by 835127729qq.com on 16/8/23.
@@ -53,9 +54,9 @@ public class CropAction implements Action{
     @Override
     public void execute(Canvas canvas) {
         //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paint.setXfermode(DrawMode.CLEAR);
         mCropCanvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        paint.setXfermode(DrawMode.SRC);
         //将foreBitmap内容绘制到mCropBitmap上
         mCropCanvas.drawBitmap(mforeBitmap,rect,mDestRect,null);
         drawCropBitmapDirectly(canvas);
@@ -63,9 +64,9 @@ public class CropAction implements Action{
 
     public void drawCropBitmapDirectly(Canvas canvas) {
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
         if(currentAngle/90%2==0){

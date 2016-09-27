@@ -6,6 +6,8 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 
+import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+
 /**
  * Created by 835127729qq.com on 16/8/22.
  */
@@ -21,7 +23,7 @@ public class MasicAction implements Action{
     @Override
     public void execute(Canvas canvas) {
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+        mPaint.setXfermode(DrawMode.DST_OUT);
         canvas.drawPath(mPath, mPaint);
     }
 

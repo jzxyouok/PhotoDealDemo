@@ -28,6 +28,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MarkAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
@@ -201,9 +202,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void drawBehindBackground(Canvas canvas){
 		recaculateRects(originBitmapRectF);
 		//清屏
-		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		mClearPaint.setXfermode(DrawMode.CLEAR);
 		mBehindCanvas.drawPaint(mClearPaint);
-		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		mClearPaint.setXfermode(DrawMode.SRC);
 
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
@@ -243,9 +244,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	private void drawActions(Canvas foreCanvas){
 		//清屏
-		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		mClearPaint.setXfermode(DrawMode.CLEAR);
 		foreCanvas.drawPaint(mClearPaint);
-		mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		mClearPaint.setXfermode(DrawMode.SRC);
 
 		foreCanvas.save();
 		mForeCanvas.drawBitmap(originBitmap, null, normalRectF,null);
