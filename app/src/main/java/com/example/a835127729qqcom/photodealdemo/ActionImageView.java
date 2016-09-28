@@ -29,6 +29,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+import com.example.a835127729qqcom.photodealdemo.util.PhotoProcessing;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
@@ -36,7 +37,6 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionLis
 import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlListener;
 import com.example.a835127729qqcom.photodealdemo.widget.query.CurrentRotateRectQuery;
 import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
-import com.xinlan.imageeditlibrary.editimage.fliter.PhotoProcessing;
 
 import java.io.IOException;
 import java.util.ArrayList;

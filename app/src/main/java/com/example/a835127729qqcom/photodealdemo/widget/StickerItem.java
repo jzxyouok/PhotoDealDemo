@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.example.a835127729qqcom.photodealdemo.R;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 
 import java.util.ArrayList;
@@ -97,11 +98,11 @@ public class StickerItem {
         // 导入工具按钮位图
         if (deleteBit == null) {
             deleteBit = BitmapFactory.decodeResource(context.getResources(),
-                    com.xinlan.imageeditlibrary.R.drawable.sticker_delete);
+                    R.drawable.sticker_delete);
         }// end if
         if (rotateBit == null) {
             rotateBit = BitmapFactory.decodeResource(context.getResources(),
-                    com.xinlan.imageeditlibrary.R.drawable.sticker_rotate);
+                    R.drawable.sticker_rotate);
         }// end if
         tipContents.add("请输入文字");
     }

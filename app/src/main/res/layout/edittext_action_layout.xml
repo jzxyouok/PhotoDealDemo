@@ -6,20 +6,20 @@
     android:layout_height="match_parent">
     <EditText
         android:id="@+id/edit_text"
-        android:textColor="@color/white"
+        android:textColor="@android:color/white"
         android:maxLength="24"
-        android:textCursorDrawable="@color/white"
+        android:textCursorDrawable="@android:color/white"
         android:layout_centerInParent="true"
         android:minHeight="70dp"
         android:hint="请输入文字"
-        android:textColorHint="@color/white"
+        android:textColorHint="@android:color/white"
         android:textAlignment="center"
         android:layout_width="180dp"
-        android:background="@color/materialcolorpicker__red"
+        android:background="@android:color/holo_red_light"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/text_count"
-        android:textColor="@color/white"
+        android:textColor="@android:color/white"
         android:text="0/24"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"

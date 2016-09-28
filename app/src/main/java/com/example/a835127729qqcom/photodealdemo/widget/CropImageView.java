@@ -12,10 +12,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.a835127729qqcom.photodealdemo.R;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
+import com.example.a835127729qqcom.photodealdemo.util.PaintUtil;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
-import com.xinlan.imageeditlibrary.R;
-import com.xinlan.imageeditlibrary.editimage.utils.PaintUtil;
 
 
 /**
