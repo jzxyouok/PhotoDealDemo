@@ -29,6 +29,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+import com.example.a835127729qqcom.photodealdemo.util.MasicUtil;
 import com.example.a835127729qqcom.photodealdemo.util.PhotoProcessing;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
@@ -149,9 +150,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mMasicPaint.setStrokeWidth(60);
 	}
 
-
+	/**
+	 * 建议在非主线程中调用该方法
+	 * @param path
+     */
 	public void init(String path){
-		setVisibility(VISIBLE);
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
 		originBitmapRectF = decodeBounds(path);
 		recaculateRects(originBitmapRectF);
@@ -167,6 +170,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		//马赛克层
 		Bitmap srcBitmap = Bitmap.createBitmap(originBitmap.copy(Bitmap.Config.ARGB_8888, true));
 		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
+		//如果你不希望使用native包,可以调用该方法来生成马赛克
+		//masicBitmap = MasicUtil.getMosaicsBitmap(srcBitmap,0.1);
 		mBehindBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mBehindCanvas = new Canvas(mBehindBackground);
 		mBehindCanvas.drawBitmap(masicBitmap,null, getmRectF(),null);
@@ -174,6 +179,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.ARGB_8888, true),
 				getMeasuredWidth(),getMeasuredHeight(),false);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
+		//使用MasicUtil.getMosaicsBitmap()来生成马赛克,可以回收srcBitmap,否则不能
+		//srcBitmap.recycle();
 	}
 
 	private RectF decodeBounds(String path){
