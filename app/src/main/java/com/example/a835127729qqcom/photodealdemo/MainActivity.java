@@ -74,10 +74,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                actionImageView.setComplete(true);
-                actionImageView.init(path);
-                actionImageView.invalidate();
-                //cropImageView.setRatioCropRect(actionImageView.getRotatedmRectF(),1);
+                new Thread(){
+                    @Override
+                    public void run() {
+                        actionImageView.setComplete(true);
+                        actionImageView.init(path);
+                        actionImageView.postInvalidate();
+                    }
+                }.start();
             }
 
             @Override
