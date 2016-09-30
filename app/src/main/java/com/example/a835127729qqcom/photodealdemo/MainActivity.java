@@ -2,12 +2,14 @@ package com.example.a835127729qqcom.photodealdemo;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.CropImageView;
 import com.example.a835127729qqcom.photodealdemo.widget.EditTextActionLayout;
 import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
@@ -27,6 +29,7 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
@@ -41,21 +44,25 @@ public class MainActivity extends AppCompatActivity {
     //String testurl = "http://img05.tooopen.com/images/20141101/sy_73835537934.jpg";
     StickerView stickerView;
     EditTextActionLayout editView;
+    ColorPickBox mColorPickBox;
     String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initImageLoader();
-
         path = getIntent().getStringExtra("path");;
         if(TextUtils.isEmpty(path)){
             finish();
         }
-        cropImageView = (CropImageView) findViewById(R.id.crop);
-        actionImageView = (ActionImageView) findViewById(R.id.main_image);
-        editView = (EditTextActionLayout) findViewById(R.id.edit);
-        stickerView = (StickerView) findViewById(R.id.stick);
+        allFindViewById();
+        initImage();
+        setupColorPickBox();
+        addAllListener();
+
+    }
+
+    private void initImage() {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .imageScaleType(ImageScaleType.NONE) // default 设置图片以如何的编码方式显示
                 .bitmapConfig(Bitmap.Config.ARGB_8888) // default 设置图片的解码类型
@@ -89,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void addAllListener() {
         actionImageView.setmBackTextActionListener(stickerView);
         stickerView.setmTextsControlListener(actionImageView);
         stickerView.setmBeginAddTextListener(editView);
@@ -96,8 +106,31 @@ public class MainActivity extends AppCompatActivity {
         actionImageView.setmCropActionListener(stickerView);
         actionImageView.setmTextActionCacheQuery(stickerView);
         stickerView.setmCurrentRotateRectQuery(actionImageView);
+        mColorPickBox.addColorPickListener(actionImageView);
+        mColorPickBox.addColorPickListener(stickerView);
+        mColorPickBox.addColorPickListener(editView);
+    }
 
+    private void allFindViewById() {
+        cropImageView = (CropImageView) findViewById(R.id.crop);
+        actionImageView = (ActionImageView) findViewById(R.id.main_image);
+        editView = (EditTextActionLayout) findViewById(R.id.edit);
+        stickerView = (StickerView) findViewById(R.id.stick);
+        mColorPickBox = (ColorPickBox) findViewById(R.id.color_pick_box);
+    }
 
+    private void setupColorPickBox() {
+        ArrayList<Integer> arr = new ArrayList<Integer>();
+        arr.add(Color.rgb(255,255,255));
+        arr.add(Color.rgb(0,0,0));
+        arr.add(Color.rgb(196,200,25));
+        arr.add(Color.rgb(219,134,0));
+        arr.add(Color.rgb(219,0,120));
+        arr.add(Color.rgb(152,0,198));
+        arr.add(Color.rgb(68,12,203));
+        arr.add(Color.rgb(0,173,202));
+        arr.add(Color.rgb(0,212,67));
+        mColorPickBox.initByInteger(arr);
     }
 
     /**

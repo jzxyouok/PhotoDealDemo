@@ -42,13 +42,6 @@ public class PicChooseActivity extends Activity{
             }
 
         });
-
-        ColorPickBox mColorPickBox = (ColorPickBox) findViewById(R.id.color_pick_box);
-        ArrayList<String> arr = new ArrayList<String>();
-        arr.add("#abcdef");
-        arr.add("#aabbcc");
-        arr.add("#ddeeff");
-        mColorPickBox.init(arr);
     }
 
     @Override

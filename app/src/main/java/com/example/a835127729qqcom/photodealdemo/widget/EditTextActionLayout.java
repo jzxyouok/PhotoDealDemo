@@ -20,13 +20,14 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.StopAddTextList
 /**
  * Created by 835127729qq.com on 16/9/19.
  */
-public class EditTextActionLayout extends FrameLayout implements BeginAddTextListener {
+public class EditTextActionLayout extends FrameLayout implements BeginAddTextListener,ColorPickBox.ColorPickListener {
     private RelativeLayout mBlackLayout;
     private EditText mEditText;
     private TextView mTextCount;
     private Context mContext;
     private StopAddTextListener mStopAddTextListener;
     private InputMethodManager inputManager;
+    private int currentColor = Color.WHITE;
     public EditTextActionLayout(Context context) {
         super(context);
         init(context);
@@ -98,6 +99,8 @@ public class EditTextActionLayout extends FrameLayout implements BeginAddTextLis
     public void onStartEditText(String text) {
         this.setVisibility(VISIBLE);
         mEditText.setText(text);
+        mEditText.setTextColor(currentColor);
+        mEditText.setHintTextColor(currentColor);
         mEditText.setSelection(mEditText.length());
         showSoftInput();
     }
@@ -115,5 +118,10 @@ public class EditTextActionLayout extends FrameLayout implements BeginAddTextLis
 
     public void setmStopAddTextListener(StopAddTextListener mStopAddTextListener) {
         this.mStopAddTextListener = mStopAddTextListener;
+    }
+
+    @Override
+    public void notify(int color) {
+        currentColor = color;
     }
 }

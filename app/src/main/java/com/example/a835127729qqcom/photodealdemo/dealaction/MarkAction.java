@@ -10,18 +10,19 @@ import android.graphics.Path;
  */
 public class MarkAction implements Action{
     Path mPath;
-    Color color;
+    int color;
     Paint mPaint;
 
-    public MarkAction(Path path,Paint paint){
+    public MarkAction(Path path,Paint paint,int color){
         mPaint = paint;
         mPath = path;
+        this.color = color;
     }
 
     @Override
     public void execute(Canvas canvas) {
+        mPaint.setColor(color);
         canvas.drawPath(mPath,mPaint);
-        //canvas.drawPath(mPath,mPaint);
     }
 
     @Override

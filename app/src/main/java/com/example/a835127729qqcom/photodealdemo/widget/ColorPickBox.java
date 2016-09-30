@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ColorPickBox extends View{
     private int mWidth,mHeight;
     private int mWidthWithoutPadding,mHeightWithoutPadding;
-    private ArrayList<String> colors = new ArrayList<>();
+    private ArrayList<Integer> colors = new ArrayList<>();
     private ArrayList<Circle> circles = new ArrayList<>();
     private Paint circlePaint = new Paint();
     //圆形大小和圆形之间距离的比值
@@ -37,8 +37,17 @@ public class ColorPickBox extends View{
         super(context, attrs, defStyleAttr);
     }
 
-    public void init(ArrayList<String> colors){
+    public void initByInteger(ArrayList<Integer> colors){
         this.colors.addAll(colors);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setDither(true);
+        intCircles();
+    }
+
+    public void initByString(ArrayList<String> colors){
+        for(String color:colors) {
+            this.colors.add(Color.parseColor(color));
+        }
         circlePaint.setAntiAlias(true);
         circlePaint.setDither(true);
         intCircles();
@@ -57,7 +66,7 @@ public class ColorPickBox extends View{
 
     private void intCircles() {
         if(mHeight<=0||mWidth<=0||colors.size()==0) return;
-        float radius = mWidthWithoutPadding/(colors.size()+(colors.size()-1)*paddingScale);
+        float radius = mWidthWithoutPadding/(colors.size()+(colors.size()-1)*paddingScale)/2;
         radius = radius>mHeightWithoutPadding/2?mHeightWithoutPadding/2:radius;
         float padding = radius*paddingScale;
         float diameter = 2*radius+padding;
@@ -70,7 +79,7 @@ public class ColorPickBox extends View{
         circles.clear();
         for(int i=0;i<colors.size();i++){
             Circle circle = new Circle();
-            circle.color = Color.parseColor(colors.get(i));
+            circle.color = colors.get(i);
             circle.isEnable = false;
             circle.radius = radius;
             circle.innerRadius = radius*innerScale;
@@ -80,6 +89,8 @@ public class ColorPickBox extends View{
             circle.rectF = new RectF(circle.x-radius,circle.y-radius,circle.x+radius,circle.y+radius);
             circles.add(circle);
         }
+        circles.get(0).isEnable = true;
+        notifyAllListener(circles.get(0).color);
         postInvalidate();
     }
 
@@ -104,15 +115,19 @@ public class ColorPickBox extends View{
         for(Circle circle:circles){
             if(circle.rectF.contains(x,y)){
                 circle.isEnable = true;
-                for(ColorPickListener colorPickListener:listeners){
-                    colorPickListener.notify(circle.color);
-                }
+                notifyAllListener(circle.color);
             }else{
                 circle.isEnable = false;
             }
         }
         postInvalidate();
         return super.onTouchEvent(event);
+    }
+
+    private void notifyAllListener(int color) {
+        for(ColorPickListener colorPickListener:listeners){
+            colorPickListener.notify(color);
+        }
     }
 
     private class Circle{

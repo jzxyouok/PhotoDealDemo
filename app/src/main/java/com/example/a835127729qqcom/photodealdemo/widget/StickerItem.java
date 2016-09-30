@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -77,10 +78,11 @@ public class StickerItem {
 
     public StickerItem(Context context,TextAction textAction) {
         mTextAction = textAction;
-        helpBoxPaint.setColor(Color.BLACK);
+        helpBoxPaint.setColor(Color.WHITE);
         helpBoxPaint.setStyle(Style.STROKE);
         helpBoxPaint.setAntiAlias(true);
-        helpBoxPaint.setStrokeWidth(4);
+        helpBoxPaint.setStrokeWidth(6);
+        helpBoxPaint.setPathEffect(new DashPathEffect(new float[] { 12, 12 }, 0));
 
         dstPaint = new Paint();
         dstPaint.setColor(Color.RED);
@@ -333,14 +335,15 @@ public class StickerItem {
             mTextAction.getTexts().add(texts.get(bottomIndex));
             bottomIndex++;
         }
-        mTextAction.setTextSize(textSize);
+        mTextAction.textSize = textSize;
         mTextAction.setRoatetAngle(roatetAngle);
         mTextAction.setRotateCenterX(helpBox.centerX());
         mTextAction.setRotateCenterY(helpBox.centerY());
     }
 
     public void realDrawText(Canvas canvas){
-        textPaint.setTextSize(textSize);
+        textPaint.setTextSize(mTextAction.textSize);
+        textPaint.setColor(mTextAction.color);
         canvas.save();
         canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
         for(int i=0;i<mTextAction.getTextPaths().size();i++){

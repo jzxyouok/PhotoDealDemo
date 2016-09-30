@@ -14,8 +14,4 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         />
-    <com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox
-        android:id="@+id/color_pick_box"
-        android:layout_width="match_parent"
-        android:layout_height="32dp" />
 </LinearLayout>

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
+    android:background="#1C1C1E"
     tools:context="com.example.a835127729qqcom.photodealdemo.MainActivity">
 
     <FrameLayout
@@ -37,62 +37,67 @@
             android:layout_width="match_parent"
             />
     </FrameLayout>
-    <Button
+    <com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox
+        android:layout_marginTop="10dp"
         android:layout_below="@id/work_space"
+        android:id="@+id/color_pick_box"
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/color_pick_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <Button
         android:onClick="mark"
-        android:layout_width="100dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="标记"/>
     <Button
-        android:layout_below="@id/work_space"
         android:onClick="masic"
-        android:layout_marginLeft="110dp"
-        android:layout_width="100dp"
+        android:layout_marginLeft="80dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="马赛克"/>
     <Button
-        android:layout_below="@id/work_space"
         android:onClick="text"
-        android:layout_marginLeft="220dp"
-        android:layout_width="100dp"
+        android:layout_marginLeft="160dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="文字"/>
     <Button
-        android:layout_marginTop="50dp"
-        android:layout_below="@id/work_space"
+        android:layout_marginLeft="240dp"
         android:onClick="crop"
-        android:layout_width="100dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="裁剪"/>
+
     <Button
-        android:layout_marginLeft="110dp"
         android:layout_marginTop="50dp"
-        android:layout_below="@id/work_space"
         android:onClick="rotate"
-        android:layout_width="100dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="旋转"/>
     <Button
         android:layout_marginTop="50dp"
-        android:layout_marginLeft="220dp"
-        android:layout_below="@id/work_space"
         android:onClick="back"
-        android:layout_width="100dp"
+        android:layout_marginLeft="80dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="返回"/>
     <Button
-        android:layout_marginTop="100dp"
-        android:layout_below="@id/work_space"
+        android:layout_marginTop="50dp"
         android:onClick="finish"
-        android:layout_width="100dp"
+        android:layout_marginLeft="160dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="完成"/>
     <Button
-        android:layout_marginTop="100dp"
-        android:layout_below="@id/work_space"
+        android:layout_marginTop="50dp"
         android:onClick="output"
-        android:layout_marginLeft="110dp"
-        android:layout_width="100dp"
+        android:layout_marginLeft="240dp"
+        android:layout_width="60dp"
         android:layout_height="50dp"
         android:text="导出"/>
+    </RelativeLayout>
 </RelativeLayout>

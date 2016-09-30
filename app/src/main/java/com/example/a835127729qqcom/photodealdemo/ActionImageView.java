@@ -32,6 +32,8 @@ import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
 import com.example.a835127729qqcom.photodealdemo.util.MasicUtil;
 import com.example.a835127729qqcom.photodealdemo.util.PhotoProcessing;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
+import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
+import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox.ColorPickListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
@@ -45,7 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class ActionImageView extends ImageView implements TextsControlListener,CurrentRotateRectQuery {
+public class ActionImageView extends ImageView implements TextsControlListener,CurrentRotateRectQuery,ColorPickListener {
 	public static final int MODE_IDLE = 0;
 	public static final int MODE_MARK = 1;
 	public static final int MODE_MASIC = 2;
@@ -79,6 +81,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private Paint mMasicPaint = new Paint();
 	//清屏画笔
 	private Paint mClearPaint = new Paint();
+	//文字画笔
+	private Paint mTextPaint = new Paint();
 	/**
 	 * 马赛克图
 	 */
@@ -112,6 +116,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private RotateActionListener mRotateActionListener;
 	private List<CropActionListener> mCropActionListeners = new ArrayList<CropActionListener>();
 	private TextActionCacheQuery mTextActionCacheQuery;
+	private int currentColor = Color.WHITE;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -129,6 +134,15 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void initPaint() {
 		setUpMarkPaint();
 		setUpMasicPaint();
+		setUpTextPaint();
+	}
+
+	private void setUpTextPaint() {
+		mTextPaint.setStyle(Style.FILL_AND_STROKE);
+		mTextPaint.setTextAlign(Paint.Align.CENTER);
+		mTextPaint.setAntiAlias(true);
+		mTextPaint.setDither(true);
+		mTextPaint.setColor(Color.WHITE);
 	}
 
 	private void setUpMarkPaint(){
@@ -305,7 +319,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 				action.stop(cropSnapshot);
 			}else if(action instanceof TextAction){
-				action.start(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
+				action.start(mCurrentAngle,mWidth/2.0f,mHeight/2.0f,mTextPaint);
 				action.execute(foreCanvas);
 			}else {
 				if (lastRotateAction != null) {//至少一次旋转
@@ -336,6 +350,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	@Override
 	public RectF query() {
 		return getCurrentRotateRectF();
+	}
+
+	@Override
+	public void notify(int color) {
+		currentColor = color;
+		mMarkPaint.setColor(color);
+		mTextPaint.setColor(color);
 	}
 
 	/**
@@ -395,7 +416,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		Action action = null;
 		switch (mode){
 			case MODE_MARK:
-				action = new MarkAction(new Path(),mMarkPaint);
+				action = new MarkAction(new Path(),mMarkPaint,currentColor);
 				break;
 			case MODE_MASIC:
 				action = new MasicAction(new Path(),mMasicPaint);

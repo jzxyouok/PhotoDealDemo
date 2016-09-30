@@ -15,7 +15,7 @@
         android:textColorHint="@android:color/white"
         android:textAlignment="center"
         android:layout_width="180dp"
-        android:background="@android:color/holo_red_light"
+        android:background="@drawable/dash_border_rect_bg"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/text_count"

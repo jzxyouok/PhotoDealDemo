@@ -3,6 +3,7 @@ package com.example.a835127729qqcom.photodealdemo.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -32,7 +33,7 @@ import java.util.Map;
  * @author panyi
  */
 public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener,
-        CropActionListener,TextActionCacheQuery {
+        CropActionListener,TextActionCacheQuery,ColorPickBox.ColorPickListener {
     private static int STATUS_IDLE = 0;
     private static int STATUS_MOVE = 1;// 移动状态
     private static int STATUS_DELETE = 2;// 删除状态
@@ -43,6 +44,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     private int currentStatus;// 当前状态
     private StickerItem currentItem;// 当前操作的贴图数据
     private float oldx, oldy;
+    private int currentColor = Color.WHITE;
 
     private LinkedHashMap<Integer, StickerItem> stickerItemMap = new LinkedHashMap<Integer, StickerItem>();// 存贮每层贴图数据
     private LinkedHashMap<TextAction, StickerItem> textActionStickItemMap = new LinkedHashMap<TextAction, StickerItem>();// 存贮每层贴图数据
@@ -221,6 +223,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
      */
     public void addTextRect(@Nullable final Rect textRect) {
         TextAction textAction = new TextAction();
+        textAction.color = currentColor;
         StickerItem item = new StickerItem(this.getContext(),textAction);
         textActionStickItemMap.put(textAction,item);
         item.init(textRect, this);
@@ -340,6 +343,15 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     public boolean query(TextAction textAction) {
         return textActionStickItemMap.keySet().contains(textAction);
+    }
+
+    @Override
+    public void notify(int color) {
+        currentColor = color;
+        if(currentItem!=null){
+            currentItem.getmTextAction().color = color;
+            postInvalidate();
+        }
     }
 
     private class TextData{

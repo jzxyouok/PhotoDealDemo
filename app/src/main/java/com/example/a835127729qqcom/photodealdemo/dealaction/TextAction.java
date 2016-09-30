@@ -20,23 +20,16 @@ public class TextAction implements Action{
     private float delAngle;
     private ArrayList<Path> textPaths = new ArrayList<Path>();
     private ArrayList<String> texts = new ArrayList<String>();
-    private static Paint paint = new Paint();
+    private Paint paint;
     private float rectCenterX,rectCenterY;
-    static {
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-    }
-
     //旋转角度
     private float roatetAngle = 0;
     //旋转中心
     private float rotateCenterX,rotateCenterY;
     //字体大小
-    float textSize;
+    public float textSize = 40;
     //画笔颜色
-    private int color = Color.WHITE;
+    public int color = Color.WHITE;
     private float[] res = new float[2];
     private Matrix matrix = new Matrix();
 
@@ -62,6 +55,7 @@ public class TextAction implements Action{
         delAngle = (float) params[0];
         rectCenterX = (float) params[1];
         rectCenterY = (float) params[2];
+        paint = (Paint) params[3];
     }
 
     @Override
@@ -73,15 +67,6 @@ public class TextAction implements Action{
     public void stop(Object... params) {
 
     }
-
-    public void setTextSize(float textSize) {
-        this.textSize = textSize;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
 
     public ArrayList<Path> getTextPaths() {
         return textPaths;
@@ -103,3 +88,4 @@ public class TextAction implements Action{
         this.rotateCenterY = rotateCenterY;
     }
 }
+
