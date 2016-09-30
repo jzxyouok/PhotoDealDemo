@@ -12,7 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
+
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 /**
  * Created by 835127729qq.com on 16/9/26.
@@ -39,6 +42,13 @@ public class PicChooseActivity extends Activity{
             }
 
         });
+
+        ColorPickBox mColorPickBox = (ColorPickBox) findViewById(R.id.color_pick_box);
+        ArrayList<String> arr = new ArrayList<String>();
+        arr.add("#abcdef");
+        arr.add("#aabbcc");
+        arr.add("#ddeeff");
+        mColorPickBox.init(arr);
     }
 
     @Override
