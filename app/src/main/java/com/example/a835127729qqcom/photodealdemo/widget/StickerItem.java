@@ -23,10 +23,6 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * @author panyi
- */
 public class StickerItem {
     /**
      * 最小缩放比例

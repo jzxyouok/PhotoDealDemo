@@ -29,8 +29,6 @@ import java.util.Map;
 
 /**
  * 贴图操作控件
- *
- * @author panyi
  */
 public class StickerView extends View implements BackTextActionListener,StopAddTextListener,RotateActionListener,
         CropActionListener,TextActionCacheQuery,ColorPickBox.ColorPickListener {
