@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         actionImageView.setMode(ActionImageView.MODE_IDLE);
         mColorPickBox.setVisibility(View.GONE);
         mMasicSizePickBox.setVisibility(View.GONE);
+        stickerView.clearState();
     }
 
     public void mark(View view){

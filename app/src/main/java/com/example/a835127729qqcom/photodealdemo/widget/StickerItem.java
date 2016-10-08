@@ -91,6 +91,8 @@ public class StickerItem {
         textPaint = new Paint();
         textPaint.setStyle(Style.FILL_AND_STROKE);
         textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setDither(true);
+        textPaint.setAntiAlias(true);
         textPaint.setColor(Color.WHITE);
 
         // 导入工具按钮位图

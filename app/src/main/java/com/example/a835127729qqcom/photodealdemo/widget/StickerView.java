@@ -250,13 +250,14 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
-    public void onStopEditText(String text) {
+    public void onStopEditText(String text,int color) {
         setVisibility(VISIBLE);
         ArrayList<String> arr = new ArrayList<String>();
         if(!TextUtils.isEmpty(text.trim())){
             arr.addAll(Arrays.asList(text.split("\n")));
         }
         currentItem.refreshTextContent(arr);
+        currentItem.getmTextAction().color = color;
         postInvalidate();
     }
 
@@ -344,7 +345,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
-    public void notify(int color) {
+    public void notifyColorChange(int color) {
         currentColor = color;
         if(currentItem!=null){
             currentItem.getmTextAction().color = color;
@@ -367,4 +368,8 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     public void setmCurrentRotateRectQuery(CurrentRotateRectQuery mCurrentRotateRectQuery) {
         this.mCurrentRotateRectQuery = mCurrentRotateRectQuery;
     }
-}// end class
+
+    public void clearState(){
+        currentItem = null;
+    }
+}

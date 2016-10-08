@@ -5,5 +5,5 @@ package com.example.a835127729qqcom.photodealdemo.widget.listener;
  * EditTextActionLayout停止编辑text,通知StickerView更新text内容
  */
 public interface StopAddTextListener {
-    void onStopEditText(String text);
+    void onStopEditText(String text,int color);
 }

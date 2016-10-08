@@ -356,7 +356,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	}
 
 	@Override
-	public void notify(int color) {
+	public void notifyColorChange(int color) {
 		currentColor = color;
 		mMarkPaint.setColor(color);
 		mTextPaint.setColor(color);

@@ -66,7 +66,7 @@ public class EditTextActionLayout extends FrameLayout implements BeginAddTextLis
                 inputManager.hideSoftInputFromWindow(mEditText.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
                 EditTextActionLayout.this.setVisibility(GONE);
                 String content = mEditText.getText().toString();
-                mStopAddTextListener.onStopEditText(content);
+                mStopAddTextListener.onStopEditText(content,currentColor);
             }
         });
     }
@@ -121,7 +121,14 @@ public class EditTextActionLayout extends FrameLayout implements BeginAddTextLis
     }
 
     @Override
-    public void notify(int color) {
+    public void notifyColorChange(int color) {
         currentColor = color;
+        post(new Runnable() {
+            @Override
+            public void run() {
+                mEditText.setTextColor(currentColor);
+                mEditText.setHintTextColor(currentColor);
+            }
+        });
     }
 }

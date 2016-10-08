@@ -143,7 +143,7 @@ public class ColorPickBox extends View{
 
     private void notifyAllListener(int color) {
         for(ColorPickListener colorPickListener:listeners){
-            colorPickListener.notify(color);
+            colorPickListener.notifyColorChange(color);
         }
     }
 
@@ -158,7 +158,7 @@ public class ColorPickBox extends View{
     }
 
     public interface ColorPickListener{
-        void notify(int color);
+        void notifyColorChange(int color);
     }
 
     public void addColorPickListener(ColorPickListener mColorPickListener){
