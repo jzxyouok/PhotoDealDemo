@@ -165,7 +165,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	}
 
 	/**
-	 * 建议在非主线程中调用该方法
+	 * 建议在非主线程中调用该方法,并且需要Imageview宽高加载完成,所以建议在onWindowFocusChanged()方法中调用
 	 * @param path
      */
 	public void init(String path){
