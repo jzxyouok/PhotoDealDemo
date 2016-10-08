@@ -47,12 +47,12 @@
             android:id="@+id/color_pick_box"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="32dp" />
+            android:layout_height="52dp" />
         <com.example.a835127729qqcom.photodealdemo.widget.MasicSizePickBox
             android:visibility="gone"
             android:id="@+id/masic_size_pick_box"
             android:layout_width="match_parent"
-            android:layout_height="32dp" />
+            android:layout_height="52dp" />
     </RelativeLayout>
 
     <RelativeLayout

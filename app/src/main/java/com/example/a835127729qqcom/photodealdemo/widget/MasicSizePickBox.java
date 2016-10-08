@@ -81,35 +81,28 @@ public class MasicSizePickBox extends View{
     private void intCircles(List<Integer> sizes) {
         int count = sizes.size();
         if(mHeight<=0||mWidth<=0||count==0) return;
-        float scalePower = count==1?0.9f:(0.9f-minSizeCircle2MaxSizeCircle)/(count-1);
+        float scalePower = count==1?1:(1-minSizeCircle2MaxSizeCircle)/(count-1);
         //计算最大圆直径
         float totalScale = 0;
         for(int i=0;i<count;i++){
             totalScale += minSizeCircle2MaxSizeCircle+scalePower*i;
         }
         totalScale += (count-1)*paddingScale;
-        float maxRadius = mWidthWithoutPadding/totalScale/2;
+        float maxRadius = 0.9f*mWidthWithoutPadding/totalScale/2;
         maxRadius = maxRadius>mHeightWithoutPadding/2?mHeightWithoutPadding/2:maxRadius;
         //计算圆的宽度
         circleWidth = maxRadius*0.05f;
         circlePaint.setStrokeWidth(circleWidth);
         //圆边缘的间距
-        float padding = maxRadius*paddingScale;
+        float padding = 2*maxRadius*paddingScale;
         //计算最左边的圆的圆心位置
         float start = mWidthWithoutPadding/2.0f;
-        if(count%2==1){//奇数
-            for(int i=0;i<count/2+1;i++){
-                start = start-(maxRadius*2)*(minSizeCircle2MaxSizeCircle+scalePower*i);
-            }
-            int preCount = count/2;
-            start = start-preCount*padding*2+minSizeCircle2MaxSizeCircle*maxRadius;
-        }else{
-            for(int i=0;i<count%2;i++){
-                start = start-(maxRadius*2)*(minSizeCircle2MaxSizeCircle+scalePower*i);
-            }
-            int preCount = count/2-1;
-            start -= padding*preCount*2+minSizeCircle2MaxSizeCircle*maxRadius;
+        float totalLength = 0;
+        for(int i=0;i<count;i++){
+            totalLength = totalLength + (maxRadius*2)*(minSizeCircle2MaxSizeCircle+scalePower*i);
         }
+        totalLength = totalLength + padding*(count-1);
+        start = start - totalLength/2 + maxRadius*minSizeCircle2MaxSizeCircle;
         //计算每个圆的坐标和大小
         lastCircle = null;
         circles.clear();
@@ -121,7 +114,7 @@ public class MasicSizePickBox extends View{
             if(lastCircle==null){
                 circle.x = start;
             }else{
-                circle.x = lastCircle.x+maxRadius*(2*minSizeCircle2MaxSizeCircle+scalePower*(2*i-1))+maxRadius*paddingScale*2;
+                circle.x = lastCircle.x+maxRadius*(2*minSizeCircle2MaxSizeCircle+scalePower*(2*i-1))+padding;
             }
             circle.y = mHeight/2.0f;
             circle.rectF = new RectF(circle.x-circle.radius,circle.y-circle.radius,circle.x+circle.radius,circle.y+circle.radius);

@@ -42,6 +42,6 @@ public class MasicAction implements Action{
 
     @Override
     public void stop(Object... params) {
-
+        mPath.lineTo((float)params[0],(float)params[1]);
     }
 }
