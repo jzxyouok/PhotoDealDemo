@@ -12,6 +12,7 @@ import android.view.View;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.CropImageView;
 import com.example.a835127729qqcom.photodealdemo.widget.EditTextActionLayout;
+import com.example.a835127729qqcom.photodealdemo.widget.MasicSizePickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.StickerView;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     StickerView stickerView;
     EditTextActionLayout editView;
     ColorPickBox mColorPickBox;
+    MasicSizePickBox mMasicSizePickBox;
     String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,13 @@ public class MainActivity extends AppCompatActivity {
         allFindViewById();
         initImage();
         setupColorPickBox();
+        setupMasicSizePickBox();
         addAllListener();
 
+    }
+
+    private void setupMasicSizePickBox() {
+        mMasicSizePickBox.init(15,25,35,45,55);
     }
 
     private void initImage() {
@@ -109,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         mColorPickBox.addColorPickListener(actionImageView);
         mColorPickBox.addColorPickListener(stickerView);
         mColorPickBox.addColorPickListener(editView);
+        mMasicSizePickBox.addMasicSizePickListener(actionImageView);
     }
 
     private void allFindViewById() {
@@ -117,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         editView = (EditTextActionLayout) findViewById(R.id.edit);
         stickerView = (StickerView) findViewById(R.id.stick);
         mColorPickBox = (ColorPickBox) findViewById(R.id.color_pick_box);
+        mMasicSizePickBox = (MasicSizePickBox) findViewById(R.id.masic_size_pick_box);
     }
 
     private void setupColorPickBox() {
@@ -165,12 +174,15 @@ public class MainActivity extends AppCompatActivity {
         cropImageView.setVisibility(View.GONE);
         actionImageView.setEnabled(true);
         actionImageView.setMode(ActionImageView.MODE_IDLE);
+        mColorPickBox.setVisibility(View.GONE);
+        mMasicSizePickBox.setVisibility(View.GONE);
     }
 
     public void mark(View view){
         Log.i("tag","mark");
         if(!actionImageView.isComplete()) return;
         preHide();
+        mColorPickBox.setVisibility(View.VISIBLE);
         actionImageView.setMode(ActionImageView.MODE_MARK);
     }
 
@@ -178,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("tag","masic");
         if(!actionImageView.isComplete()) return;
         preHide();
+        mMasicSizePickBox.setVisibility(View.VISIBLE);
         actionImageView.setMode(ActionImageView.MODE_MASIC);
     }
 
@@ -187,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
         preHide();
         actionImageView.setMode(ActionImageView.MODE_TEXT);
         stickerView.setVisibility(View.VISIBLE);
+        mColorPickBox.setVisibility(View.VISIBLE);
         actionImageView.setEnabled(false);
     }
 

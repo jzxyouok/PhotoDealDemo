@@ -34,6 +34,7 @@ import com.example.a835127729qqcom.photodealdemo.util.PhotoProcessing;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox.ColorPickListener;
+import com.example.a835127729qqcom.photodealdemo.widget.MasicSizePickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.BackTextActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.RotateActionListener;
@@ -47,7 +48,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class ActionImageView extends ImageView implements TextsControlListener,CurrentRotateRectQuery,ColorPickListener {
+public class ActionImageView extends ImageView implements TextsControlListener,CurrentRotateRectQuery,ColorPickListener,
+		MasicSizePickBox.MasicSizePickListener{
 	public static final int MODE_IDLE = 0;
 	public static final int MODE_MARK = 1;
 	public static final int MODE_MASIC = 2;
@@ -117,6 +119,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private List<CropActionListener> mCropActionListeners = new ArrayList<CropActionListener>();
 	private TextActionCacheQuery mTextActionCacheQuery;
 	private int currentColor = Color.WHITE;
+	private float currentStrokeWidth = 1;
 
 	public ActionImageView(Context context) {
 		this(context, null);
@@ -359,6 +362,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mTextPaint.setColor(color);
 	}
 
+	@Override
+	public void notify(float size) {
+		currentStrokeWidth = size;
+	}
+
 	/**
 	 * 裁剪后的快照
 	 */
@@ -419,7 +427,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				action = new MarkAction(new Path(),mMarkPaint,currentColor);
 				break;
 			case MODE_MASIC:
-				action = new MasicAction(new Path(),mMasicPaint);
+				action = new MasicAction(new Path(),mMasicPaint,currentStrokeWidth);
 				break;
 		}
 		return action;

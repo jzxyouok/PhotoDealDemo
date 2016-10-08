@@ -25,6 +25,11 @@ public class ColorPickBox extends View{
     private float innerScale = 0.7f;
     private float aroundWidthScale = 0.09f;
     private ArrayList<ColorPickListener> listeners = new ArrayList<>();
+    private Circle lastCircle = null;
+    private Circle currentCircle = null;
+    private boolean isChange = false;
+
+
     public ColorPickBox(Context context) {
         super(context);
     }
@@ -90,6 +95,7 @@ public class ColorPickBox extends View{
             circles.add(circle);
         }
         circles.get(0).isEnable = true;
+        currentCircle = circles.get(0);
         notifyAllListener(circles.get(0).color);
         postInvalidate();
     }
@@ -112,15 +118,26 @@ public class ColorPickBox extends View{
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        for(Circle circle:circles){
-            if(circle.rectF.contains(x,y)){
-                circle.isEnable = true;
-                notifyAllListener(circle.color);
-            }else{
-                circle.isEnable = false;
-            }
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                lastCircle = currentCircle;
+                for(Circle circle:circles){
+                    if(circle.rectF.contains(x,y)){
+                        isChange = true;
+                        currentCircle = circle;
+                        circle.isEnable = true;
+                        notifyAllListener(circle.color);
+                    }else{
+                        circle.isEnable = false;
+                    }
+                }
+                if(!isChange && lastCircle!=null){
+                    lastCircle.isEnable = true;
+                }
+                isChange = false;
+                postInvalidate();
+                break;
         }
-        postInvalidate();
         return super.onTouchEvent(event);
     }
 

@@ -37,15 +37,27 @@
             android:layout_width="match_parent"
             />
     </FrameLayout>
-    <com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox
+    <RelativeLayout
         android:layout_marginTop="10dp"
-        android:layout_below="@id/work_space"
-        android:id="@+id/color_pick_box"
+        android:id="@+id/pick_box_layout"
         android:layout_width="match_parent"
-        android:layout_height="32dp" />
+        android:layout_below="@id/work_space"
+        android:layout_height="wrap_content">
+        <com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox
+            android:id="@+id/color_pick_box"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
+        <com.example.a835127729qqcom.photodealdemo.widget.MasicSizePickBox
+            android:visibility="gone"
+            android:id="@+id/masic_size_pick_box"
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
+    </RelativeLayout>
+
     <RelativeLayout
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/color_pick_box"
+        android:layout_below="@id/pick_box_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     <Button

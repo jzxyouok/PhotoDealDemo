@@ -14,16 +14,19 @@ import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
 public class MasicAction implements Action{
     Path mPath;
     Paint mPaint;
+    float paintWidth;
 
-    public MasicAction(Path path,Paint paint){
+    public MasicAction(Path path,Paint paint,float width){
         mPaint = paint;
         mPath = path;
+        paintWidth = width;
     }
 
     @Override
     public void execute(Canvas canvas) {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setXfermode(DrawMode.DST_OUT);
+        mPaint.setStrokeWidth(paintWidth);
         canvas.drawPath(mPath, mPaint);
     }
 
