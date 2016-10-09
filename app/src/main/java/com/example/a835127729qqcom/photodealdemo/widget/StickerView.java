@@ -256,9 +256,11 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         if(!TextUtils.isEmpty(text.trim())){
             arr.addAll(Arrays.asList(text.split("\n")));
         }
-        currentItem.refreshTextContent(arr);
-        currentItem.getmTextAction().color = color;
-        postInvalidate();
+        if(currentItem!=null) {
+            currentItem.refreshTextContent(arr);
+            currentItem.getmTextAction().color = color;
+            postInvalidate();
+        }
     }
 
     @Override
