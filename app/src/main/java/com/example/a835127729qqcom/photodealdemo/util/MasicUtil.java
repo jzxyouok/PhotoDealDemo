@@ -49,4 +49,47 @@ public final class MasicUtil {
         Log.i("MasicUtil","DrawTime:" + (end - start)+"ms");
         return resultBmp;
     }
+
+    /**
+     * 和上面的函数同样的功能，效率远高于上面
+     *
+     * @param bmp
+     * @param precent
+     * @return
+     */
+    public static Bitmap getMosaicsBitmaps(Bitmap bmp, double precent) {
+        long start = System.currentTimeMillis();
+        int bmpW = bmp.getWidth();
+        int bmpH = bmp.getHeight();
+        int[] pixels = new int[bmpH * bmpW];
+        bmp.getPixels(pixels, 0, bmpW, 0, 0, bmpW, bmpH);
+        int raw = (int) (bmpW * precent);
+        int unit;
+        if (raw == 0) {
+            unit = bmpW;
+        } else {
+            unit = bmpW / raw; //原来的unit*unit像素点合成一个，使用原左上角的值
+        }
+        if (unit >= bmpW || unit >= bmpH) {
+            return getMosaicsBitmap(bmp, precent);
+        }
+        for (int i = 0; i < bmpH; ) {
+            for (int j = 0; j < bmpW; ) {
+                int leftTopPoint = i * bmpW + j;
+                for (int k = 0; k < unit; k++) {
+                    for (int m = 0; m < unit; m++) {
+                        int point = (i + k) * bmpW + (j + m);
+                        if (point < pixels.length) {
+                            pixels[point] = pixels[leftTopPoint];
+                        }
+                    }
+                }
+                j += unit;
+            }
+            i += unit;
+        }
+        long end = System.currentTimeMillis();
+        Log.i("MasicUtil","DrawTime:" + (end - start)+"ms");
+        return Bitmap.createBitmap(pixels, bmpW, bmpH, Bitmap.Config.ARGB_8888);
+    }
 }

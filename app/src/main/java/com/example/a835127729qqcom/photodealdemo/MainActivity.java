@@ -1,5 +1,6 @@
 package com.example.a835127729qqcom.photodealdemo;
 
+import android.app.ActivityManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -253,4 +254,11 @@ public class MainActivity extends AppCompatActivity {
 //        actionImageView.invalidate();
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ActivityManager activityMgr= (ActivityManager) this.getSystemService(ACTIVITY_SERVICE );
+        activityMgr.killBackgroundProcesses(getPackageName());
+    }
 }

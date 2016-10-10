@@ -171,30 +171,26 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 建议在非主线程中调用该方法,并且需要Imageview宽高加载完成,所以建议在onWindowFocusChanged()方法中调用
 	 * @param path
      */
-	public void init(String path){
+	public synchronized void init(String path){
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
 		originBitmapRectF = decodeBounds(path);
 		recaculateRects(originBitmapRectF);
 		// 初始化bitmap
 		mForeBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mForeCanvas = new Canvas(mForeBackground);
-		mForeCanvas.drawColor(Color.RED);
-		mForeCanvas.drawBitmap(originBitmap, null, normalRectF,null);
 		//裁剪层
 		cropBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
 		mCropCanvas = new Canvas(cropBitmap);
 
 		//马赛克层
-		Bitmap srcBitmap = Bitmap.createBitmap(originBitmap.copy(Bitmap.Config.ARGB_8888, true));
+		Bitmap srcBitmap = originBitmap.copy(Bitmap.Config.ARGB_8888, true);
 		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
 		//如果你不希望使用native包,可以调用该方法来生成马赛克
-		//masicBitmap = MasicUtil.getMosaicsBitmap(srcBitmap,0.1);
-		mBehindBackground = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Config.ARGB_8888);
+		//masicBitmap = MasicUtil.getMosaicsBitmaps(srcBitmap,0.1);
+		mBehindBackground = Bitmap.createScaledBitmap(masicBitmap,getMeasuredWidth(), getMeasuredHeight(), false);
 		mBehindCanvas = new Canvas(mBehindBackground);
-		mBehindCanvas.drawBitmap(masicBitmap,null, getmRectF(),null);
 		//马赛克裁剪层
-		cropMasicBitmap = Bitmap.createScaledBitmap(masicBitmap.copy(Bitmap.Config.ARGB_8888, true),
-				getMeasuredWidth(),getMeasuredHeight(),false);
+		cropMasicBitmap = Bitmap.createBitmap(getMeasuredWidth(),getMeasuredHeight(),Config.ARGB_8888);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
 		//使用MasicUtil.getMosaicsBitmap()来生成马赛克,可以回收srcBitmap,否则不能
 		//srcBitmap.recycle();
@@ -702,5 +698,34 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	public void setComplete(boolean complete) {
 		isComplete = complete;
+	}
+
+	public synchronized void recycleResource(){
+		isComplete = false;
+		if(masicBitmap!=null){
+			masicBitmap.recycle();
+			masicBitmap = null;
+		}
+
+		if(mBehindBackground!=null){
+			mBehindBackground.recycle();
+			mBehindBackground = null;
+		}
+
+		if(cropMasicBitmap!=null){
+			cropMasicBitmap.recycle();
+			cropMasicBitmap = null;
+		}
+
+		if(mForeBackground!=null){
+			mForeBackground.recycle();
+			mForeBackground = null;
+		}
+
+		if(cropBitmap!=null){
+			cropBitmap.recycle();
+			cropBitmap = null;
+		}
+		System.gc();
 	}
 }
