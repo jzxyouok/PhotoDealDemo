@@ -168,7 +168,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	}
 
 	/**
-	 * 建议在非主线程中调用该方法,并且需要Imageview宽高加载完成,所以建议在onWindowFocusChanged()方法中调用
+	 * 建议在非主线程中调用该方法,并且需要Imageview宽高加载完成,所以建议在onWindowFocusChanged()方法中调用,并且hasFocus为true
 	 * @param path
      */
 	public synchronized void init(String path){
@@ -183,17 +183,18 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mCropCanvas = new Canvas(cropBitmap);
 
 		//马赛克层
-		Bitmap srcBitmap = originBitmap.copy(Bitmap.Config.ARGB_8888, true);
+		Bitmap srcBitmap = originBitmap.copy(Bitmap.Config.ARGB_4444, true);
 		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
 		//如果你不希望使用native包,可以调用该方法来生成马赛克
 		//masicBitmap = MasicUtil.getMosaicsBitmaps(srcBitmap,0.1);
 		mBehindBackground = Bitmap.createScaledBitmap(masicBitmap,getMeasuredWidth(), getMeasuredHeight(), false);
 		mBehindCanvas = new Canvas(mBehindBackground);
 		//马赛克裁剪层
-		cropMasicBitmap = Bitmap.createBitmap(getMeasuredWidth(),getMeasuredHeight(),Config.ARGB_8888);
+		cropMasicBitmap = Bitmap.createBitmap(getMeasuredWidth(),getMeasuredHeight(),Config.ARGB_4444);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
 		//使用MasicUtil.getMosaicsBitmap()来生成马赛克,可以回收srcBitmap,否则不能
 		//srcBitmap.recycle();
+		isComplete = true;
 	}
 
 	private RectF decodeBounds(String path){
@@ -220,6 +221,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @param canvas
 	 */
 	private void drawBehindBackground(Canvas canvas){
+		if(isComplete==false) return;
 		recaculateRects(originBitmapRectF);
 		//清屏
 		mClearPaint.setXfermode(DrawMode.CLEAR);
@@ -254,6 +256,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @param canvas
 	 */
 	private void drawForeBackground(Canvas canvas) {
+		if(isComplete==false) return;
 		recaculateRects(originBitmapRectF);
 		drawActions(mForeCanvas);
 		canvas.save();

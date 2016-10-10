@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import com.example.a835127729qqcom.photodealdemo.util.PhotoDealImageLoader;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
 import com.example.a835127729qqcom.photodealdemo.widget.CropImageView;
 import com.example.a835127729qqcom.photodealdemo.widget.EditTextActionLayout;
@@ -71,37 +72,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initImage() {
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .imageScaleType(ImageScaleType.NONE) // default 设置图片以如何的编码方式显示
-                .bitmapConfig(Bitmap.Config.ARGB_8888) // default 设置图片的解码类型
-                .build();
-        ImageLoader.getInstance().displayImage("file://"+path, actionImageView,new ImageLoadingListener(){
-
+//        DisplayImageOptions options = new DisplayImageOptions.Builder()
+//                .imageScaleType(ImageScaleType.NONE) // default 设置图片以如何的编码方式显示
+//                .bitmapConfig(Bitmap.Config.ARGB_8888) // default 设置图片的解码类型
+//                .build();
+//        ImageLoader.getInstance().displayImage("file://"+path, actionImageView,new ImageLoadingListener(){
+//
+//            @Override
+//            public void onLoadingStarted(String imageUri, View view) {
+//
+//            }
+//
+//            @Override
+//            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+//                Log.i("cky",failReason.toString());
+//            }
+//
+//            @Override
+//            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+//                new Thread(){
+//                    @Override
+//                    public void run() {
+//                        actionImageView.init(path);
+//                        actionImageView.postInvalidate();
+//                    }
+//                }.start();
+//            }
+//
+//            @Override
+//            public void onLoadingCancelled(String imageUri, View view) {
+//
+//            }
+//        });
+        PhotoDealImageLoader.getInstance().loadBitmap(path, actionImageView, new PhotoDealImageLoader.LoadListener() {
             @Override
-            public void onLoadingStarted(String imageUri, View view) {
+            public void onStart() {
 
             }
 
             @Override
-            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                Log.i("cky",failReason.toString());
-            }
-
-            @Override
-            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            public void onEnd() {
                 new Thread(){
                     @Override
                     public void run() {
-                        actionImageView.setComplete(true);
                         actionImageView.init(path);
                         actionImageView.postInvalidate();
                     }
                 }.start();
-            }
-
-            @Override
-            public void onLoadingCancelled(String imageUri, View view) {
-
             }
         });
     }
