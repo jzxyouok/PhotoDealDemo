@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         cropImageView.setVisibility(View.VISIBLE);
     }
 
-    public void rotate(View view){
+    public void rotate(final View view){
         Log.i("tag","rotate");
         if(!actionImageView.isComplete()) return;
         preHide();

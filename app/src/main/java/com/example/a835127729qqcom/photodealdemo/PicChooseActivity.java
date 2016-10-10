@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
+import com.example.a835127729qqcom.photodealdemo.widget.TestView;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -54,5 +55,13 @@ public class PicChooseActivity extends Activity{
             startActivity(intent);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        TestView testView = (TestView) findViewById(R.id.test);
+        testView.init();
+        testView.postInvalidate();
     }
 }

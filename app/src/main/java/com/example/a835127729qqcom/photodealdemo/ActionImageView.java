@@ -209,7 +209,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-			drawBehindBackground(canvas);
+			//drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -315,8 +315,12 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF());
 					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
 				}else {
+					RectF lastNormalRectf = new RectF(normalRectF);
+					RectF lastScaleRectf = getCurrentScaleRectF();
+					RectF lastRotateRectf = getCurrentRotateRectF();
 					recaculateRects(((CropAction) action).mCropRect);
-					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF());
+					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
+							lastNormalRectf,lastScaleRectf,lastRotateRectf);
 					action.execute(foreCanvas);
 				}
 				action.stop(cropSnapshot);
@@ -334,17 +338,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 			}
 		}
-	}
-
-	/**
-	 * 重新初始化工具矩阵
-	 * @param rectF
-     */
-	private void recaculateRects(RectF rectF) {
-		normalRectF = generateRectF(rectF);
-		normalRect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
-		rotateRectF = generateRotateRectF(normalRectF);
-		scaleRectF = generateScaleRectF(normalRectF);
 	}
 
 	private CropSnapshot cropSnapshot = new CropSnapshot();
@@ -370,7 +363,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 裁剪后的快照
 	 */
 	public class CropSnapshot{
-		public boolean isCache = true;
+		public boolean isCache = false;
 		public void setCropAction(CropAction cropAction) {
 			if(!isCache){
 				this.cropAction = null;
@@ -487,7 +480,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @param rectf
 	 */
 	public void crop(RectF rectf){
-		mCurrentAction = new CropAction(rectf,getmRect().centerX(),getmRect().centerY(),
+		mCurrentAction = new CropAction(rectf,getmRectF().centerX(),getmRectF().centerY(),
 				cropBitmap,mForeBackground,mCropCanvas,
 				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
@@ -553,6 +546,16 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		}.start();
 	}
 
+	/**
+	 * 重新初始化工具矩阵
+	 * @param rectF
+	 */
+	private void recaculateRects(RectF rectF) {
+		normalRectF = generateRectF(rectF);
+		normalRect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
+		rotateRectF = generateRotateRectF(rectF);
+		scaleRectF = generateScaleRectF(rectF);
+	}
 
 	/**
 	 * 根据长宽缩放到控件大小
@@ -592,6 +595,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			scale = mWidth/rectF.height();
 		}
 		Matrix matrix = new Matrix();
+		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
 		matrix.postRotate(90,mWidth/2,mHeight/2);
 		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
 		matrix.mapRect(rf);
@@ -614,6 +618,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			scale = mWidth/rectF.height();
 		}
 		Matrix matrix = new Matrix();
+		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
 		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
 		matrix.mapRect(rf);
 		return rf;
@@ -621,9 +626,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	public RectF getCurrentRotateRectF(){
 		if(mCurrentAngle/90%2==0){
-			return normalRectF;
+			return new RectF(normalRectF);
 		}else {
-			return rotateRectF;
+			return new RectF(rotateRectF);
 		}
 	}
 
@@ -637,9 +642,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	private RectF getCurrentScaleRectF(){
 		if(mCurrentAngle/90%2==0){
-			return normalRectF;
+			return new RectF(normalRectF);
 		}else {
-			return scaleRectF;
+			return new RectF(scaleRectF);
 		}
 	}
 
