@@ -62,6 +62,9 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	private float textMargin = 50;
 	//文字大小
 	private float textSize = 10;
+	//裁剪框是否被激活,也就是是否被触碰
+	private boolean isActived = false;
+	private CropActiveListener mCropActiveListener;
 
 	public CropImageView(Context context) {
 		super(context);
@@ -234,9 +237,11 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 				ret = true;
 				selectedControllerCicle = selectCircle;// 记录选中控制点编号
 				status = STATUS_SCALE;// 进入缩放状态
+				innerActive();
 			} else if (cropRect.contains(x, y)) {// 选择缩放框内部
 				ret = true;
 				status = STATUS_MOVE;// 进入移动状态
+				innerActive();
 			} else {// 没有选择
 
 			}// end if
@@ -261,6 +266,27 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		oldy = y;
 		return ret;
 	}
+
+	private void innerActive(){
+		if(!isActived){
+			isActived = true;
+			if(mCropActiveListener!=null) {
+				mCropActiveListener.onCropActive();
+			}
+		}
+	}
+
+	/**
+	 * 取消激活状态
+	 */
+	public void unActive(){
+		isActived = false;
+	}
+
+	public boolean isActived(){
+		return isActived;
+	}
+
 
 	/**
 	 * 移动剪切框
@@ -475,7 +501,6 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 
 	@Override
 	public void onCrop() {
-
 	}
 
 	@Override
@@ -483,4 +508,11 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		setRatioCropRect(destRect,1);
 	}
 
-}// end class
+	public interface CropActiveListener{
+		void onCropActive();
+	}
+
+	public void setmCropActiveListener(CropActiveListener mCropActiveListener) {
+		this.mCropActiveListener = mCropActiveListener;
+	}
+}
