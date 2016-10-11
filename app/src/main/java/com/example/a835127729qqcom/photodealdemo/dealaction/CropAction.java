@@ -69,7 +69,7 @@ public class CropAction implements Action{
         drawCropBitmapDirectly(canvas);
     }
 
-    public void drawCropBitmapDirectly(Canvas canvas) {
+    private void drawCropBitmapDirectly(Canvas canvas) {
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
@@ -82,6 +82,17 @@ public class CropAction implements Action{
         canvas.restore();
     }
 
+    public void drawCropBitmapFromCache(Canvas canvas) {
+        //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(DrawMode.CLEAR);
+        canvas.drawPaint(paint);
+        paint.setXfermode(DrawMode.SRC);
+        //绘制裁剪图片
+        canvas.save();
+        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
+        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.restore();
+    }
 
     @Override
     public void start(Object... params) {
@@ -108,7 +119,20 @@ public class CropAction implements Action{
         drawCropMasicBitmapDirectly(canvas);
     }
 
-    public void drawCropMasicBitmapDirectly(Canvas canvas) {
+    private void drawCropMasicBitmapDirectly(Canvas canvas) {
+        //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //绘制裁剪图片
+        canvas.save();
+        canvas.rotate(-currentAngle,centerX,centerY);
+        canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
+        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.restore();
+    }
+
+    public void drawCropMasicBitmapFromCache(Canvas canvas) {
         //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);

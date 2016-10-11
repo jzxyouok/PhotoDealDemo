@@ -237,7 +237,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			recaculateRects(cropSnapshot.cropAction.mCropRect);
 			cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 					lastNormalRect,lastScaleRectf);
-			cropSnapshot.cropAction.drawCropMasicBitmapDirectly(mBehindCanvas);
+			cropSnapshot.cropAction.drawCropMasicBitmapFromCache(mBehindCanvas);
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
@@ -322,7 +322,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					recaculateRects(cropSnapshot.cropAction.mCropRect);
 					cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
-					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
+					cropSnapshot.cropAction.drawCropBitmapFromCache(foreCanvas);
 				}else {
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
