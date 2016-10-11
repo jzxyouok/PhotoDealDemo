@@ -234,7 +234,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
 			Rect lastNormalRect = new Rect(normalRect);
 			RectF lastScaleRectf = getCurrentScaleRectF();
-			recaculateRects(new RectF(cropSnapshot.cropAction.mCropRect));
+			recaculateRects(cropSnapshot.cropAction.mCropRect);
 			cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 					lastNormalRect,lastScaleRectf);
 			cropSnapshot.cropAction.drawCropMasicBitmapDirectly(mBehindCanvas);
@@ -243,7 +243,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				if (action instanceof CropAction) {
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					recaculateRects(new RectF(((CropAction) action).mCropRect));
+					recaculateRects(((CropAction) action).mCropRect);
 					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
 					action.next(mBehindCanvas, mCurrentAngle);
@@ -319,14 +319,14 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					recaculateRects(new RectF(cropSnapshot.cropAction.mCropRect));
+					recaculateRects(cropSnapshot.cropAction.mCropRect);
 					cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
 					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
 				}else {
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					recaculateRects(new RectF(((CropAction) action).mCropRect));
+					recaculateRects(((CropAction) action).mCropRect);
 					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
 					action.execute(foreCanvas);
@@ -468,7 +468,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 						}
 					}
 					if(lastCropAction!=null){
-						recaculateRects(new RectF((((CropAction) action).mCropRect)));
+						recaculateRects((((CropAction) action).mCropRect));
 					}else{
 						recaculateRects(originBitmapRectF);
 					}
@@ -562,6 +562,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		normalRect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		rotateRectF = generateRotateRectF(rectF);
 		scaleRectF = generateScaleRectF(rectF);
+	}
+
+	private void recaculateRects(Rect rect) {
+		recaculateRects(new RectF(rect));
 	}
 
 	/**
