@@ -58,11 +58,6 @@ public class CropAction implements Action{
         RectF rf = new RectF(Math.round(mCropRect.left),Math.round(mCropRect.top),
                 Math.round(mCropRect.right),Math.round(mCropRect.bottom));
         mCropRect = rf;
-        //RotateUtil.rotateRect(rf,centerX,centerY,-angle);
-//        Matrix m = new Matrix();
-//        m.postRotate(-angle,centerX,centerY);
-//        m.mapRect(rf);
-//        rect = new Rect((int) rf.left,(int) rf.top,(int) rf.right,(int) rf.bottom);
     }
 
     @Override
@@ -102,25 +97,13 @@ public class CropAction implements Action{
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
-        paint.setXfermode(DrawMode.CLEAR);
-        canvas.drawPaint(paint);
-        paint.setXfermode(DrawMode.SRC);
-
-        canvas.save();
-        canvas.rotate(-currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
-        //canvas.clipRect(mCropRect);
-        Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
-        canvas.drawBitmap(mCropBitmap,cropRect,rotateRectf,null);
-        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
-        canvas.restore();
 //        mCropCanvas.save();
 //        mCropCanvas.clipRect(mCropRect);
 //        //Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
 //        mCropCanvas.drawBitmap(mCropBitmap,null,new RectF(0,0,300,300),null);
 //        mCropCanvas.restore();
 
-        //drawCropBitmapDirectly(canvas);
+        drawCropBitmapDirectly(canvas);
     }
 
     public void drawCropBitmapDirectly(Canvas canvas) {
@@ -128,12 +111,19 @@ public class CropAction implements Action{
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
+        canvas.save();
+        canvas.rotate(-currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
+        //canvas.clipRect(mCropRect);
+        Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
+        canvas.drawBitmap(mCropBitmap,cropRect,rotateRectf,null);
+        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.restore();
         //绘制裁剪图片
-        Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
+        //Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
         //Paint paint = new Paint();
         //paint.setColor(Color.RED);
         //canvas.drawRect(rect2,paint);
-        canvas.drawBitmap(mCropBitmap, rect2, mDestRect, null);
+        //canvas.drawBitmap(mCropBitmap, rect2, mDestRect, null);
 //        if(currentAngle/90%2==0){
 //            Rect rect2 = new Rect((int)rotateRectf.left,(int)rotateRectf.top,(int)rotateRectf.right,(int)rotateRectf.bottom);
 //            canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
@@ -155,21 +145,6 @@ public class CropAction implements Action{
         lastRotateRectf = (RectF) params[6];
     }
 
-    public void drawCropMasicBitmapDirectly(Canvas canvas) {
-        //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        //绘制裁剪图片
-        if(currentAngle/90%2==0){
-            Rect rect2 = new Rect((int)rotateRectf.left,(int)rotateRectf.top,(int)rotateRectf.right,(int)rotateRectf.bottom);
-            canvas.drawBitmap(mCropMasicBitmap,rect2,rotateRectf,null);
-        }else {
-            Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
-            canvas.drawBitmap(mCropMasicBitmap, rect2, mDestRect, null);
-        }
-    }
-
     @Override
     public void next(Object... params) {
         Canvas canvas = (Canvas) params[0];
@@ -178,8 +153,36 @@ public class CropAction implements Action{
         mCropMasicCanvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //将mBehindBitmap内容绘制到mCropMasicBitmap上
-        mCropMasicCanvas.drawBitmap(mBehindBitmap,rect,mDestRect,null);
+//        mCropMasicCanvas.drawBitmap(mBehindBitmap,rect,mDestRect,null);
+        mCropMasicCanvas.save();
+        mCropMasicCanvas.rotate(currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
+        Rect lastNormalRect = new Rect((int)lastNormalRectf.left,(int)lastNormalRectf.top,
+                (int)lastNormalRectf.right,(int)lastNormalRectf.bottom);
+        mCropMasicCanvas.drawBitmap(mBehindBitmap,lastNormalRect,lastScaleRectf,null);
+        mCropMasicCanvas.restore();
         drawCropMasicBitmapDirectly(canvas);
+    }
+
+    public void drawCropMasicBitmapDirectly(Canvas canvas) {
+        //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //绘制裁剪图片
+        canvas.save();
+        canvas.rotate(-currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
+        //canvas.clipRect(mCropRect);
+        Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
+        canvas.drawBitmap(mCropMasicBitmap,cropRect,rotateRectf,null);
+        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.restore();
+//        if(currentAngle/90%2==0){
+//            Rect rect2 = new Rect((int)rotateRectf.left,(int)rotateRectf.top,(int)rotateRectf.right,(int)rotateRectf.bottom);
+//            canvas.drawBitmap(mCropMasicBitmap,rect2,rotateRectf,null);
+//        }else {
+//            Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
+//            canvas.drawBitmap(mCropMasicBitmap, rect2, mDestRect, null);
+//        }
     }
 
     @Override

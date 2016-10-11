@@ -209,7 +209,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-			//drawBehindBackground(canvas);
+			drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -232,14 +232,22 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
 		mBehindCanvas.restore();
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
+			RectF lastNormalRectf = new RectF(normalRectF);
+			RectF lastScaleRectf = getCurrentScaleRectF();
+			RectF lastRotateRectf = getCurrentRotateRectF();
 			recaculateRects(cropSnapshot.cropAction.mCropRect);
-			cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF());
+			cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
+					lastNormalRectf,lastScaleRectf,lastRotateRectf);
 			cropSnapshot.cropAction.drawCropMasicBitmapDirectly(mBehindCanvas);
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
+					RectF lastNormalRectf = new RectF(normalRectF);
+					RectF lastScaleRectf = getCurrentScaleRectF();
+					RectF lastRotateRectf = getCurrentRotateRectF();
 					recaculateRects(((CropAction) action).mCropRect);
-					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF());
+					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
+							lastNormalRectf,lastScaleRectf,lastRotateRectf);
 					action.next(mBehindCanvas, mCurrentAngle);
 				}
 			}
@@ -311,8 +319,12 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			}
 			if(action instanceof CropAction){
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
-					recaculateRects(((CropAction) action).mCropRect);
-					cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF());
+					RectF lastNormalRectf = new RectF(normalRectF);
+					RectF lastScaleRectf = getCurrentScaleRectF();
+					RectF lastRotateRectf = getCurrentRotateRectF();
+					recaculateRects(cropSnapshot.cropAction.mCropRect);
+					cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
+							lastNormalRectf,lastScaleRectf,lastRotateRectf);
 					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
 				}else {
 					RectF lastNormalRectf = new RectF(normalRectF);
@@ -363,7 +375,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 裁剪后的快照
 	 */
 	public class CropSnapshot{
-		public boolean isCache = false;
+		public boolean isCache = true;
 		public void setCropAction(CropAction cropAction) {
 			if(!isCache){
 				this.cropAction = null;
@@ -561,20 +573,16 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 根据长宽缩放到控件大小
 	 * @param rectF
 	 * @return
-     */
+	 */
 	private RectF generateRectF(RectF rectF){
 		RectF rf = new RectF(rectF);
-		float scale = 1;
-		if(rectF.width()>rectF.height()){
-			scale = mWidth/rectF.width();
-		}else if(rectF.width()==rectF.height()){
-			scale = mWidth<mHeight?mWidth/rectF.width():mHeight/rectF.height();
-		}else{
-			scale = mHeight/rectF.height();
-		}
+		float scaleW = mWidth/rectF.width();
+		float scaleH = mHeight/rectF.height();
+		float scale = scaleW<scaleH?scaleW:scaleH;
+
 		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.postTranslate(mWidth/2.0f-rf.centerX(),mHeight/2.0f-rf.centerY());
+		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
 		return rf;
 	}
@@ -583,21 +591,17 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 旋转后,根据长宽缩放到控件大小
 	 * @param rectF
 	 * @return
-     */
+	 */
 	private RectF generateRotateRectF(RectF rectF){
 		RectF rf = new RectF(rectF);
-		float scale = 1;
-		if(rectF.width()>rectF.height()){
-			scale = mHeight/rectF.width();
-		}else if(rectF.width()==rectF.height()){
-			scale = mWidth<mHeight?mWidth/rectF.width():mHeight/rectF.height();
-		}else{
-			scale = mWidth/rectF.height();
-		}
+		float scaleW = mWidth/rectF.height();
+		float scaleH = mHeight/rectF.width();
+		float scale = scaleW<scaleH?scaleW:scaleH;
+
 		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postRotate(90,mWidth/2,mHeight/2);
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.postTranslate(mWidth/2.0f-rf.centerX(),mHeight/2.0f-rf.centerY());
+		matrix.postRotate(90,mWidth/2.0f,mHeight/2.0f);
+		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
 		return rf;
 	}
@@ -609,17 +613,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 */
 	private RectF generateScaleRectF(RectF rectF){
 		RectF rf = new RectF(rectF);
-		float scale = 1;
-		if(rectF.width()>rectF.height()){
-			scale = mHeight/rectF.width();
-		}else if(rectF.width()==rectF.height()){
-			scale = mWidth<mHeight?mWidth/rectF.width():mHeight/rectF.height();
-		}else{
-			scale = mWidth/rectF.height();
-		}
+		float scaleW = mWidth/rectF.height();
+		float scaleH = mHeight/rectF.width();
+		float scale = scaleW<scaleH?scaleW:scaleH;
+
 		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		matrix.postTranslate(mWidth/2.0f-rf.centerX(),mHeight/2.0f-rf.centerY());
+		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
 		return rf;
 	}
