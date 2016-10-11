@@ -230,6 +230,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void drawBehindBackground(Canvas canvas){
 		if(isComplete==false) return;
 		recaculateRects(originBitmapRectF);
+//		int count = mBehindCanvas.getSaveCount();
+//		if(count>1)
+//			mBehindCanvas.restoreToCount(1);
 		//清屏
 		mClearPaint.setXfermode(DrawMode.CLEAR);
 		mBehindCanvas.drawPaint(mClearPaint);
@@ -238,6 +241,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
 		mBehindCanvas.restore();
+//		mBehindCanvas.saveLayer(0,0,mWidth,mHeight,null,Canvas.ALL_SAVE_FLAG);
+//		//mBehindCanvas.save();
+//		mBehindCanvas.drawRGB(0,0,0);
+//		//mBehindCanvas.restore();
+
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
 			Rect lastNormalRect = new Rect(normalRect);
 			RectF lastScaleRectf = getCurrentScaleRectF();
@@ -254,6 +262,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
 					action.next(mBehindCanvas, mCurrentAngle);
+				}else if(action instanceof MasicAction){
+					//action.execute(mBehindCanvas);
 				}
 			}
 		}
@@ -285,6 +295,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mClearPaint.setXfermode(DrawMode.SRC);
 
 		foreCanvas.save();
+		//将png透明背景去除,否则会出现毛刺,因为png不能完全遮挡生成的马赛克背景
+		mForeCanvas.drawRGB(0,0,0);
 		mForeCanvas.drawBitmap(originBitmap, null, normalRectF,null);
 		foreCanvas.restore();
 
