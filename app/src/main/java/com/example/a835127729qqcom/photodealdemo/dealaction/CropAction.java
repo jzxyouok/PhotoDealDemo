@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
@@ -128,7 +129,7 @@ public class CropAction implements Action{
         canvas.save();
         canvas.rotate(-currentAngle,centerX,centerY);
         canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
-        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
         canvas.restore();
     }
 

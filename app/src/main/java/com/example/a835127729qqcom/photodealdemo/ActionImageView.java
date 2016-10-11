@@ -605,6 +605,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postTranslate(mWidth/2.0f-rf.centerX(),mHeight/2.0f-rf.centerY());
 		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
+		matrix.reset();
+		if(scaleW<scaleH){//缩放至宽
+			if(rf.height()>mWidth){
+				scale = mWidth/rf.height();
+				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}else{
+			if(rf.width()>mHeight){
+				scale = mHeight/rf.width();
+				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}
 		return rf;
 	}
 
@@ -624,6 +638,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postRotate(90,mWidth/2.0f,mHeight/2.0f);
 		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
+		matrix.reset();
+		if(scaleW<scaleH){//缩放至宽
+			if(rf.height()>mWidth){
+				scale = mWidth/rf.height();
+				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}else{
+			if(rf.width()>mHeight){
+				scale = mHeight/rf.width();
+				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}
 		return rf;
 	}
 
@@ -642,6 +670,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postTranslate(mWidth/2.0f-rf.centerX(),mHeight/2.0f-rf.centerY());
 		matrix.postScale(scale,scale,mWidth/2.0f,mHeight/2.0f);
 		matrix.mapRect(rf);
+		matrix.reset();
+		if(scaleW<scaleH){//缩放至宽
+			if(rf.height()>mWidth){
+				scale = mWidth/rf.height();
+				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}else{
+			if(rf.width()>mHeight){
+				scale = mHeight/rf.width();
+				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
+				matrix.mapRect(rf);
+			}
+		}
 		return rf;
 	}
 
