@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -14,6 +16,7 @@ import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.R;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
+import com.example.a835127729qqcom.photodealdemo.util.DensityUtil;
 import com.example.a835127729qqcom.photodealdemo.util.PaintUtil;
 import com.example.a835127729qqcom.photodealdemo.widget.listener.CropActionListener;
 
@@ -41,6 +44,9 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 
 	private Paint mBackgroundPaint;// 背景Paint
 	private Paint mStyleBoxPaint;
+	private Paint mTextPaint;
+	private Paint clearPaint;
+
 	private Bitmap circleBit;
 	private Rect circleRect = new Rect();
 	private RectF leftTopCircleRect;
@@ -52,6 +58,10 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	private RectF tempRect = new RectF();// 临时存贮矩形数据
 
 	private float ratio = -1;// 剪裁缩放比率
+	//文字距离框的距离
+	private float textMargin = 50;
+	//文字大小
+	private float textSize = 10;
 
 	public CropImageView(Context context) {
 		super(context);
@@ -70,6 +80,10 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 
 	private void init(Context context) {
 		mContext = context;
+
+		textSize = DensityUtil.dip2px(context,13);
+		textMargin = DensityUtil.dip2px(context,18);
+
 		mBackgroundPaint = PaintUtil.newBackgroundPaint(context);
 		circleBit = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.sticker_rotate);
@@ -82,6 +96,16 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		mStyleBoxPaint = new Paint();
 		mStyleBoxPaint.setColor(Color.WHITE);
 		mStyleBoxPaint.setStyle(Paint.Style.STROKE);
+
+		mTextPaint = new Paint();
+		mTextPaint.setColor(Color.WHITE);
+		mTextPaint.setStyle(Paint.Style.STROKE);
+		mTextPaint.setTextAlign(Paint.Align.CENTER);
+		mTextPaint.setTextSize(textSize);
+
+		clearPaint = new Paint();
+		clearPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+		clearPaint.setColor(Color.TRANSPARENT);
 	}
 
 	/**
@@ -130,6 +154,9 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		int h = getHeight();
 		if (w <= 0 || h <= 0)
 			return;
+		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		//canvas.drawPaint(clearPaint);
+		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
 		// 绘制黑色背景
 		backUpRect.set(0, 0, w, cropRect.top);
@@ -164,19 +191,31 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	 */
 	private void drawLines(Canvas canvas){
 		mStyleBoxPaint.setStyle(Paint.Style.STROKE);
-		canvas.drawRect(cropRect,mStyleBoxPaint);
+		//canvas.drawRect(cropRect,mStyleBoxPaint);
 		//横线
 		float heightOfhorizontalLine = cropRect.height()/3;
+		canvas.drawLine(cropRect.left,cropRect.top,
+				cropRect.right,cropRect.top,mStyleBoxPaint);
 		canvas.drawLine(cropRect.left,heightOfhorizontalLine+cropRect.top,
 				cropRect.right,heightOfhorizontalLine+cropRect.top,mStyleBoxPaint);
 		canvas.drawLine(cropRect.left,heightOfhorizontalLine*2+cropRect.top,
 				cropRect.right,heightOfhorizontalLine*2+cropRect.top,mStyleBoxPaint);
+		canvas.drawLine(cropRect.left,cropRect.bottom,
+				cropRect.right,cropRect.bottom,mStyleBoxPaint);
 		//纵线
 		float widthOfVerticalLine = cropRect.width()/3;
+		canvas.drawLine(cropRect.left,cropRect.top,
+				cropRect.left,cropRect.bottom,mStyleBoxPaint);
 		canvas.drawLine(cropRect.left+widthOfVerticalLine,cropRect.top,
 				cropRect.left+widthOfVerticalLine,cropRect.bottom,mStyleBoxPaint);
 		canvas.drawLine(cropRect.left+widthOfVerticalLine*2,cropRect.top,
 				cropRect.left+widthOfVerticalLine*2,cropRect.bottom,mStyleBoxPaint);
+		canvas.drawLine(cropRect.right,cropRect.top,
+				cropRect.right,cropRect.bottom,mStyleBoxPaint);
+
+		//绘制大小提示
+		canvas.drawText(Math.round(cropRect.width())+"x"+Math.round(cropRect.height()),
+				cropRect.centerX(),cropRect.bottom+textMargin,mTextPaint);
 	}
 
 	/**
@@ -220,7 +259,6 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		// 记录上一次动作点
 		oldx = x;
 		oldy = y;
-
 		return ret;
 	}
 
