@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Region;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -59,7 +60,7 @@ public class TestView extends View{
             mClearPaint.setXfermode(DrawMode.SRC);
             canvas2.drawBitmap(bitmap,0,0,null);
             canvas2.save();
-            canvas2.clipRect(new Rect(0, 0, 100, 100));
+            canvas2.clipRect(new Rect(0, 0, 100, 100), Region.Op.REPLACE);
             canvas2.drawBitmap(bitmap2, null, rectF, null);
             canvas2.restore();
             canvas.drawBitmap(bitmap2, null, rectF, null);

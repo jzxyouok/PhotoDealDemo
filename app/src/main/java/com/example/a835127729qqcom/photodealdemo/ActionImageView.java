@@ -232,22 +232,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
 		mBehindCanvas.restore();
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
-			RectF lastNormalRectf = new RectF(normalRectF);
+			Rect lastNormalRect = new Rect(normalRect);
 			RectF lastScaleRectf = getCurrentScaleRectF();
-			RectF lastRotateRectf = getCurrentRotateRectF();
-			recaculateRects(cropSnapshot.cropAction.mCropRect);
-			cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
-					lastNormalRectf,lastScaleRectf,lastRotateRectf);
+			recaculateRects(new RectF(cropSnapshot.cropAction.mCropRect));
+			cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
+					lastNormalRect,lastScaleRectf);
 			cropSnapshot.cropAction.drawCropMasicBitmapDirectly(mBehindCanvas);
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
-					RectF lastNormalRectf = new RectF(normalRectF);
+					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					RectF lastRotateRectf = getCurrentRotateRectF();
-					recaculateRects(((CropAction) action).mCropRect);
-					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
-							lastNormalRectf,lastScaleRectf,lastRotateRectf);
+					recaculateRects(new RectF(((CropAction) action).mCropRect));
+					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
+							lastNormalRect,lastScaleRectf);
 					action.next(mBehindCanvas, mCurrentAngle);
 				}
 			}
@@ -319,20 +317,18 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			}
 			if(action instanceof CropAction){
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
-					RectF lastNormalRectf = new RectF(normalRectF);
+					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					RectF lastRotateRectf = getCurrentRotateRectF();
-					recaculateRects(cropSnapshot.cropAction.mCropRect);
-					cropSnapshot.cropAction.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
-							lastNormalRectf,lastScaleRectf,lastRotateRectf);
+					recaculateRects(new RectF(cropSnapshot.cropAction.mCropRect));
+					cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
+							lastNormalRect,lastScaleRectf);
 					cropSnapshot.cropAction.drawCropBitmapDirectly(foreCanvas);
 				}else {
-					RectF lastNormalRectf = new RectF(normalRectF);
+					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					RectF lastRotateRectf = getCurrentRotateRectF();
-					recaculateRects(((CropAction) action).mCropRect);
-					action.start(getCurrentRotateRectF(),mCurrentAngle,getCurrentScaleRectF(), new Rect(normalRect),
-							lastNormalRectf,lastScaleRectf,lastRotateRectf);
+					recaculateRects(new RectF(((CropAction) action).mCropRect));
+					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
+							lastNormalRect,lastScaleRectf);
 					action.execute(foreCanvas);
 				}
 				action.stop(cropSnapshot);
@@ -393,7 +389,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 		mWidth = getMeasuredWidth();
 		mHeight = getMeasuredHeight();
-		Log.i("tag","w="+mWidth+",h="+mHeight);
+		//Log.i("tag","w="+mWidth+",h="+mHeight);
 	}
 
 	@Override
@@ -402,20 +398,20 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		int action = MotionEventCompat.getActionMasked(event);
 		switch (action){
 			case MotionEvent.ACTION_DOWN:
-				Log.i("tag","down");
+				//Log.i("tag","down");
 				mCurrentAction = produceMarkActionOrMasicAction();
 				if (mCurrentAction==null) return false;
 				mCurrentAction.start(event.getX(),event.getY());
 				actions.add(mCurrentAction);
 				return true;
 			case MotionEvent.ACTION_MOVE:
-				Log.i("tag","move");
+				//Log.i("tag","move");
 				if (mCurrentAction==null) return false;
 				mCurrentAction.next(event.getX(),event.getY());
 				invalidate();
 				return true;
 			case MotionEvent.ACTION_UP:
-				Log.i("tag","up");
+				//Log.i("tag","up");
 				if (mCurrentAction==null) return false;
 				mCurrentAction.stop(event.getX(),event.getY());
 				invalidate();
@@ -472,7 +468,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 						}
 					}
 					if(lastCropAction!=null){
-						recaculateRects((((CropAction) action).mCropRect));
+						recaculateRects(new RectF((((CropAction) action).mCropRect)));
 					}else{
 						recaculateRects(originBitmapRectF);
 					}
@@ -492,9 +488,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @param rectf
 	 */
 	public void crop(RectF rectf){
-		mCurrentAction = new CropAction(rectf,getmRectF().centerX(),getmRectF().centerY(),
-				cropBitmap,mForeBackground,mCropCanvas,
-				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
+		mCurrentAction = new CropAction(mWidth/2.0f,mHeight/2.0f,rectf, cropBitmap,mForeBackground,mCropCanvas,
+				cropMasicBitmap,mBehindBackground,mCropMasicCanvas);
 		actions.add(mCurrentAction);
 
 		cropSnapshot.setCropAction(null);

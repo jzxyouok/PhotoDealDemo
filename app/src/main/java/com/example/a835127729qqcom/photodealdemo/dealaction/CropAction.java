@@ -3,61 +3,55 @@ package com.example.a835127729qqcom.photodealdemo.dealaction;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
-import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
-import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
-
-import java.io.IOException;
 
 /**
  * Created by 835127729qq.com on 16/8/23.
  */
 public class CropAction implements Action{
-    public RectF mCropRect;
-    public RectF mDestRect;
     private Bitmap mCropBitmap;
     private Bitmap mforeBitmap;
     private Canvas mCropCanvas;
     private Bitmap mCropMasicBitmap;
     private Bitmap mBehindBitmap;
     private Canvas mCropMasicCanvas;
-    private Rect rect;
-    private RectF rotateRectf;
-    private Rect normalRect;
-    private static Paint paint = new Paint();
     private float currentAngle = 0;
-
-    private RectF lastNormalRectf;
+    //旋转中心
+    float centerX,centerY;
+    //裁剪矩阵
+    public Rect mCropRect;
+    //裁剪后的矩阵
+    private RectF rotateRectf;
+    public RectF scaleRect;
+    //裁剪前的矩阵
+    private Rect lastNormalRect;
     private RectF lastScaleRectf;
-    private RectF lastRotateRectf;
 
-
+    private static Paint paint = new Paint();
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(Color.TRANSPARENT);
     }
 
-    public CropAction(RectF cropRect, float centerX,float centerY,Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
-                      Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas, float angle){
-        mCropRect = cropRect;
+    public CropAction(float centerx,float centery,RectF cropRect, Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
+                      Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas){
+        centerX = centerx;
+        centerY = centery;
         mCropBitmap = cropBitmap;
         mforeBitmap = foreBitmap;
         mCropCanvas = croprCanvas;
         mCropMasicBitmap = cropMasicBitmap;
         mBehindBitmap = behindBitmap;
         mCropMasicCanvas = cropMasicCanvas;
-        RectF rf = new RectF(Math.round(mCropRect.left),Math.round(mCropRect.top),
-                Math.round(mCropRect.right),Math.round(mCropRect.bottom));
-        mCropRect = rf;
+        mCropRect = new Rect(Math.round(cropRect.left),Math.round(cropRect.top),
+                Math.round(cropRect.right),Math.round(cropRect.bottom));
     }
 
     @Override
@@ -67,41 +61,10 @@ public class CropAction implements Action{
         mCropCanvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //将foreBitmap内容绘制到mCropBitmap上
-//        mCropCanvas.drawBitmap(mforeBitmap,rect,mDestRect,null);
-//        try {
-//            SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage/","ssss.png");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                try {
-//                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage/","ttt.png");
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }.start();
         mCropCanvas.save();
-        mCropCanvas.rotate(currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
-        Rect lastNormalRect = new Rect((int)lastNormalRectf.left,(int)lastNormalRectf.top,
-                (int)lastNormalRectf.right,(int)lastNormalRectf.bottom);
+        mCropCanvas.rotate(currentAngle,centerX,centerY);
         mCropCanvas.drawBitmap(mforeBitmap,lastNormalRect,lastScaleRectf,null);
         mCropCanvas.restore();
-//        Paint paint = new Paint();
-//        paint.setColor(Color.RED);
-//        mCropCanvas.drawRect(mCropRect,paint);
-//        try {
-//            SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage/","ttt.png");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        mCropCanvas.save();
-//        mCropCanvas.clipRect(mCropRect);
-//        //Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
-//        mCropCanvas.drawBitmap(mCropBitmap,null,new RectF(0,0,300,300),null);
-//        mCropCanvas.restore();
 
         drawCropBitmapDirectly(canvas);
     }
@@ -111,38 +74,23 @@ public class CropAction implements Action{
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
-        canvas.save();
-        canvas.rotate(-currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
-        //canvas.clipRect(mCropRect);
-        Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
-        canvas.drawBitmap(mCropBitmap,cropRect,rotateRectf,null);
-        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
-        canvas.restore();
         //绘制裁剪图片
-        //Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
-        //Paint paint = new Paint();
-        //paint.setColor(Color.RED);
-        //canvas.drawRect(rect2,paint);
-        //canvas.drawBitmap(mCropBitmap, rect2, mDestRect, null);
-//        if(currentAngle/90%2==0){
-//            Rect rect2 = new Rect((int)rotateRectf.left,(int)rotateRectf.top,(int)rotateRectf.right,(int)rotateRectf.bottom);
-//            canvas.drawBitmap(mCropBitmap,rect2,rotateRectf,null);
-//        }else {
-//            Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
-//            canvas.drawBitmap(mCropBitmap, rect2, mDestRect, null);
-//        }
+        canvas.save();
+        canvas.rotate(-currentAngle,centerX,centerY);
+        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
+        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.restore();
     }
 
 
     @Override
     public void start(Object... params) {
-        rotateRectf = (RectF) params[0];
-        currentAngle = (float) params[1];
-        mDestRect = (RectF) params[2];
-        normalRect = (Rect) params[3];
-        lastNormalRectf = (RectF) params[4];
-        lastScaleRectf = (RectF) params[5];
-        lastRotateRectf = (RectF) params[6];
+        currentAngle = (float) params[0];
+        rotateRectf = (RectF) params[1];
+        scaleRect = (RectF) params[2];
+        //裁剪前的矩阵
+        lastNormalRect = (Rect) params[3];
+        lastScaleRectf = (RectF) params[4];
     }
 
     @Override
@@ -153,11 +101,8 @@ public class CropAction implements Action{
         mCropMasicCanvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //将mBehindBitmap内容绘制到mCropMasicBitmap上
-//        mCropMasicCanvas.drawBitmap(mBehindBitmap,rect,mDestRect,null);
         mCropMasicCanvas.save();
-        mCropMasicCanvas.rotate(currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
-        Rect lastNormalRect = new Rect((int)lastNormalRectf.left,(int)lastNormalRectf.top,
-                (int)lastNormalRectf.right,(int)lastNormalRectf.bottom);
+        mCropMasicCanvas.rotate(currentAngle,centerX,centerY);
         mCropMasicCanvas.drawBitmap(mBehindBitmap,lastNormalRect,lastScaleRectf,null);
         mCropMasicCanvas.restore();
         drawCropMasicBitmapDirectly(canvas);
@@ -170,19 +115,10 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
         canvas.save();
-        canvas.rotate(-currentAngle,lastNormalRectf.centerX(),lastNormalRectf.centerY());
-        //canvas.clipRect(mCropRect);
-        Rect cropRect = new Rect((int)mCropRect.left,(int)mCropRect.top,(int)mCropRect.right,(int)mCropRect.bottom);
-        canvas.drawBitmap(mCropMasicBitmap,cropRect,rotateRectf,null);
-        Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.rotate(-currentAngle,centerX,centerY);
+        canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
+        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
         canvas.restore();
-//        if(currentAngle/90%2==0){
-//            Rect rect2 = new Rect((int)rotateRectf.left,(int)rotateRectf.top,(int)rotateRectf.right,(int)rotateRectf.bottom);
-//            canvas.drawBitmap(mCropMasicBitmap,rect2,rotateRectf,null);
-//        }else {
-//            Rect rect2 = new Rect((int)mDestRect.left,(int)mDestRect.top,(int)mDestRect.right,(int)mDestRect.bottom);
-//            canvas.drawBitmap(mCropMasicBitmap, rect2, mDestRect, null);
-//        }
     }
 
     @Override
