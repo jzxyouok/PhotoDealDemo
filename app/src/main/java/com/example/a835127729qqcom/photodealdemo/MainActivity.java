@@ -276,6 +276,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManager activityMgr= (ActivityManager) this.getSystemService(ACTIVITY_SERVICE );
-        activityMgr.killBackgroundProcesses(getPackageName());
+        //activityMgr.killBackgroundProcesses(getPackageName());
     }
 }

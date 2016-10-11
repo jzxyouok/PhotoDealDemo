@@ -17,6 +17,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -56,6 +57,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	public static final int MODE_TEXT = 3;
 	public static final int MODE_CROP = 4;
 	public static final int MODE_ROTATE = 5;
+	/**
+	 * 图片路径
+	 */
+	private String picPath;
 	/**
 	 * 当前操作
 	 */
@@ -172,6 +177,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @param path
      */
 	public synchronized void init(String path){
+		picPath = path;
+		if(mWidth<=0 || mHeight<=0 || isComplete) return;
+		isComplete = true;
 		originBitmap = ((BitmapDrawable) getDrawable()).getBitmap();
 		originBitmapRectF = decodeBounds(path);
 		recaculateRects(originBitmapRectF);
@@ -194,7 +202,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
 		//使用MasicUtil.getMosaicsBitmap()来生成马赛克,可以回收srcBitmap,否则不能
 		//srcBitmap.recycle();
-		isComplete = true;
 	}
 
 	private RectF decodeBounds(String path){
@@ -389,6 +396,9 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 		mWidth = getMeasuredWidth();
 		mHeight = getMeasuredHeight();
+		if(mWidth>0 && mHeight>0 && !isComplete && !TextUtils.isEmpty(picPath)){
+			init(picPath);
+		}
 		//Log.i("tag","w="+mWidth+",h="+mHeight);
 	}
 
