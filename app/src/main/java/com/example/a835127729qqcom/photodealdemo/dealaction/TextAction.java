@@ -31,7 +31,8 @@ public class TextAction implements Action{
     //画笔颜色
     public int color = Color.WHITE;
     private float[] res = new float[2];
-    private Matrix matrix = new Matrix();
+    private static Matrix matrix = new Matrix();
+    private float currentNormalRectF2scaleRectF;
 
     @Override
     public void execute(Canvas canvas) {
@@ -42,6 +43,7 @@ public class TextAction implements Action{
         canvas.save();
         canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
         canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
+
         for(int i=0;i<textPaths.size();i++){
             paint.setTextSize(textSize);
             paint.setColor(color);
@@ -56,6 +58,7 @@ public class TextAction implements Action{
         rectCenterX = (float) params[1];
         rectCenterY = (float) params[2];
         paint = (Paint) params[3];
+        //currentNormalRectF2scaleRectF = (float) params[4];
     }
 
     @Override
