@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -20,6 +21,7 @@ public class TextAction implements Action{
     private float delAngle;
     private ArrayList<Path> textPaths = new ArrayList<Path>();
     private ArrayList<String> texts = new ArrayList<String>();
+    private ArrayList<Line> lines = new ArrayList<Line>();
     private Paint paint;
     private float rectCenterX,rectCenterY;
     //旋转角度
@@ -36,20 +38,88 @@ public class TextAction implements Action{
 
     @Override
     public void execute(Canvas canvas) {
+        paint.setTextSize(textSize*currentNormalRectF2scaleRectF);
+        paint.setColor(color);
         matrix.reset();
-        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
-        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
+        for(int i=0;i<texts.size();i++){
+            Line line = lines.get(i);
+            matrix.reset();
+            matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
+            matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+            float[] startpoint = new float[]{line.startX,line.startY};
+            float[] endpoint = new float[]{line.endX,line.endY};
+            float[] centerpoint = new float[]{rotateCenterX,rotateCenterY};
+            matrix.mapPoints(startpoint);
+            matrix.mapPoints(endpoint);
+            matrix.mapPoints(centerpoint);
 
-        canvas.save();
-        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
-        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
+            matrix.reset();
+            matrix.postRotate(roatetAngle,centerpoint[0],centerpoint[1]);
+            matrix.mapPoints(startpoint);
+            matrix.mapPoints(endpoint);
 
-        for(int i=0;i<textPaths.size();i++){
-            paint.setTextSize(textSize);
-            paint.setColor(color);
-            canvas.drawTextOnPath(texts.get(i),textPaths.get(i),0,0,paint);
+            Path dest = new Path();
+            dest.moveTo(startpoint[0],startpoint[1]);
+            dest.lineTo(endpoint[0],endpoint[1]);
+            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
         }
-        canvas.restore();
+
+//        matrix.reset();
+//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
+//
+//        canvas.save();
+//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
+//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
+//        for(int i=0;i<texts.size();i++){
+//            Line line = lines.get(i);
+//            paint.setTextSize(textSize);
+//            paint.setColor(color);
+//            matrix.reset();
+//            matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
+//            float[] startpoint = new float[]{line.startX,line.startY};
+//            float[] endpoint = new float[]{line.endX,line.endY};
+//            matrix.mapPoints(startpoint);
+//            matrix.mapPoints(endpoint);
+//            Path dest = new Path();
+//            dest.moveTo(startpoint[0],startpoint[1]);
+//            dest.lineTo(endpoint[0],endpoint[1]);
+//            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
+//        }
+//        canvas.restore();
+
+//        matrix.reset();
+//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
+//
+//        canvas.save();
+//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
+//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
+//
+//        for(int i=0;i<textPaths.size();i++){
+//            paint.setTextSize(textSize);
+//            paint.setColor(color);
+//            canvas.drawTextOnPath(texts.get(i),textPaths.get(i),0,0,paint);
+//        }
+//        canvas.restore();
+
+//        matrix.reset();
+//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
+//
+//        canvas.save();
+//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
+//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
+//        for(int i=0;i<textPaths.size();i++){
+//            paint.setTextSize(textSize*currentNormalRectF2scaleRectF);
+//            paint.setColor(color);
+//            matrix.reset();
+//            matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
+//            Path dest = new Path();
+//            textPaths.get(i).transform(matrix,dest);
+//            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
+//        }
+//        canvas.restore();
     }
 
     @Override
@@ -58,7 +128,7 @@ public class TextAction implements Action{
         rectCenterX = (float) params[1];
         rectCenterY = (float) params[2];
         paint = (Paint) params[3];
-        //currentNormalRectF2scaleRectF = (float) params[4];
+        currentNormalRectF2scaleRectF = (float) params[4];
     }
 
     @Override
@@ -71,12 +141,31 @@ public class TextAction implements Action{
 
     }
 
+    private class Line{
+        float startX,startY,endX,endY;
+
+        public Line(float startX, float startY, float endX, float endY) {
+            this.startX = startX;
+            this.startY = startY;
+            this.endX = endX;
+            this.endY = endY;
+        }
+    }
+
+    public ArrayList<Line> getLines() {
+        return lines;
+    }
+
     public ArrayList<Path> getTextPaths() {
         return textPaths;
     }
 
     public ArrayList<String> getTexts() {
         return texts;
+    }
+
+    public void addLine(float startX, float startY, float endX, float endY){
+        lines.add(new Line(startX,startY,endX,endY));
     }
 
     public void setRoatetAngle(float roatetAngle) {

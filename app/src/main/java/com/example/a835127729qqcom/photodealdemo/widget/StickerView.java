@@ -264,36 +264,38 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
-    public void onRotate(float angle,View view) {
+    public void onRotate(float angle,float nextNormalRectF2scaleRectF) {
         for(StickerItem item : stickerItemMap.values()){
-            calculateRotateInfluences(angle, item);
+            calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
         for(ArrayList<TextData> datas:textActionCache){
             for(TextData data:datas){
-                calculateRotateInfluences(angle, data.item);
+                calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
             }
         }
         invalidate();
     }
 
     @Override
-    public void onRotateBack(float angle) {
+    public void onRotateBack(float angle,float nextNormalRectF2scaleRectF) {
+        //// TODO: 16/10/12
         for(StickerItem item : stickerItemMap.values()){
-            calculateRotateInfluences(angle, item);
+            calculateRotateInfluences(angle, item,0);
         }
         for(ArrayList<TextData> datas:textActionCache){
             for(TextData data:datas){
-                calculateRotateInfluences(angle, data.item);
+                calculateRotateInfluences(angle, data.item,0);
             }
         }
         invalidate();
     }
 
-    private void calculateRotateInfluences(float angle, StickerItem item) {
+    private void calculateRotateInfluences(float angle, StickerItem item,float nextNormalRectF2scaleRectF) {
         rotateMatrix.reset();
         //计算新的中心点
         float newCenter[] = new float[2];
         rotateMatrix.postRotate(angle,getMeasuredWidth()/2,getMeasuredHeight()/2);
+        rotateMatrix.postScale(nextNormalRectF2scaleRectF,nextNormalRectF2scaleRectF,getMeasuredWidth()/2,getMeasuredHeight()/2);
         rotateMatrix.mapPoints(newCenter,new float[]{item.dstRect.centerX(),item.dstRect.centerY()});
         //平移
         item.updatePos(newCenter[0]-item.dstRect.centerX(),newCenter[1]-item.dstRect.centerY());
@@ -302,6 +304,12 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         rotateMatrix.postRotate(angle,newCenter[0],newCenter[1]);
         float[] res = new float[2];
         rotateMatrix.mapPoints(res,new float[]{item.detectRotateRect.centerX(),item.detectRotateRect.centerY()});
+
+        //缩放
+        rotateMatrix.reset();
+        rotateMatrix.postScale(nextNormalRectF2scaleRectF,nextNormalRectF2scaleRectF,newCenter[0],newCenter[1]);
+        rotateMatrix.mapPoints(res);
+
         item.updateRotateAndScale(item.detectRotateRect.centerX(),item.detectRotateRect.centerY(),
                 res[0]-item.detectRotateRect.centerX(),res[1]-item.detectRotateRect.centerY());
         item.calculateTextAction();

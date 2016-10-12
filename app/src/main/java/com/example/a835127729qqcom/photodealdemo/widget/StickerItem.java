@@ -11,10 +11,12 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.R;
@@ -250,6 +252,7 @@ public class StickerItem {
         rotateRect(this.detectDeleteRect, this.dstRect.centerX(),
                 this.dstRect.centerY(), roatetAngle);
         calculateTextAction();
+        Log.i("cky","helpbox w="+helpBox.width()+",h="+helpBox.height());
     }
 
     public void draw(Canvas canvas) {
@@ -288,6 +291,7 @@ public class StickerItem {
         }
         mTextAction.getTextPaths().clear();
         mTextAction.getTexts().clear();
+        mTextAction.getLines().clear();
         int numOfTextLine = texts.size();
         if(numOfTextLine==0){
             return;
@@ -318,8 +322,10 @@ public class StickerItem {
         int topIndex = topOfCenterLineNum;
         while (topIndex >= 0){
             path.reset();
-            path.moveTo(left,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
-            path.lineTo(right,topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum));
+            float pointY = topCenterY + (textSize + lineMargin) * (topIndex-topOfCenterLineNum);
+            path.moveTo(left,pointY);
+            path.lineTo(right,pointY);
+            mTextAction.addLine(left,pointY,right,pointY);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(topIndex));
             topIndex--;
@@ -327,8 +333,10 @@ public class StickerItem {
         int bottomIndex = bottomOfCenterLineNum;
         while (bottomIndex<numOfTextLine){
             path.reset();
-            path.moveTo(left,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
-            path.lineTo(right,bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum));
+            float pointY = bottomCenterY + (textSize + lineMargin) * (bottomIndex-bottomOfCenterLineNum);
+            path.moveTo(left,pointY);
+            path.lineTo(right,pointY);
+            mTextAction.addLine(left,pointY,right,pointY);
             mTextAction.getTextPaths().add(new Path(path));
             mTextAction.getTexts().add(texts.get(bottomIndex));
             bottomIndex++;

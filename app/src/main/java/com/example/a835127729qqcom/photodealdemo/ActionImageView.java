@@ -351,7 +351,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 				action.stop(cropSnapshot);
 			}else if(action instanceof TextAction){
-				action.start(mCurrentAngle,mWidth/2,mHeight/2,mTextPaint);
+				action.start(mCurrentAngle,mWidth/2,mHeight/2,mTextPaint,normalRectF2scaleRectF);
 				action.execute(foreCanvas);
 			}else {
 				if (lastRotateAction != null) {//至少一次旋转
@@ -494,7 +494,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					if(i<0){
 						mCurrentAngle = 0;
 					}
-					mRotateActionListener.onRotateBack(mCurrentAngle-((RotateAction) action).getmAngle());
+					float nextNormalRectF2scaleRectF = 1.0f;
+					if(mCurrentAngle/90%2==1){//下一个角度,恢复原位
+						nextNormalRectF2scaleRectF = scaleRectF.width()/normalRectF.width();
+					}else{
+						nextNormalRectF2scaleRectF = normalRectF.width()/scaleRectF.width();
+					}
+					mRotateActionListener.onRotateBack(mCurrentAngle-((RotateAction) action).getmAngle(),nextNormalRectF2scaleRectF);
 					action.stop(getCurrentRotateRectF());
 				}else if(action instanceof TextAction){
 					if(mBackTextActionListener!=null) mBackTextActionListener.onBackTextAction((TextAction)action);
@@ -546,7 +552,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	public void rotate(float angle, RotateAction.RotateActionBackListener rotateActionBackListener, RotateActionListener rotateActionListener){
 		mCurrentAction = new RotateAction(angle,rotateActionBackListener);
 		mRotateActionListener = rotateActionListener;
-		mRotateActionListener.onRotate(angle-mCurrentAngle,this);
+		float nextNormalRectF2scaleRectF = 1.0f;
+		if(angle/90%2==1){//下一个角度,恢复原位
+			nextNormalRectF2scaleRectF = scaleRectF.width()/normalRectF.width();
+		}else{
+			nextNormalRectF2scaleRectF = normalRectF.width()/scaleRectF.width();
+		}
+		mRotateActionListener.onRotate(angle-mCurrentAngle,nextNormalRectF2scaleRectF);
 		mCurrentAngle = angle;
 		actions.add(mCurrentAction);
 		invalidate();
@@ -602,7 +614,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		normalRect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		rotateRectF = generateRotateRectF(rectF);
 		scaleRectF = generateScaleRectF(rectF);
-		normalRectF2scaleRectF = normalRectF.width()/scaleRectF.width();
+		normalRectF2scaleRectF = normalRectF.width()/getCurrentScaleRectF().width();
 	}
 
 	private void recaculateRects(Rect rect) {
@@ -638,7 +650,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 //				matrix.mapRect(rf);
 //			}
 //		}
-		Log.i("cky","normalrect w="+rf.width()+",h="+rf.height());
+//		Log.i("cky","normalrect w="+rf.width()+",h="+rf.height());
 		return rf;
 	}
 
@@ -706,7 +718,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 //				matrix.mapRect(rf);
 //			}
 //		}
-		Log.i("cky","scalerect w="+rf.width()+",h="+rf.height());
+		//Log.i("cky","scalerect w="+rf.width()+",h="+rf.height());
 		return rf;
 	}
 
