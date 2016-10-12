@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.a835127729qqcom.photodealdemo.util.PhotoDealImageLoader;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox;
@@ -37,34 +39,50 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     CropImageView cropImageView;
     ActionImageView actionImageView;
-    //长图w=2000,h=600
-    //String testurl = "http://oss.xlyprint.cn/79e6b1fc-9c28-4d03-b53e-3191f9b96060.jpg";
-    //长图w=600,h=2000
-    //String testurl = "http://www.qqkubao.com/uploadfile/2016/07/2/20160726094926525.jpg";
-    //小图w=50,h=50
-    //String testurl = "http://www.xuanbird.com/wp-content/uploads/avatars/1/0d845f23b2a61342e7f9b79e97c5ba3c-bpthumb.jpg";
-    //普通图片
-    //String testurl = "http://img05.tooopen.com/images/20141101/sy_73835537934.jpg";
     StickerView stickerView;
     EditTextActionLayout editView;
     ColorPickBox mColorPickBox;
     MasicSizePickBox mMasicSizePickBox;
+    private FrameLayout workSpace;
     String path;
+    private boolean needToResize = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initImageLoader();
         path = getIntent().getStringExtra("path");;
         if(TextUtils.isEmpty(path)){
             finish();
         }
         allFindViewById();
-        initImage();
         setupColorPickBox();
         setupMasicSizePickBox();
         addAllListener();
+    }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus && !actionImageView.isComplete() && needToResize) {
+            //确定workplace高度
+            resizeLayout();
+            initImage();
+        }
+    }
+
+    /**
+     * 动态计算布局,将底部工具栏显示出来
+     * 并且给actionImageView设置一个确定的高度,防止软键盘弹出的时候被挤压
+     */
+    private void resizeLayout() {
+        needToResize = false;
+        ViewGroup.LayoutParams layoutParams = workSpace.getLayoutParams();
+        int newHeight = workSpace.getMeasuredHeight() - getResources().getDimensionPixelSize(R.dimen.photo_no_pic_part_layout_height);
+        layoutParams.height = newHeight;
+        workSpace.setLayoutParams(layoutParams);
+        ViewGroup.LayoutParams layoutParams2 = actionImageView.getLayoutParams();
+        layoutParams2.height = newHeight;
+        actionImageView.setLayoutParams(layoutParams2);
     }
 
     private void setupMasicSizePickBox() {
@@ -72,38 +90,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initImage() {
-//        DisplayImageOptions options = new DisplayImageOptions.Builder()
-//                .imageScaleType(ImageScaleType.NONE) // default 设置图片以如何的编码方式显示
-//                .bitmapConfig(Bitmap.Config.ARGB_8888) // default 设置图片的解码类型
-//                .build();
-//        ImageLoader.getInstance().displayImage("file://"+path, actionImageView,new ImageLoadingListener(){
-//
-//            @Override
-//            public void onLoadingStarted(String imageUri, View view) {
-//
-//            }
-//
-//            @Override
-//            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-//                Log.i("cky",failReason.toString());
-//            }
-//
-//            @Override
-//            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-//                new Thread(){
-//                    @Override
-//                    public void run() {
-//                        actionImageView.init(path);
-//                        actionImageView.postInvalidate();
-//                    }
-//                }.start();
-//            }
-//
-//            @Override
-//            public void onLoadingCancelled(String imageUri, View view) {
-//
-//            }
-//        });
         PhotoDealImageLoader.getInstance().loadBitmap(path, actionImageView, new PhotoDealImageLoader.LoadListener() {
             @Override
             public void onStart() {
@@ -138,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void allFindViewById() {
+        workSpace = (FrameLayout) findViewById(R.id.work_space);
         cropImageView = (CropImageView) findViewById(R.id.crop);
         actionImageView = (ActionImageView) findViewById(R.id.main_image);
         editView = (EditTextActionLayout) findViewById(R.id.edit);
@@ -158,33 +145,6 @@ public class MainActivity extends AppCompatActivity {
         arr.add(Color.rgb(0,173,202));
         arr.add(Color.rgb(0,212,67));
         mColorPickBox.initByInteger(arr);
-    }
-
-    /**
-     * 初始化图片载入框架
-     */
-    private void initImageLoader() {
-        File cacheDir = StorageUtils.getCacheDirectory(this);
-        int MAXMEMONRY = (int) (Runtime.getRuntime().maxMemory());
-
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-                this).memoryCacheExtraOptions(480, 800).defaultDisplayImageOptions(defaultOptions)
-                .diskCacheExtraOptions(480, 800, null).threadPoolSize(3)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .tasksProcessingOrder(QueueProcessingType.FIFO)
-                .denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new LruMemoryCache(MAXMEMONRY / 5))
-                .diskCache(new UnlimitedDiskCache(cacheDir))
-                .diskCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
-                .imageDownloader(new BaseImageDownloader(this)) // default
-                .imageDecoder(new BaseImageDecoder(false)) // default
-                .defaultDisplayImageOptions(DisplayImageOptions.createSimple()).build();
-
-        ImageLoader.getInstance().init(config);
     }
 
     private void preHide(){
@@ -264,18 +224,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-//        actionImageView.setComplete(true);
-//        actionImageView.init(path);
-//        actionImageView.invalidate();
-    }
-
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         ActivityManager activityMgr= (ActivityManager) this.getSystemService(ACTIVITY_SERVICE );
-        //activityMgr.killBackgroundProcesses(getPackageName());
+        activityMgr.killBackgroundProcesses(getPackageName());
     }
 }
