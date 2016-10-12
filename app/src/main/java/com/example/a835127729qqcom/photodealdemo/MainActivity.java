@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void preHide(){
-        //stickerView.setVisibility(View.GONE);
+        stickerView.setVisibility(View.GONE);
         cropImageView.setVisibility(View.GONE);
         actionImageView.setEnabled(true);
         actionImageView.setMode(ActionImageView.MODE_IDLE);

@@ -38,6 +38,7 @@ import com.example.a835127729qqcom.photodealdemo.widget.listener.TextsControlLis
 import com.example.a835127729qqcom.photodealdemo.widget.query.CurrentRotateRectQuery;
 import com.example.a835127729qqcom.photodealdemo.widget.query.TextActionCacheQuery;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -278,8 +279,15 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		if(isComplete==false) return;
 		recaculateRects(originBitmapRectF);
 		drawActions(mForeCanvas);
+
+//		try {
+//			SaveBitmap2File.saveFile(mForeBackground,"/storage/emulated/0/ActionImage","sss.png");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
 		canvas.save();
-		canvas.rotate(mCurrentAngle,mWidth/2,mHeight/2);
+		canvas.rotate(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
 //		Paint paint = new Paint();
 //		paint.setColor(Color.GREEN);
 //		canvas.drawRect(getCurrentScaleRectF(),paint);
@@ -343,7 +351,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					cropSnapshot.cropAction.drawCropBitmapFromCache(foreCanvas);
 				}else {
 					Rect lastNormalRect = new Rect(normalRect);
-					RectF lastScaleRectf = getCurrentScaleRectF();
+					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);//getCurrentScaleRectF();
 					recaculateRects(((CropAction) action).mCropRect);
 					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
@@ -535,7 +543,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 */
 	public void crop(RectF rectf){
 		mCurrentAction = new CropAction(mWidth/2,mHeight/2,rectf, cropBitmap,mForeBackground,mCropCanvas,
-				cropMasicBitmap,mBehindBackground,mCropMasicCanvas);
+				cropMasicBitmap,mBehindBackground,mCropMasicCanvas,mCurrentAngle);
 		actions.add(mCurrentAction);
 
 		cropSnapshot.setCropAction(null);
@@ -685,7 +693,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 //				matrix.mapRect(rf);
 //			}
 //		}
-		Log.i("cky","rotaterect w="+rf.width()+",h="+rf.height());
+		//Log.i("cky","rotaterect w="+rf.width()+",h="+rf.height());
 		return rf;
 	}
 
@@ -740,6 +748,14 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	private RectF getCurrentScaleRectF(){
 		if(mCurrentAngle/90%2==0){
+			return new RectF(normalRectF);
+		}else {
+			return new RectF(scaleRectF);
+		}
+	}
+
+	private RectF getCurrentScaleRectFBaseOnLastAngle(float angle){
+		if(angle/90%2==0){
 			return new RectF(normalRectF);
 		}else {
 			return new RectF(scaleRectF);

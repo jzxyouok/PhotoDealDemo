@@ -3,6 +3,7 @@ package com.example.a835127729qqcom.photodealdemo.dealaction;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -12,6 +13,9 @@ import android.util.Log;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
+
+import java.io.IOException;
 
 /**
  * Created by 835127729qq.com on 16/8/23.
@@ -28,6 +32,7 @@ public class CropAction implements Action{
     float centerX,centerY;
     //裁剪矩阵
     public Rect mCropRect;
+    public RectF mCropRectF;
     //裁剪后的矩阵
     private RectF rotateRectf;
     public RectF scaleRect;
@@ -35,6 +40,7 @@ public class CropAction implements Action{
     private Rect lastNormalRect;
     private RectF lastScaleRectf;
 
+    private float angle;
     private static Paint paint = new Paint();
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -42,7 +48,8 @@ public class CropAction implements Action{
     }
 
     public CropAction(float centerx,float centery,RectF cropRect, Bitmap cropBitmap, Bitmap foreBitmap, Canvas croprCanvas,
-                      Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas){
+                      Bitmap cropMasicBitmap, Bitmap behindBitmap, Canvas cropMasicCanvas,float angle){
+        this.angle = angle;
         centerX = centerx;
         centerY = centery;
         mCropBitmap = cropBitmap;
@@ -51,10 +58,12 @@ public class CropAction implements Action{
         mCropMasicBitmap = cropMasicBitmap;
         mBehindBitmap = behindBitmap;
         mCropMasicCanvas = cropMasicCanvas;
+        mCropRectF = new RectF(cropRect);
         mCropRect = new Rect(Math.round(cropRect.left),Math.round(cropRect.top),
                 Math.round(cropRect.right),Math.round(cropRect.bottom));
     }
 
+    private int count = 1;
     @Override
     public void execute(Canvas canvas) {
         //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
@@ -66,11 +75,29 @@ public class CropAction implements Action{
         mCropCanvas.rotate(currentAngle,centerX,centerY);
         mCropCanvas.drawBitmap(mforeBitmap,lastNormalRect,lastScaleRectf,null);
         mCropCanvas.restore();
+        Log.i("cky","lastnormal width="+lastNormalRect.width()+",height="+lastNormalRect.height());
+        Log.i("cky","lastscale width="+lastScaleRectf.width()+",height="+lastScaleRectf.height());
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
+                    count++;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
         drawCropBitmapDirectly(canvas);
     }
 
     private void drawCropBitmapDirectly(Canvas canvas) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(currentAngle-angle,centerX,centerY);
+        RectF dest = new RectF();
+        matrix.mapRect(dest,mCropRectF);
+        Rect destrect = new Rect((int)dest.left,(int)dest.top,(int)dest.right,(int)dest.bottom);
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
@@ -78,9 +105,20 @@ public class CropAction implements Action{
         //绘制裁剪图片
         canvas.save();
         canvas.rotate(-currentAngle,centerX,centerY);
-        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
-        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.drawBitmap(mCropBitmap,destrect,rotateRectf,null);
+        Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
         canvas.restore();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage","sss.png");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
+
     }
 
     public void drawCropBitmapFromCache(Canvas canvas) {
