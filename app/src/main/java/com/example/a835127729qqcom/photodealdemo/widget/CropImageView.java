@@ -10,6 +10,10 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +33,8 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	private static int STATUS_IDLE = 1;// 空闲状态
 	private static int STATUS_MOVE = 2;// 移动状态
 	private static int STATUS_SCALE = 3;// 缩放状态
+	private final int delayMillis = 500;
+	private final int hideTextSingal = 0;
 
 	private int CIRCLE_WIDTH = 46;
 	private Context mContext;
@@ -58,6 +64,8 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	private RectF tempRect = new RectF();// 临时存贮矩形数据
 
 	private float ratio = -1;// 剪裁缩放比率
+	//是否需要显示尺寸文字
+	private volatile boolean isShowText = false;
 	//文字距离框的距离
 	private float textMargin = 50;
 	//文字大小
@@ -65,6 +73,8 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	//裁剪框是否被激活,也就是是否被触碰
 	private boolean isActived = false;
 	private CropActiveListener mCropActiveListener;
+
+	private static Handler mHandler;
 
 	public CropImageView(Context context) {
 		super(context);
@@ -82,8 +92,21 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	}
 
 	private void init(Context context) {
-		mContext = context;
+		if(mHandler==null){
+			HandlerThread thread = new HandlerThread("CropImageView");
+			thread.start();
+			mHandler = new Handler(thread.getLooper()) {
+				@Override
+				public void handleMessage(Message msg) {
+					if(msg.what==hideTextSingal){
+						isShowText = false;
+						postInvalidate();
+					}
+				}
+			};
+		}
 
+		mContext = context;
 		textSize = DensityUtil.dip2px(context,13);
 		textMargin = DensityUtil.dip2px(context,18);
 
@@ -217,8 +240,10 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 				cropRect.right,cropRect.bottom,mStyleBoxPaint);
 
 		//绘制大小提示
-		canvas.drawText(Math.round(cropRect.width())+"x"+Math.round(cropRect.height()),
-				cropRect.centerX(),cropRect.bottom+textMargin,mTextPaint);
+		if(isShowText) {
+			canvas.drawText(Math.round(cropRect.width()) + "x" + Math.round(cropRect.height()),
+					cropRect.centerX(), cropRect.bottom + textMargin, mTextPaint);
+		}
 	}
 
 	/**
@@ -232,6 +257,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		float y = event.getY();
 		switch (action & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
+			isShowText = true;
 			int selectCircle = isSeletedControllerCircle(x, y);
 			if (selectCircle > 0) {// 选择控制点
 				ret = true;
@@ -258,6 +284,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		case MotionEvent.ACTION_CANCEL:
 		case MotionEvent.ACTION_UP:
 			status = STATUS_IDLE;// 回归空闲状态
+			mHandler.sendEmptyMessageDelayed(hideTextSingal, delayMillis);
 			break;
 		}// end switch
 
