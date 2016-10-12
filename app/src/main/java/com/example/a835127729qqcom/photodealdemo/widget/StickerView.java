@@ -280,11 +280,11 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     public void onRotateBack(float angle,float nextNormalRectF2scaleRectF) {
         //// TODO: 16/10/12
         for(StickerItem item : stickerItemMap.values()){
-            calculateRotateInfluences(angle, item,0);
+            calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
         for(ArrayList<TextData> datas:textActionCache){
             for(TextData data:datas){
-                calculateRotateInfluences(angle, data.item,0);
+                calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
             }
         }
         invalidate();
