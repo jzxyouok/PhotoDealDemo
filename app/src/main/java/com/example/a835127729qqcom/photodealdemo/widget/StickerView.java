@@ -282,11 +282,6 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         for(StickerItem item : stickerItemMap.values()){
             calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
-        for(ArrayList<TextData> datas:textActionCache){
-            for(TextData data:datas){
-                //calculateRotateInfluences(angle, data.item,1.0f);
-            }
-        }
         invalidate();
     }
 
@@ -295,18 +290,10 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         for(StickerItem item : stickerItemMap.values()){
             calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
-        for(ArrayList<TextData> datas:textActionCache){
-            for(TextData data:datas){
-                //calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
-            }
-        }
         invalidate();
     }
 
     private void calculateRotateInfluences(float angle, StickerItem item,float nextNormalRectF2scaleRectF) {
-        //item.nextNormalRectF2scaleRectF = nextNormalRectF2scaleRectF;
-        //item.angle = angle;
-        //item.getmTextAction().saveCurrentNormalRectF2scaleRectF = nextNormalRectF2scaleRectF;
         rotateMatrix.reset();
         //计算新的中心点
         float newCenter[] = new float[2];

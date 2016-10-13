@@ -227,9 +227,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void drawBehindBackground(Canvas canvas){
 		if(isComplete==false) return;
 		recaculateRects(originBitmapRectF);
-//		int count = mBehindCanvas.getSaveCount();
-//		if(count>1)
-//			mBehindCanvas.restoreToCount(1);
+
 		//清屏
 		mClearPaint.setXfermode(DrawMode.CLEAR);
 		mBehindCanvas.drawPaint(mClearPaint);
@@ -238,10 +236,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mBehindCanvas.save();
 		mBehindCanvas.drawBitmap(masicBitmap, null, normalRectF,null);
 		mBehindCanvas.restore();
-//		mBehindCanvas.saveLayer(0,0,mWidth,mHeight,null,Canvas.ALL_SAVE_FLAG);
-//		//mBehindCanvas.save();
-//		mBehindCanvas.drawRGB(0,0,0);
-//		//mBehindCanvas.restore();
 
 		if(cropSnapshot!=null && cropSnapshot.cropAction!=null && actions.contains(cropSnapshot.cropAction)){
 			Rect lastNormalRect = new Rect(normalRect);
@@ -365,8 +359,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}else{
 					action.start(-mCurrentAngle, mWidth / 2.0f, mHeight / 2.0f, mTextPaint, normalRectF2scaleRectF);
 				}
-				//action.start(startAngle-mCurrentAngle,mWidth/2.0f,mHeight/2.0f,mTextPaint,normalRectF2scaleRectF);
-				//action.start(-mCurrentAngle,mWidth/2.0f,mHeight/2.0f,mTextPaint,normalRectF2scaleRectF);
 				action.execute(foreCanvas);
 //				try {
 //					SaveBitmap2File.saveFile(mForeBackground,"/storage/emulated/0/ActionImage",count+"aaa.png");
@@ -386,7 +378,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			}
 		}
 	}
-	private int count = 1;
 
 	private CropSnapshot cropSnapshot = new CropSnapshot();
 

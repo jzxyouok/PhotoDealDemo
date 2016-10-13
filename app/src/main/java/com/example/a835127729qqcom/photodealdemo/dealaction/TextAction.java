@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Created by 835127729qq.com on 16/8/22.
  */
 public class TextAction implements Action{
-    //裁剪前状态
+    //保留裁剪前状态
     public float saveNormalRectF2scaleRectF = 1;
     public float saveAngle = 0;
 
@@ -37,10 +37,8 @@ public class TextAction implements Action{
     public float textSize = 40;
     //画笔颜色
     public int color = Color.WHITE;
-    private float[] res = new float[2];
     private static Matrix matrix = new Matrix();
     public float currentNormalRectF2scaleRectF = 1.0f;
-//    public float saveCurrentNormalRectF2scaleRectF = 1.0f;
 
     @Override
     public void execute(Canvas canvas) {
@@ -69,63 +67,6 @@ public class TextAction implements Action{
             dest.lineTo(endpoint[0],endpoint[1]);
             canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
         }
-
-//        matrix.reset();
-//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
-//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
-//
-//        canvas.save();
-//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
-//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
-//        for(int i=0;i<texts.size();i++){
-//            Line line = lines.get(i);
-//            paint.setTextSize(textSize);
-//            paint.setColor(color);
-//            matrix.reset();
-//            matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
-//            float[] startpoint = new float[]{line.startX,line.startY};
-//            float[] endpoint = new float[]{line.endX,line.endY};
-//            matrix.mapPoints(startpoint);
-//            matrix.mapPoints(endpoint);
-//            Path dest = new Path();
-//            dest.moveTo(startpoint[0],startpoint[1]);
-//            dest.lineTo(endpoint[0],endpoint[1]);
-//            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
-//        }
-//        canvas.restore();
-
-//        matrix.reset();
-//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
-//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
-//
-//        canvas.save();
-//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
-//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
-//
-//        for(int i=0;i<textPaths.size();i++){
-//            paint.setTextSize(textSize);
-//            paint.setColor(color);
-//            canvas.drawTextOnPath(texts.get(i),textPaths.get(i),0,0,paint);
-//        }
-//        canvas.restore();
-
-//        matrix.reset();
-//        matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
-//        matrix.mapPoints(res,new float[]{rotateCenterX,rotateCenterY});
-//
-//        canvas.save();
-//        canvas.translate(res[0]-rotateCenterX,res[1]-rotateCenterY);
-//        canvas.rotate(roatetAngle-delAngle,rotateCenterX,rotateCenterY);
-//        for(int i=0;i<textPaths.size();i++){
-//            paint.setTextSize(textSize*currentNormalRectF2scaleRectF);
-//            paint.setColor(color);
-//            matrix.reset();
-//            matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
-//            Path dest = new Path();
-//            textPaths.get(i).transform(matrix,dest);
-//            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
-//        }
-//        canvas.restore();
     }
 
     @Override
@@ -135,7 +76,7 @@ public class TextAction implements Action{
         rectCenterY = (float) params[2];
         paint = (Paint) params[3];
         currentNormalRectF2scaleRectF = (float) params[4];
-        Log.i("cky","delAngle="+delAngle+",currentNormalRectF2scaleRectF="+currentNormalRectF2scaleRectF);
+        //Log.i("cky","delAngle="+delAngle+",currentNormalRectF2scaleRectF="+currentNormalRectF2scaleRectF);
     }
 
     @Override
