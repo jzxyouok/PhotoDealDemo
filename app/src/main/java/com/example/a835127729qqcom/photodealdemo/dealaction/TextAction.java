@@ -40,6 +40,11 @@ public class TextAction implements Action{
     private static Matrix matrix = new Matrix();
     public float currentNormalRectF2scaleRectF = 1.0f;
 
+    //工具
+    float[] startpoint = new float[2];
+    float[] endpoint = new float[2];
+    float[] centerpoint = new float[2];
+    Path toolPath = new Path();
     @Override
     public void execute(Canvas canvas) {
         paint.setTextSize(textSize*currentNormalRectF2scaleRectF);
@@ -50,9 +55,12 @@ public class TextAction implements Action{
             matrix.reset();
             matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
             matrix.postRotate(delAngle,rectCenterX,rectCenterY);
-            float[] startpoint = new float[]{line.startX,line.startY};
-            float[] endpoint = new float[]{line.endX,line.endY};
-            float[] centerpoint = new float[]{rotateCenterX,rotateCenterY};
+            startpoint[0] = line.startX;
+            startpoint[1] = line.startY;
+            endpoint[0] = line.endX;
+            endpoint[1] = line.endY;
+            centerpoint[0] = rotateCenterX;
+            centerpoint[1] = rotateCenterY;
             matrix.mapPoints(startpoint);
             matrix.mapPoints(endpoint);
             matrix.mapPoints(centerpoint);
@@ -61,11 +69,10 @@ public class TextAction implements Action{
             matrix.postRotate(roatetAngle,centerpoint[0],centerpoint[1]);
             matrix.mapPoints(startpoint);
             matrix.mapPoints(endpoint);
-
-            Path dest = new Path();
-            dest.moveTo(startpoint[0],startpoint[1]);
-            dest.lineTo(endpoint[0],endpoint[1]);
-            canvas.drawTextOnPath(texts.get(i),dest,0,0,paint);
+            toolPath.reset();
+            toolPath.moveTo(startpoint[0],startpoint[1]);
+            toolPath.lineTo(endpoint[0],endpoint[1]);
+            canvas.drawTextOnPath(texts.get(i),toolPath,0,0,paint);
         }
     }
 

@@ -137,9 +137,9 @@ public class CropAction implements Action{
     public void next(Object... params) {
         Canvas canvas = (Canvas) params[0];
         //清屏,清除mCropMasicBitmap之前上的绘制,因为新的绘制,有当前mBehindBitmap决定
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paint.setXfermode(DrawMode.CLEAR);
         mCropMasicCanvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        paint.setXfermode(DrawMode.SRC);
         //将mBehindBitmap内容绘制到mCropMasicBitmap上
         mCropMasicCanvas.save();
         mCropMasicCanvas.rotate(currentAngle,centerX,centerY);
@@ -150,9 +150,9 @@ public class CropAction implements Action{
 
     private void drawCropMasicBitmapDirectly(Canvas canvas) {
         //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         canvas.save();
         canvas.rotate(-angle,centerX,centerY);
@@ -163,9 +163,9 @@ public class CropAction implements Action{
 
     public void drawCropMasicBitmapFromCache(Canvas canvas) {
         //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         canvas.save();
         canvas.rotate(-angle,centerX,centerY);
