@@ -33,9 +33,12 @@ public class PhotoDealImageLoader {
     }
 
     public synchronized void loadBitmap(String url, ImageView imageView,  LoadListener mLoadListener){
-        int maxMemory = (int) ((Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory())/ 1024);
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        long restMemory = (maxMemory-totalMemory+freeMemory)/ 1024;
         // 使用剩余可用内存值的1/12作为每片缓存最大值,一次编辑需要6片缓存。
-        eachCacheSize = maxMemory / 12;
+        eachCacheSize = (int)(restMemory / 12);
         if (mBitmapWorkerTask != null) {
             mBitmapWorkerTask.cancel(true);
         }
