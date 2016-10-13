@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         needToResize = false;
         ViewGroup.LayoutParams layoutParams = workSpace.getLayoutParams();
         int newHeight = workSpace.getMeasuredHeight() - getResources().getDimensionPixelSize(R.dimen.photo_no_pic_part_layout_height);
+        newHeight = newHeight/2*2;//强制偶数
         layoutParams.height = newHeight;
         workSpace.setLayoutParams(layoutParams);
         ViewGroup.LayoutParams layoutParams2 = actionImageView.getLayoutParams();
