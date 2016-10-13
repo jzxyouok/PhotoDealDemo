@@ -359,8 +359,21 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}
 				action.stop(cropSnapshot);
 			}else if(action instanceof TextAction){
-				action.start(mCurrentAngle,mWidth/2,mHeight/2,mTextPaint,normalRectF2scaleRectF);
+				TextAction textAction = (TextAction) action;
+				if(!mTextActionCacheQuery.query(textAction)) {
+					action.start(-textAction.saveAngle, mWidth / 2.0f, mHeight / 2.0f, mTextPaint, textAction.saveNormalRectF2scaleRectF);
+				}else{
+					action.start(-mCurrentAngle, mWidth / 2.0f, mHeight / 2.0f, mTextPaint, normalRectF2scaleRectF);
+				}
+				//action.start(startAngle-mCurrentAngle,mWidth/2.0f,mHeight/2.0f,mTextPaint,normalRectF2scaleRectF);
+				//action.start(-mCurrentAngle,mWidth/2.0f,mHeight/2.0f,mTextPaint,normalRectF2scaleRectF);
 				action.execute(foreCanvas);
+//				try {
+//					SaveBitmap2File.saveFile(mForeBackground,"/storage/emulated/0/ActionImage",count+"aaa.png");
+//					count++;
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
 			}else {
 				if (lastRotateAction != null) {//至少一次旋转
 					foreCanvas.save();
@@ -373,6 +386,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			}
 		}
 	}
+	private int count = 1;
 
 	private CropSnapshot cropSnapshot = new CropSnapshot();
 
@@ -549,7 +563,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		cropSnapshot.setCropAction(null);
 		postInvalidate();
 		for(CropActionListener cropActionListener:mCropActionListeners) {
-			cropActionListener.onCrop();
+			cropActionListener.onCrop(mCurrentAngle,normalRectF2scaleRectF);
 		}
 	}
 

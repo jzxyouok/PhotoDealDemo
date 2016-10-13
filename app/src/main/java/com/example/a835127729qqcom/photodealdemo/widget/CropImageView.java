@@ -527,7 +527,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	}
 
 	@Override
-	public void onCrop() {
+	public void onCrop(float currentAngle,float currentNormalRectF2scaleRectF) {
 	}
 
 	@Override

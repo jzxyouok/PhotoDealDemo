@@ -264,13 +264,27 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     @Override
+    public void onCrop(float currentAngle,float currentNormalRectF2scaleRectF) {
+        ArrayList<TextData> datas = new ArrayList<TextData>();
+        for(Map.Entry<Integer,StickerItem> entry:stickerItemMap.entrySet()){
+            entry.getValue().getmTextAction().saveAngle = currentAngle;
+            entry.getValue().getmTextAction().saveNormalRectF2scaleRectF = currentNormalRectF2scaleRectF;
+            datas.add(new TextData(entry.getKey(),entry.getValue().getmTextAction(),entry.getValue()));
+        }
+        textActionCache.add(datas);
+        stickerItemMap.clear();
+        textActionStickItemMap.clear();
+        postInvalidate();
+    }
+
+    @Override
     public void onRotate(float angle,float nextNormalRectF2scaleRectF) {
         for(StickerItem item : stickerItemMap.values()){
             calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
         for(ArrayList<TextData> datas:textActionCache){
             for(TextData data:datas){
-                calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
+                //calculateRotateInfluences(angle, data.item,1.0f);
             }
         }
         invalidate();
@@ -278,19 +292,21 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
 
     @Override
     public void onRotateBack(float angle,float nextNormalRectF2scaleRectF) {
-        //// TODO: 16/10/12
         for(StickerItem item : stickerItemMap.values()){
             calculateRotateInfluences(angle, item,nextNormalRectF2scaleRectF);
         }
         for(ArrayList<TextData> datas:textActionCache){
             for(TextData data:datas){
-                calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
+                //calculateRotateInfluences(angle, data.item,nextNormalRectF2scaleRectF);
             }
         }
         invalidate();
     }
 
     private void calculateRotateInfluences(float angle, StickerItem item,float nextNormalRectF2scaleRectF) {
+        //item.nextNormalRectF2scaleRectF = nextNormalRectF2scaleRectF;
+        //item.angle = angle;
+        //item.getmTextAction().saveCurrentNormalRectF2scaleRectF = nextNormalRectF2scaleRectF;
         rotateMatrix.reset();
         //计算新的中心点
         float newCenter[] = new float[2];
@@ -320,17 +336,6 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     }
 
     private ArrayList<ArrayList<TextData>> textActionCache = new ArrayList<ArrayList<TextData>>();
-    @Override
-    public void onCrop() {
-        ArrayList<TextData> datas = new ArrayList<TextData>();
-        for(Map.Entry<Integer,StickerItem> entry:stickerItemMap.entrySet()){
-            datas.add(new TextData(entry.getKey(),entry.getValue().getmTextAction(),entry.getValue()));
-        }
-        textActionCache.add(datas);
-        stickerItemMap.clear();
-        textActionStickItemMap.clear();
-        postInvalidate();
-    }
 
     @Override
     public void onCropBack(RectF rectF) {
@@ -352,6 +357,11 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
     @Override
     public boolean query(TextAction textAction) {
         return textActionStickItemMap.keySet().contains(textAction);
+    }
+
+    @Override
+    public boolean isCurrentEmpty() {
+        return textActionStickItemMap.isEmpty();
     }
 
     @Override

@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,10 @@ import java.util.ArrayList;
  * Created by 835127729qq.com on 16/8/22.
  */
 public class TextAction implements Action{
+    //裁剪前状态
+    public float saveNormalRectF2scaleRectF = 1;
+    public float saveAngle = 0;
+
     private float delAngle;
     private ArrayList<Path> textPaths = new ArrayList<Path>();
     private ArrayList<String> texts = new ArrayList<String>();
@@ -34,7 +39,8 @@ public class TextAction implements Action{
     public int color = Color.WHITE;
     private float[] res = new float[2];
     private static Matrix matrix = new Matrix();
-    private float currentNormalRectF2scaleRectF;
+    public float currentNormalRectF2scaleRectF = 1.0f;
+//    public float saveCurrentNormalRectF2scaleRectF = 1.0f;
 
     @Override
     public void execute(Canvas canvas) {
@@ -45,7 +51,7 @@ public class TextAction implements Action{
             Line line = lines.get(i);
             matrix.reset();
             matrix.postScale(currentNormalRectF2scaleRectF,currentNormalRectF2scaleRectF,rectCenterX,rectCenterY);
-            matrix.postRotate(-delAngle,rectCenterX,rectCenterY);
+            matrix.postRotate(delAngle,rectCenterX,rectCenterY);
             float[] startpoint = new float[]{line.startX,line.startY};
             float[] endpoint = new float[]{line.endX,line.endY};
             float[] centerpoint = new float[]{rotateCenterX,rotateCenterY};
@@ -129,6 +135,7 @@ public class TextAction implements Action{
         rectCenterY = (float) params[2];
         paint = (Paint) params[3];
         currentNormalRectF2scaleRectF = (float) params[4];
+        Log.i("cky","delAngle="+delAngle+",currentNormalRectF2scaleRectF="+currentNormalRectF2scaleRectF);
     }
 
     @Override

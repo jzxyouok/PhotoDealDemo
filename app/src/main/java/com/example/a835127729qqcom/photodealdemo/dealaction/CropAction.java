@@ -89,17 +89,12 @@ public class CropAction implements Action{
         mCropCanvas.restore();
         Log.i("cky","lastnormal width="+lastNormalRect.width()+",height="+lastNormalRect.height());
         Log.i("cky","lastscale width="+lastScaleRectf.width()+",height="+lastScaleRectf.height());
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                try {
-//                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
-//                    count++;
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }.start();
+//        try {
+//            SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
+//            count++;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         drawCropBitmapDirectly(canvas);
     }
@@ -115,7 +110,24 @@ public class CropAction implements Action{
         canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
         Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
         canvas.restore();
+//        try {
+//            SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
+//            count++;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
+//                    count++;
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
 //        Matrix matrix = new Matrix();
 //        matrix.postRotate(currentAngle-angle,centerX,centerY);
 //        RectF dest = new RectF();

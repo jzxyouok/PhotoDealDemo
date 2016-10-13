@@ -7,6 +7,6 @@ import android.graphics.RectF;
  * ActionImageView通知StickerView,发生裁剪操作
  */
 public interface CropActionListener {
-    void onCrop();
+    void onCrop(float currentAngle,float currentNormalRectF2scaleRectF);
     void onCropBack(RectF rectF);
 }
