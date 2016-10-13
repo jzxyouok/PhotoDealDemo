@@ -111,19 +111,15 @@ public class CropAction implements Action{
 //                }
 //            }
 //        }.start();
-        Matrix matrix = new Matrix();
-        matrix.postRotate(currentAngle-angle,centerX,centerY);
-        RectF dest = new RectF();
-        matrix.mapRect(dest,mCropRectF);
-        Rect destrect = new Rect((int)dest.left,(int)dest.top,(int)dest.right,(int)dest.bottom);
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         canvas.save();
-        canvas.rotate(-currentAngle,centerX,centerY);
-        canvas.drawBitmap(mCropBitmap,destrect,rotateRectf,null);
+        canvas.rotate(-angle,centerX,centerY);
+        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
+        Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
         canvas.restore();
     }
 
@@ -172,7 +168,7 @@ public class CropAction implements Action{
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //绘制裁剪图片
         canvas.save();
-        canvas.rotate(-currentAngle,centerX,centerY);
+        canvas.rotate(-angle,centerX,centerY);
         canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
         //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
         canvas.restore();

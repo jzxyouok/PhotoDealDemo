@@ -213,7 +213,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-			//drawBehindBackground(canvas);
+			drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -282,9 +282,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 		canvas.save();
 		canvas.rotate(mCurrentAngle,mWidth/2.0f,mHeight/2.0f);
-//		Paint paint = new Paint();
-//		paint.setColor(Color.GREEN);
-//		canvas.drawRect(getCurrentScaleRectF(),paint);
 		canvas.drawBitmap(mForeBackground,normalRect, getCurrentScaleRectF(),null);
 		canvas.restore();
 	}
@@ -402,7 +399,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 裁剪后的快照
 	 */
 	public class CropSnapshot{
-		public boolean isCache = false;
+		public boolean isCache = true;
 		public void setCropAction(CropAction cropAction) {
 			if(!isCache){
 				this.cropAction = null;
