@@ -66,48 +66,71 @@ public class CropAction implements Action{
     private int count = 1;
     @Override
     public void execute(Canvas canvas) {
+//        //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
+//        paint.setXfermode(DrawMode.CLEAR);
+//        mCropCanvas.drawPaint(paint);
+//        paint.setXfermode(DrawMode.SRC);
+//        //将foreBitmap内容绘制到mCropBitmap上
+//        mCropCanvas.save();
+//        mCropCanvas.rotate(currentAngle,centerX,centerY);
+//        mCropCanvas.drawBitmap(mforeBitmap,lastNormalRect,lastScaleRectf,null);
+//        mCropCanvas.restore();
+//        Log.i("cky","lastnormal width="+lastNormalRect.width()+",height="+lastNormalRect.height());
+//        Log.i("cky","lastscale width="+lastScaleRectf.width()+",height="+lastScaleRectf.height());
+
         //清屏,清除mCropBitmap之前上的绘制,因为新的绘制,有当前forebitmap决定
         paint.setXfermode(DrawMode.CLEAR);
         mCropCanvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //将foreBitmap内容绘制到mCropBitmap上
         mCropCanvas.save();
-        mCropCanvas.rotate(currentAngle,centerX,centerY);
+        mCropCanvas.rotate(angle,centerX,centerY);
         mCropCanvas.drawBitmap(mforeBitmap,lastNormalRect,lastScaleRectf,null);
         mCropCanvas.restore();
         Log.i("cky","lastnormal width="+lastNormalRect.width()+",height="+lastNormalRect.height());
         Log.i("cky","lastscale width="+lastScaleRectf.width()+",height="+lastScaleRectf.height());
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
-                    count++;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
+//                    count++;
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
 
         drawCropBitmapDirectly(canvas);
     }
 
     private void drawCropBitmapDirectly(Canvas canvas) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(currentAngle-angle,centerX,centerY);
-        RectF dest = new RectF();
-        matrix.mapRect(dest,mCropRectF);
-        Rect destrect = new Rect((int)dest.left,(int)dest.top,(int)dest.right,(int)dest.bottom);
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         canvas.save();
-        canvas.rotate(-currentAngle,centerX,centerY);
-        canvas.drawBitmap(mCropBitmap,destrect,rotateRectf,null);
+        canvas.rotate(-angle,centerX,centerY);
+        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
         Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
         canvas.restore();
+
+//        Matrix matrix = new Matrix();
+//        matrix.postRotate(currentAngle-angle,centerX,centerY);
+//        RectF dest = new RectF();
+//        matrix.mapRect(dest,mCropRectF);
+//        Rect destrect = new Rect((int)dest.left,(int)dest.top,(int)dest.right,(int)dest.bottom);
+//        //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
+//        paint.setXfermode(DrawMode.CLEAR);
+//        canvas.drawPaint(paint);
+//        paint.setXfermode(DrawMode.SRC);
+//        //绘制裁剪图片
+//        canvas.save();
+//        canvas.rotate(-currentAngle,centerX,centerY);
+//        canvas.drawBitmap(mCropBitmap,destrect,rotateRectf,null);
+//        Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
+//        canvas.restore();
 //        new Thread(){
 //            @Override
 //            public void run() {
@@ -122,14 +145,34 @@ public class CropAction implements Action{
     }
 
     public void drawCropBitmapFromCache(Canvas canvas) {
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    Log.i("cky","cache");
+//                    SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage","kkk.png");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
+        Matrix matrix = new Matrix();
+        matrix.postRotate(currentAngle-angle,centerX,centerY);
+        RectF dest = new RectF();
+        matrix.mapRect(dest,mCropRectF);
+        Rect destrect = new Rect((int)dest.left,(int)dest.top,(int)dest.right,(int)dest.bottom);
         //清屏,清除foreBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
         paint.setXfermode(DrawMode.CLEAR);
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
         canvas.save();
-        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
-        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+        canvas.rotate(-currentAngle,centerX,centerY);
+        canvas.drawBitmap(mCropBitmap,destrect,rotateRectf,null);
+//        Rect rect = new Rect((int)lastScaleRectf.left,(int)lastScaleRectf.top,
+//                (int)lastScaleRectf.right,(int)lastScaleRectf.bottom);
+//        canvas.drawBitmap(mCropBitmap,rect,rotateRectf,null);
+        //Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
         canvas.restore();
     }
 

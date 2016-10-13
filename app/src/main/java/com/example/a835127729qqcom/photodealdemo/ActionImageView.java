@@ -344,7 +344,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			if(action instanceof CropAction){
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
 					Rect lastNormalRect = new Rect(normalRect);
-					RectF lastScaleRectf = getCurrentScaleRectF();
+					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);
 					recaculateRects(cropSnapshot.cropAction.mCropRect);
 					cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
 							lastNormalRect,lastScaleRectf);
