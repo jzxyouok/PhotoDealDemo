@@ -41,7 +41,7 @@ public class SaveBitmap2File {
         return myCaptureFile;
     }
 
-    public static void saveImageToGallery(Context context, Bitmap bmp) {
+    public static File saveImageToGallery(Context context, Bitmap bmp) {
         // 首先保存图片
         File appDir = new File(Environment.getExternalStorageDirectory(), "ActionImage");
         if (!appDir.exists()) {
@@ -70,5 +70,6 @@ public class SaveBitmap2File {
         }
         // 最后通知图库更新
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+        return file;
     }
 }

@@ -220,7 +220,12 @@ public class MainActivity extends AppCompatActivity {
     public void output(View view){
         Log.i("tag","output");
         if(!actionImageView.isComplete()) return;
-        actionImageView.output();
+        new Thread() {
+            @Override
+            public void run() {
+                actionImageView.output();
+            }
+        }.start();
     }
 
     @Override

@@ -577,42 +577,37 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	/**
 	 * 生成图片文件
      */
-	public void output(){
-		new Thread(){
-			@Override
-			public void run() {
-				Rect srcrect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
-				RectF destrect;// = new RectF(0,0,getCurrentRotateRect().width(),getCurrentRotateRect().height());
-				RectF rotateRect = getCurrentRotateRectF();
-				if(originBitmapRectF.width()<mWidth&&originBitmapRectF.height()<mHeight) {
-					float scale;
-					if(originBitmapRectF.width()<originBitmapRectF.height()){
-						scale = originBitmapRectF.width()/rotateRect.width();
-					}else if(originBitmapRectF.width()==originBitmapRectF.height()){
-						scale = rotateRect.width()<rotateRect.height()?originBitmapRectF.width()/rotateRect.width():originBitmapRectF.height()/rotateRect.height();
-					}else{
-						scale = originBitmapRectF.height()/rotateRect.height();
-					}
-					destrect = new RectF(0,0,rotateRect.width()*scale,rotateRect.height()*scale);
-				}else{
-					destrect = new RectF(0,0,rotateRect.width(),rotateRect.height());
-				}
-				RectF rect1 = new RectF();
-				Matrix matrix = new Matrix();
-				matrix.postRotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
-				matrix.mapRect(rect1,destrect);
-
-				Bitmap bitmap = Bitmap.createBitmap((int)destrect.width(),(int)destrect.height(), Bitmap.Config.ARGB_8888);
-				Canvas canvas = new Canvas(bitmap);
-				canvas.save();
-				canvas.rotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
-				canvas.drawRect(rect1,mMarkPaint);
-				canvas.drawBitmap(mBehindBackground,srcrect, rect1,null);
-				canvas.drawBitmap(mForeBackground,srcrect, rect1,null);
-				canvas.restore();
-				SaveBitmap2File.saveImageToGallery(ActionImageView.this.getContext(),bitmap);
+	public String output(){
+		Rect srcrect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
+		RectF destrect;// = new RectF(0,0,getCurrentRotateRect().width(),getCurrentRotateRect().height());
+		RectF rotateRect = getCurrentRotateRectF();
+		if(originBitmapRectF.width()<mWidth&&originBitmapRectF.height()<mHeight) {
+			float scale;
+			if(originBitmapRectF.width()<originBitmapRectF.height()){
+				scale = originBitmapRectF.width()/rotateRect.width();
+			}else if(originBitmapRectF.width()==originBitmapRectF.height()){
+				scale = rotateRect.width()<rotateRect.height()?originBitmapRectF.width()/rotateRect.width():originBitmapRectF.height()/rotateRect.height();
+			}else{
+				scale = originBitmapRectF.height()/rotateRect.height();
 			}
-		}.start();
+			destrect = new RectF(0,0,rotateRect.width()*scale,rotateRect.height()*scale);
+		}else{
+			destrect = new RectF(0,0,rotateRect.width(),rotateRect.height());
+		}
+		RectF rect1 = new RectF();
+		Matrix matrix = new Matrix();
+		matrix.postRotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
+		matrix.mapRect(rect1,destrect);
+
+		Bitmap bitmap = Bitmap.createBitmap((int)destrect.width(),(int)destrect.height(), Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		canvas.save();
+		canvas.rotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
+		canvas.drawRect(rect1,mMarkPaint);
+		canvas.drawBitmap(mBehindBackground,srcrect, rect1,null);
+		canvas.drawBitmap(mForeBackground,srcrect, rect1,null);
+		canvas.restore();
+		return SaveBitmap2File.saveImageToGallery(ActionImageView.this.getContext(),bitmap).getAbsolutePath();
 	}
 
 	/**
