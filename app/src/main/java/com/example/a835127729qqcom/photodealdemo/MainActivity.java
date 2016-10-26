@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         if(!actionImageView.isComplete()) return;
         preHide();
         actionImageView.setMode(ActionImageView.MODE_CROP);
-        cropImageView.setRatioCropRect(actionImageView.getCurrentRotateRectF(),1);
+        cropImageView.setRatioCropRect(actionImageView.getCurrentRotateRectF(),-1);
         cropImageView.setVisibility(View.VISIBLE);
     }
 

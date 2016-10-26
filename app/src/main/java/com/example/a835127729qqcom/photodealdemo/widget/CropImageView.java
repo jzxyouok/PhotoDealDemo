@@ -523,7 +523,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 
 	@Override
 	public void onCropActionBack(RectF destRect) {
-		setRatioCropRect(destRect,1);
+		setRatioCropRect(destRect,-1);
 	}
 
 	@Override
@@ -532,7 +532,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 
 	@Override
 	public void onCropBack(RectF destRect) {
-		setRatioCropRect(destRect,1);
+		setRatioCropRect(destRect,-1);
 	}
 
 	public interface CropActiveListener{

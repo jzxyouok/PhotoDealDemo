@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.example.a835127729qqcom.photodealdemo.ActionImageView;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+import com.example.a835127729qqcom.photodealdemo.util.RectUtil;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 
 import java.io.IOException;
@@ -36,11 +37,12 @@ public class CropAction implements Action{
     //裁剪后的矩阵
     private RectF rotateRectf;
     public RectF scaleRect;
+    public RectF normalRectF;
     //裁剪前的矩阵
     private Rect lastNormalRect;
     private RectF lastScaleRectf;
 
-    private float angle;
+    public float angle;
     private static Paint paint = new Paint();
     static {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -74,11 +76,15 @@ public class CropAction implements Action{
         mCropCanvas.rotate(angle,centerX,centerY);
         mCropCanvas.drawBitmap(mforeBitmap,lastNormalRect,lastScaleRectf,null);
         mCropCanvas.restore();
+
+//        paint.setColor(Color.GREEN);
+//        mCropCanvas.drawRect(normalRectF,paint);
+//        paint.setColor(Color.RED);
+//        mCropCanvas.drawRect(scaleRect,paint);
         Log.i("cky","lastnormal width="+lastNormalRect.width()+",height="+lastNormalRect.height());
         Log.i("cky","lastscale width="+lastScaleRectf.width()+",height="+lastScaleRectf.height());
 //        try {
-//            SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage",count+"ttt.png");
-//            count++;
+//            SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage","ttt.png");
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
@@ -92,11 +98,44 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
-        canvas.save();
-        canvas.rotate(-angle,centerX,centerY);
-        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
-        Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
-        canvas.restore();
+        canvas.drawRGB(255,255,0);
+        if(angle/90%2==0){
+            canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
+        }else{
+            canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
+
+            Rect rect = RectUtil.changeRectF2Rect(normalRectF);
+            paint.setXfermode(DrawMode.CLEAR);
+            mCropCanvas.drawPaint(paint);
+            paint.setXfermode(DrawMode.SRC);
+            mCropCanvas.drawBitmap(mforeBitmap,rect,normalRectF,null);
+
+//            try {
+//                SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage","vvv.png");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            paint.setXfermode(DrawMode.CLEAR);
+            canvas.drawPaint(paint);
+            paint.setXfermode(DrawMode.SRC);
+            canvas.save();
+            canvas.rotate(-angle,centerX,centerY);
+            canvas.drawBitmap(mCropBitmap,rect,scaleRect,null);
+            canvas.restore();
+            //到这来,仍然是完整的图片
+//            try {
+//                SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage","qqq.png");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+        }
+        Log.i("ccc","width="+rotateRectf.width()+",height="+rotateRectf.height());
+//        try {
+//            SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage","kkk.png");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void drawCropBitmapFromCache(Canvas canvas) {
@@ -128,9 +167,16 @@ public class CropAction implements Action{
         currentAngle = (float) params[0];
         rotateRectf = (RectF) params[1];
         scaleRect = (RectF) params[2];
+        normalRectF = (RectF) params[5];
         //裁剪前的矩阵
         lastNormalRect = (Rect) params[3];
         lastScaleRectf = (RectF) params[4];
+        Log.i("ccc","normalRectF "+normalRectF.toString());
+        Log.i("ccc","rotateRectf "+rotateRectf.toString());
+        Log.i("ccc","scaleRect "+scaleRect.toString());
+        Log.i("ccc","normalRectF width="+normalRectF.width()+",height="+normalRectF.height());
+        Log.i("ccc","rotateRectf width="+rotateRectf.width()+",height="+rotateRectf.height());
+        Log.i("ccc","scaleRect width="+scaleRect.width()+",height="+scaleRect.height());
     }
 
     @Override

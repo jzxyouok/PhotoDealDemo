@@ -213,7 +213,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-			drawBehindBackground(canvas);
+//			drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -333,6 +333,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				continue;
 			}
 			if(action instanceof CropAction){
+				CropAction cropAction = (CropAction) action;
 				if(cropSnapshot.cropAction!=null && cropSnapshot.cropAction==action){
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);
@@ -343,10 +344,16 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				}else {
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);//getCurrentScaleRectF();
-					recaculateRects(((CropAction) action).mCropRect);
-					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
-							lastNormalRect,lastScaleRectf);
+					recaculateRects(cropAction.mCropRect);
+					action.start(mCurrentAngle,rotateRectF,scaleRectF,lastNormalRect,lastScaleRectf,normalRectF);
 					action.execute(foreCanvas);
+					/*
+					 * 如果处于旋转状态,应该重新计算,这里的理解很重要
+					 * 因为裁剪以后,如果之前存在旋转,那么裁剪以后的方位,需要重新计算
+					 */
+					if(cropAction.angle/90%2==1){
+						recaculateRects(new RectF(rotateRectF));
+					}
 				}
 				action.stop(cropSnapshot);
 			}else if(action instanceof TextAction){
@@ -399,7 +406,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 裁剪后的快照
 	 */
 	public class CropSnapshot{
-		public boolean isCache = true;
+		public boolean isCache = false;
 		public void setCropAction(CropAction cropAction) {
 			if(!isCache){
 				this.cropAction = null;
@@ -524,7 +531,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 						}
 					}
 					if(lastCropAction!=null){
-						recaculateRects((((CropAction) action).mCropRect));
+						CropAction cropAction = (CropAction) action;
+						recaculateRects(cropAction.mCropRect);
+						if(cropAction.angle/90%2==1){
+							recaculateRects(new RectF(rotateRectF));
+						}
 					}else{
 						recaculateRects(originBitmapRectF);
 					}
