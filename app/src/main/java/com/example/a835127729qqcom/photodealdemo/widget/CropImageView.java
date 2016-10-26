@@ -142,7 +142,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	public void setCropRect(RectF rect) {
 		imageRect.set(rect);
 		cropRect.set(rect);
-		scaleRect(cropRect, 0.5f);
+		scaleRect(cropRect, 1f);
 		invalidate();
 	}
 

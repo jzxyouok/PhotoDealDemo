@@ -652,21 +652,18 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
 		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
 		matrix.mapRect(rf);
-//		matrix.reset();
-//		if(scaleW<scaleH){//缩放至宽
-//			if(rf.height()>mWidth){
-//				scale = mWidth/rf.height();
-//				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
-//		}else{
-//			if(rf.width()>mHeight){
-//				scale = mHeight/rf.width();
-//				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
-//		}
-//		Log.i("cky","normalrect w="+rf.width()+",h="+rf.height());
+
+		if(scaleW<scaleH){
+			//将宽对齐
+			float del = -rf.left;
+			rf.left = 0;
+			rf.right = rf.right+del;
+		}else{
+			//将高对齐
+			float del = -rf.top;
+			rf.top = 0;
+			rf.bottom = rf.bottom+del;
+		}
 		return rf;
 	}
 
@@ -687,21 +684,17 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
 		matrix.mapRect(rf);
 
-//		matrix.reset();
-//		if(scaleW<scaleH){//缩放至宽
-//			if(rf.height()>mWidth){
-//				scale = mWidth/rf.height();
-//				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
-//		}else{
-//			if(rf.width()>mHeight){
-//				scale = mHeight/rf.width();
-//				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
-//		}
-		//Log.i("cky","rotaterect w="+rf.width()+",h="+rf.height());
+		if(scaleW<scaleH){
+			//将宽对齐
+			float del = -rf.left;
+			rf.left = 0;
+			rf.right = rf.right+del;
+		}else{
+			//将高对齐
+			float del = -rf.top;
+			rf.top = 0;
+			rf.bottom = rf.bottom+del;
+		}
 		return rf;
 	}
 
@@ -720,19 +713,17 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
 		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
 		matrix.mapRect(rf);
-//		matrix.reset();
-//		if(scaleW<scaleH){//缩放至宽
-//			if(rf.height()>mWidth){
-//				scale = mWidth/rf.height();
-//				matrix.postScale(1,scale,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
+
+//		if(scaleW<scaleH){
+//			//将宽对齐
+//			float del = -rf.left;
+//			rf.left = 0;
+//			rf.right = rf.right+del;
 //		}else{
-//			if(rf.width()>mHeight){
-//				scale = mHeight/rf.width();
-//				matrix.postScale(scale,1,mWidth/2.0f,mWidth/2.0f);
-//				matrix.mapRect(rf);
-//			}
+//			//将高对齐
+//			float del = -rf.top;
+//			rf.top = 0;
+//			rf.bottom = rf.bottom+del;
 //		}
 		//Log.i("cky","scalerect w="+rf.width()+",h="+rf.height());
 		return rf;
