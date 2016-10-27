@@ -213,7 +213,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	protected void onDraw(Canvas canvas) {
 		//绘制masic背景
 		if(masicBitmap!=null && isComplete) {
-//			drawBehindBackground(canvas);
+			drawBehindBackground(canvas);
 			drawForeBackground(canvas);
 		}else{
 			super.onDraw(canvas);
@@ -247,12 +247,19 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
+					CropAction cropAction = (CropAction) action;
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectF();
-					recaculateRects(((CropAction) action).mCropRect);
-					action.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
-							lastNormalRect,lastScaleRectf);
-					action.next(mBehindCanvas, mCurrentAngle);
+					recaculateRects(cropAction.mCropRect);
+					cropAction.start(mCurrentAngle,rotateRectF,scaleRectF,lastNormalRect,lastScaleRectf,normalRectF);
+					cropAction.next(mBehindCanvas, mCurrentAngle);
+					/*
+					 * 如果处于旋转状态,应该重新计算,这里的理解很重要
+					 * 因为裁剪以后,如果之前存在旋转,那么裁剪以后的方位,需要重新计算
+					 */
+					if(cropAction.angle/90%2==1){
+						recaculateRects(new RectF(rotateRectF));
+					}
 				}else if(action instanceof MasicAction){
 					//action.execute(mBehindCanvas);
 				}

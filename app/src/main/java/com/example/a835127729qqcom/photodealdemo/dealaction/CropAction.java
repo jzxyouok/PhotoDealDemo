@@ -98,7 +98,7 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
-        canvas.drawRGB(255,255,0);
+//        canvas.drawRGB(255,255,0);
         if(angle/90%2==0){
             canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
         }else{
@@ -193,11 +193,12 @@ public class CropAction implements Action{
         paint.setXfermode(DrawMode.SRC);
         //将mBehindBitmap内容绘制到mCropMasicBitmap上
         mCropMasicCanvas.save();
-        mCropMasicCanvas.rotate(currentAngle,centerX,centerY);
+        mCropMasicCanvas.rotate(angle,centerX,centerY);
         mCropMasicCanvas.drawBitmap(mBehindBitmap,lastNormalRect,lastScaleRectf,null);
         mCropMasicCanvas.restore();
         drawCropMasicBitmapDirectly(canvas);
     }
+
 
     private void drawCropMasicBitmapDirectly(Canvas canvas) {
         //清屏,清除mBehindBitmap之前上的绘制,因为已经将这些,绘制到mCropBitmap
@@ -205,11 +206,19 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
-        canvas.save();
-        canvas.rotate(-angle,centerX,centerY);
-        canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
-        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
-        canvas.restore();
+        if(angle/90%2==0){
+            canvas.drawBitmap(mCropMasicBitmap,mCropRect,normalRectF,null);
+        }else {
+            canvas.save();
+            canvas.rotate(-angle, centerX, centerY);
+            canvas.drawBitmap(mCropMasicBitmap,mCropRect,scaleRect, null);
+            canvas.restore();
+        }
+//        canvas.save();
+//        canvas.rotate(-angle,centerX,centerY);
+//        canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
+//        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
+//        canvas.restore();
     }
 
     public void drawCropMasicBitmapFromCache(Canvas canvas) {
