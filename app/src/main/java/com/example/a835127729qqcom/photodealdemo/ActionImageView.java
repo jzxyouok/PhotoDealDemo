@@ -241,9 +241,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 			Rect lastNormalRect = new Rect(normalRect);
 			RectF lastScaleRectf = getCurrentScaleRectF();
 			recaculateRects(cropSnapshot.cropAction.mCropRect);
-			cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
-					lastNormalRect,lastScaleRectf);
+			cropSnapshot.cropAction.start(mCurrentAngle,rotateRectF,scaleRectF,lastNormalRect,lastScaleRectf,normalRectF);
 			cropSnapshot.cropAction.drawCropMasicBitmapFromCache(mBehindCanvas);
+			if(cropSnapshot.cropAction.angle/90%2==1){
+				recaculateRects(new RectF(rotateRectF));
+			}
 		}else {
 			for (Action action : actions) {
 				if (action instanceof CropAction) {
@@ -345,9 +347,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);
 					recaculateRects(cropSnapshot.cropAction.mCropRect);
-					cropSnapshot.cropAction.start(mCurrentAngle,getCurrentRotateRectF(),getCurrentScaleRectF(),
-							lastNormalRect,lastScaleRectf);
+					cropSnapshot.cropAction.start(mCurrentAngle,rotateRectF,scaleRectF,lastNormalRect,lastScaleRectf,normalRectF);
 					cropSnapshot.cropAction.drawCropBitmapFromCache(foreCanvas);
+					if(cropAction.angle/90%2==1){
+						recaculateRects(new RectF(rotateRectF));
+					}
 				}else {
 					Rect lastNormalRect = new Rect(normalRect);
 					RectF lastScaleRectf = getCurrentScaleRectFBaseOnLastAngle(startAngle);//getCurrentScaleRectF();
@@ -413,7 +417,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * 裁剪后的快照
 	 */
 	public class CropSnapshot{
-		public boolean isCache = false;
+		public boolean isCache = true;
 		public void setCropAction(CropAction cropAction) {
 			if(!isCache){
 				this.cropAction = null;

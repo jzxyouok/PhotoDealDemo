@@ -160,11 +160,15 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
-        canvas.save();
-        canvas.rotate(-angle,centerX,centerY);
-        canvas.drawBitmap(mCropBitmap,mCropRect,rotateRectf,null);
-        Log.i("cky","width="+rotateRectf.width()+",height="+rotateRectf.height());
-        canvas.restore();
+//        canvas.drawRGB(255,255,0);
+        if(angle/90%2==0){
+            canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
+        }else {
+            canvas.save();
+            canvas.rotate(-angle, centerX, centerY);
+            canvas.drawBitmap(mCropBitmap, mCropRect, scaleRect, null);
+            canvas.restore();
+        }
     }
 
     @Override
@@ -227,11 +231,14 @@ public class CropAction implements Action{
         canvas.drawPaint(paint);
         paint.setXfermode(DrawMode.SRC);
         //绘制裁剪图片
-        canvas.save();
-        canvas.rotate(-angle,centerX,centerY);
-        canvas.drawBitmap(mCropMasicBitmap,mCropRect,rotateRectf,null);
-        //Log.i("cky","width="+rotateRectf.width()+",h="+rotateRectf.height());
-        canvas.restore();
+        if(angle/90%2==0){
+            canvas.drawBitmap(mCropMasicBitmap,mCropRect,normalRectF,null);
+        }else {
+            canvas.save();
+            canvas.rotate(-angle, centerX, centerY);
+            canvas.drawBitmap(mCropMasicBitmap,mCropRect,scaleRect, null);
+            canvas.restore();
+        }
     }
 
     @Override
