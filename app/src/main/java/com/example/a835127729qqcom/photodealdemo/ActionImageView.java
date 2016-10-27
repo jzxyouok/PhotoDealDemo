@@ -648,6 +648,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		recaculateRects(new RectF(rect));
 	}
 
+	private Matrix recaculateRectMatrix = new Matrix();
 	/**
 	 * 根据长宽缩放到控件大小
 	 * @param rectF
@@ -659,10 +660,10 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		float scaleH = mHeight/rectF.height();
 		float scale = scaleW<scaleH?scaleW:scaleH;
 
-		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
-		matrix.mapRect(rf);
+		recaculateRectMatrix.reset();
+		recaculateRectMatrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
+		recaculateRectMatrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		recaculateRectMatrix.mapRect(rf);
 
 		if(scaleW<scaleH){
 			//将宽对齐
@@ -689,11 +690,11 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		float scaleH = mHeight/rectF.width();
 		float scale = scaleW<scaleH?scaleW:scaleH;
 
-		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postRotate(90,mWidth/2,mHeight/2);
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
-		matrix.mapRect(rf);
+		recaculateRectMatrix.reset();
+		recaculateRectMatrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
+		recaculateRectMatrix.postRotate(90,mWidth/2,mHeight/2);
+		recaculateRectMatrix.postScale(scale,scale,mWidth/2,mHeight/2);
+		recaculateRectMatrix.mapRect(rf);
 
 		if(scaleW<scaleH){
 			//将宽对齐
@@ -715,15 +716,21 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 * @return
 	 */
 	private RectF generateScaleRectF(RectF rectF){
-		RectF rf = new RectF(rectF);
-		float scaleW = mWidth/rectF.height();
-		float scaleH = mHeight/rectF.width();
-		float scale = scaleW<scaleH?scaleW:scaleH;
-
-		Matrix matrix = new Matrix();
-		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
-		matrix.mapRect(rf);
+		//通过rotaterect的准确性,保证scalerect的准确性
+		RectF rf = generateRotateRectF(rectF);
+		recaculateRectMatrix.reset();
+		recaculateRectMatrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
+		recaculateRectMatrix.postRotate(-90,mWidth/2,mHeight/2);
+		recaculateRectMatrix.mapRect(rf);
+//		RectF rf = new RectF(rectF);
+//		float scaleW = mWidth/rectF.height();
+//		float scaleH = mHeight/rectF.width();
+//		float scale = scaleW<scaleH?scaleW:scaleH;
+//
+//		Matrix matrix = new Matrix();
+//		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
+//		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
+//		matrix.mapRect(rf);
 
 //		if(scaleW<scaleH){
 //			//将宽对齐
