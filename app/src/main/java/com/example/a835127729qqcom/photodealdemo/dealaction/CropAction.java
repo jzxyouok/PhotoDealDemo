@@ -102,27 +102,32 @@ public class CropAction implements Action{
         if(angle/90%2==0){
             canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
         }else{
-            canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
-
-            Rect rect = RectUtil.changeRectF2Rect(normalRectF);
-            paint.setXfermode(DrawMode.CLEAR);
-            mCropCanvas.drawPaint(paint);
-            paint.setXfermode(DrawMode.SRC);
-            mCropCanvas.drawBitmap(mforeBitmap,rect,normalRectF,null);
-
-//            try {
-//                SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage","vvv.png");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-            paint.setXfermode(DrawMode.CLEAR);
-            canvas.drawPaint(paint);
-            paint.setXfermode(DrawMode.SRC);
             canvas.save();
             canvas.rotate(-angle,centerX,centerY);
-            canvas.drawBitmap(mCropBitmap,rect,scaleRect,null);
+            canvas.drawBitmap(mCropBitmap,mCropRect,scaleRect,null);
             canvas.restore();
+
+//            canvas.drawBitmap(mCropBitmap,mCropRect,normalRectF,null);
+//
+//            Rect rect = RectUtil.changeRectF2Rect(normalRectF);
+//            paint.setXfermode(DrawMode.CLEAR);
+//            mCropCanvas.drawPaint(paint);
+//            paint.setXfermode(DrawMode.SRC);
+//            mCropCanvas.drawBitmap(mforeBitmap,rect,normalRectF,null);
+//
+////            try {
+////                SaveBitmap2File.saveFile(mCropBitmap,"/storage/emulated/0/ActionImage","vvv.png");
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            }
+//
+//            paint.setXfermode(DrawMode.CLEAR);
+//            canvas.drawPaint(paint);
+//            paint.setXfermode(DrawMode.SRC);
+//            canvas.save();
+//            canvas.rotate(-angle,centerX,centerY);
+//            canvas.drawBitmap(mCropBitmap,rect,scaleRect,null);
+//            canvas.restore();
             //到这来,仍然是完整的图片
 //            try {
 //                SaveBitmap2File.saveFile(mforeBitmap,"/storage/emulated/0/ActionImage","qqq.png");
