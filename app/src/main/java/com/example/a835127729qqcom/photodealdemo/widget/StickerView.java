@@ -128,7 +128,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
                         currentStatus = STATUS_ROTATE;
                         oldx = x;
                         oldy = y;
-                    } else if (item.dstRect.contains(x, y)) {// 移动模式
+                    } else if (item.isRotateRectContainXY(x,y)/*item.dstRect.contains(x, y)*/) {// 移动模式
                         // 被选中一张贴图
                         ret = true;
                         if (currentItem != null) {

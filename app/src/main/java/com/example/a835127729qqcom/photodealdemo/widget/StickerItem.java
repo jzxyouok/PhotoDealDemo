@@ -21,6 +21,7 @@ import android.view.View;
 
 import com.example.a835127729qqcom.photodealdemo.R;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
+import com.example.a835127729qqcom.photodealdemo.util.RotateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -256,7 +257,8 @@ public class StickerItem {
     }
 
     public void draw(Canvas canvas) {
-        //canvas.drawRect(this.dstRect, dstPaint);
+//        canvas.drawRect(this.dstRect, dstPaint);
+//        canvas.drawRect(this.helpBox, dstPaint);
         if (this.isDrawHelpTool) {// 绘制辅助工具线
             canvas.save();
             canvas.rotate(roatetAngle, helpBox.centerX(), helpBox.centerY());
@@ -272,6 +274,15 @@ public class StickerItem {
             //canvas.drawRect(detectDeleteRect, this.toolPaint);
         }// end if
         drawText(canvas);
+
+//        boolean flag = isRotateRectContainXY(helpBox.centerX(),helpBox.centerY());
+//        Log.i("cky","flag="+flag);
+//        canvas.drawLine(leftTopPoint[0],leftTopPoint[1],rightTopPoint[0],rightTopPoint[1],dstPaint);
+//        canvas.drawLine(leftTopPoint[0],leftTopPoint[1],leftBottomPoint[0],leftBottomPoint[1],dstPaint);
+//        canvas.drawLine(rightTopPoint[0],rightTopPoint[1],rightBottomPoint[0],rightBottomPoint[1],dstPaint);
+//        canvas.drawLine(leftBottomPoint[0],leftBottomPoint[1],rightBottomPoint[0],rightBottomPoint[1],dstPaint);
+//
+//        canvas.drawCircle(helpBox.centerX(),helpBox.centerY(),20,dstPaint);
     }
 
     /**
@@ -421,6 +432,32 @@ public class StickerItem {
         float dy = newY - y;
 
         rect.offset(dx, dy);
+    }
+
+    private Matrix rotateMatrix = new Matrix();
+    private float[] leftTopPoint = new float[2];
+    private float[] rightTopPoint = new float[2];
+    private float[] leftBottomPoint = new float[2];
+    private float[] rightBottomPoint = new float[2];
+    public boolean isRotateRectContainXY(float x,float y){
+        leftTopPoint[0] = helpBox.left;
+        leftTopPoint[1] = helpBox.top;
+        rightTopPoint[0] = helpBox.right;
+        rightTopPoint[1] = helpBox.top;
+        leftBottomPoint[0] = helpBox.left;
+        leftBottomPoint[1] = helpBox.bottom;
+        rightBottomPoint[0] = helpBox.right;
+        rightBottomPoint[1] = helpBox.bottom;
+
+        rotateMatrix.reset();
+        rotateMatrix.postRotate(roatetAngle,helpBox.centerX(),helpBox.centerY());
+        rotateMatrix.mapPoints(leftTopPoint);
+        rotateMatrix.mapPoints(rightTopPoint);
+        rotateMatrix.mapPoints(leftBottomPoint);
+        rotateMatrix.mapPoints(rightBottomPoint);
+
+        return RotateUtil.pInQuadrangle(leftTopPoint[0],leftTopPoint[1],rightTopPoint[0],rightTopPoint[1],
+                leftBottomPoint[0],leftBottomPoint[1],rightBottomPoint[0],rightBottomPoint[1],x,y);
     }
 
     public TextAction getmTextAction() {
