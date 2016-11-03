@@ -89,7 +89,7 @@ public class MasicSizePickBox extends View{
         }
         totalScale += (count-1)*paddingScale;
         float maxRadius = 0.9f*mWidthWithoutPadding/totalScale/2;
-        maxRadius = maxRadius>mHeightWithoutPadding/2?mHeightWithoutPadding/2:maxRadius;
+        maxRadius = maxRadius>0.9f*mHeightWithoutPadding/2?0.9f*mHeightWithoutPadding/2:maxRadius;
         //计算圆的宽度
         circleWidth = maxRadius*0.05f;
         circlePaint.setStrokeWidth(circleWidth);

@@ -92,19 +92,7 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 	}
 
 	private void init(Context context) {
-		if(mHandler==null){
-			HandlerThread thread = new HandlerThread("CropImageView");
-			thread.start();
-			mHandler = new Handler(thread.getLooper()) {
-				@Override
-				public void handleMessage(Message msg) {
-					if(msg.what==hideTextSingal){
-						isShowText = false;
-						postInvalidate();
-					}
-				}
-			};
-		}
+		initHandler();
 
 		mContext = context;
 		textSize = DensityUtil.dip2px(context,13);
@@ -132,6 +120,31 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 		clearPaint = new Paint();
 		clearPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 		clearPaint.setColor(Color.TRANSPARENT);
+	}
+
+	private void initHandler() {
+		if(mHandler==null){
+			HandlerThread thread = new HandlerThread("CropImageView");
+			thread.start();
+			mHandler = new Handler(thread.getLooper()) {
+				@Override
+				public void handleMessage(Message msg) {
+					if(msg.what==hideTextSingal && status == STATUS_IDLE){
+						isShowText = false;
+						postInvalidate();
+					}
+				}
+			};
+		}
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		if(mHandler!=null){
+			mHandler.getLooper().quit();
+			mHandler = null;
+		}
+		super.onDetachedFromWindow();
 	}
 
 	/**
@@ -281,7 +294,6 @@ public class CropImageView extends View implements RotateAction.RotateActionBack
 				translateCrop(x - oldx, y - oldy);
 			}
 			break;
-		case MotionEvent.ACTION_CANCEL:
 		case MotionEvent.ACTION_UP:
 			status = STATUS_IDLE;// 回归空闲状态
 			mHandler.sendEmptyMessageDelayed(hideTextSingal, delayMillis);
