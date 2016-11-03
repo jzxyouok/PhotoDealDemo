@@ -207,12 +207,20 @@ public class MainActivity extends AppCompatActivity {
     public void output(View view){
         Log.i("tag","output");
         if(!actionImageView.isComplete()) return;
-        new Thread() {
+        //以下操作,是为了保证最后绘制的内容,都被绘制完整
+        actionImageView.setMode(ActionImageView.MODE_IDLE);
+        actionImageView.postInvalidate();
+        actionImageView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                actionImageView.output();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        actionImageView.output();
+                    }
+                }.start();
             }
-        }.start();
+        },300);
     }
 
     @Override

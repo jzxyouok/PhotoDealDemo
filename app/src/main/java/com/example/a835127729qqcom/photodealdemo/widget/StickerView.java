@@ -360,7 +360,7 @@ public class StickerView extends View implements BackTextActionListener,StopAddT
         }
     }
 
-    private class TextData{
+    private static class TextData{
         public TextData(Integer integer, TextAction textAction, StickerItem item) {
             this.integer = integer;
             this.textAction = textAction;
