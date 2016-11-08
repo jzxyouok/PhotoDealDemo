@@ -27,6 +27,7 @@ import com.example.a835127729qqcom.photodealdemo.dealaction.MasicAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.RotateAction;
 import com.example.a835127729qqcom.photodealdemo.dealaction.TextAction;
 import com.example.a835127729qqcom.photodealdemo.util.DrawMode;
+import com.example.a835127729qqcom.photodealdemo.util.MasicUtil;
 import com.example.a835127729qqcom.photodealdemo.util.PhotoProcessing;
 import com.example.a835127729qqcom.photodealdemo.util.SaveBitmap2File;
 import com.example.a835127729qqcom.photodealdemo.widget.ColorPickBox.ColorPickListener;
@@ -72,7 +73,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	/**
 	 * Actions操作
 	 */
-	private LinkedList<Action> actions = new LinkedList<Action>();
+	private NotifyLinkedList<Action> actions = new NotifyLinkedList<Action>();
 	/**
 	 * 是否初始化完成,图片是否加载完成
 	 */
@@ -153,7 +154,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	private void setUpMarkPaint(){
 		mMarkPaint.setStyle(Style.STROKE);
 		mMarkPaint.setColor(Color.RED);
-		mMarkPaint.setStrokeWidth(20);
+		mMarkPaint.setStrokeWidth(6);
 		mMarkPaint.setAntiAlias(true);
 		mMarkPaint.setDither(true);
 	}
@@ -166,13 +167,13 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mMasicPaint.setStrokeJoin(Paint.Join.ROUND); // 圆角
 		mMasicPaint.setStrokeCap(Paint.Cap.ROUND); // 圆角
 		// 设置画笔宽度
-		mMasicPaint.setStrokeWidth(60);
+		mMasicPaint.setStrokeWidth(18);
 	}
 
 	/**
 	 * 建议在非主线程中调用该方法,并且需要Imageview宽高加载完成,所以建议在onWindowFocusChanged()方法中调用,并且hasFocus为true
 	 * @param path
-     */
+	 */
 	public synchronized void init(String path){
 		picPath = path;
 		if(mWidth<=0 || mHeight<=0 || isComplete) return;
@@ -188,17 +189,17 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		mCropCanvas = new Canvas(cropBitmap);
 
 		//马赛克层
-		Bitmap srcBitmap = originBitmap.copy(Bitmap.Config.ARGB_4444, true);
-		masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
+		Bitmap srcBitmap = originBitmap.copy(Config.ARGB_4444, true);
+		//masicBitmap = PhotoProcessing.filterPhoto(srcBitmap, 12);
 		//如果你不希望使用native包,可以调用该方法来生成马赛克
-		//masicBitmap = MasicUtil.getMosaicsBitmaps(srcBitmap,0.1);
+		masicBitmap = MasicUtil.getMosaicsBitmaps(srcBitmap,0.1);
 		mBehindBackground = Bitmap.createScaledBitmap(masicBitmap,getMeasuredWidth(), getMeasuredHeight(), false);
 		mBehindCanvas = new Canvas(mBehindBackground);
 		//马赛克裁剪层
 		cropMasicBitmap = Bitmap.createBitmap(getMeasuredWidth(),getMeasuredHeight(),Config.ARGB_4444);
 		mCropMasicCanvas = new Canvas(cropMasicBitmap);
 		//使用MasicUtil.getMosaicsBitmap()来生成马赛克,可以回收srcBitmap,否则不能
-		//srcBitmap.recycle();
+		srcBitmap.recycle();
 	}
 
 	private RectF decodeBounds(String path){
@@ -226,6 +227,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 */
 	private void drawBehindBackground(Canvas canvas){
 		if(isComplete==false) return;
+		if(mBehindCanvas==null) return;
 		recaculateRects(originBitmapRectF);
 
 		//清屏
@@ -280,6 +282,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	 */
 	private void drawForeBackground(Canvas canvas) {
 		if(isComplete==false) return;
+		if(mForeCanvas==null) return;
 		recaculateRects(originBitmapRectF);
 		drawActions(mForeCanvas);
 
@@ -448,7 +451,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	/**
 	 * 根据缩放比例,计算实际的点的位置
 	 * @param event
-     */
+	 */
 	private void scalePoint(MotionEvent event) {
 		scalePointMatrix.reset();
 		scalePointMatrix.postScale(normalRectF2scaleRectF,normalRectF2scaleRectF,mWidth/2,mHeight/2);
@@ -504,8 +507,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 	/**
 	 * 撤销
 	 */
-	public void back(){
-		if(actions.size()==0) return;
+	public boolean back(){
+		if(actions.size()==0) return false;
 		final Action action = actions.removeLast();
 		post(new Runnable() {
 			@Override
@@ -542,9 +545,8 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 						}
 					}
 					if(lastCropAction!=null){
-						CropAction cropAction = (CropAction) action;
-						recaculateRects(cropAction.mCropRect);
-						if(cropAction.angle/90%2==1){
+						recaculateRects(lastCropAction.mCropRect);
+						if(lastCropAction.angle/90%2==1){
 							recaculateRects(new RectF(rotateRectF));
 						}
 					}else{
@@ -559,6 +561,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 				postInvalidate();
 			}
 		});
+		return true;
 	}
 
 	/**
@@ -598,7 +601,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 
 	/**
 	 * 生成图片文件
-     */
+	 */
 	public String output(){
 		Rect srcrect = new Rect((int)normalRectF.left,(int)normalRectF.top,(int)normalRectF.right,(int)normalRectF.bottom);
 		RectF destrect;// = new RectF(0,0,getCurrentRotateRect().width(),getCurrentRotateRect().height());
@@ -621,7 +624,7 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		matrix.postRotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
 		matrix.mapRect(rect1,destrect);
 
-		Bitmap bitmap = Bitmap.createBitmap((int)destrect.width(),(int)destrect.height(), Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap((int)destrect.width(),(int)destrect.height(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		canvas.save();
 		canvas.rotate(mCurrentAngle,destrect.centerX(),destrect.centerY());
@@ -722,28 +725,6 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		recaculateRectMatrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
 		recaculateRectMatrix.postRotate(-90,mWidth/2,mHeight/2);
 		recaculateRectMatrix.mapRect(rf);
-//		RectF rf = new RectF(rectF);
-//		float scaleW = mWidth/rectF.height();
-//		float scaleH = mHeight/rectF.width();
-//		float scale = scaleW<scaleH?scaleW:scaleH;
-//
-//		Matrix matrix = new Matrix();
-//		matrix.postTranslate(mWidth/2-rf.centerX(),mHeight/2-rf.centerY());
-//		matrix.postScale(scale,scale,mWidth/2,mHeight/2);
-//		matrix.mapRect(rf);
-
-//		if(scaleW<scaleH){
-//			//将宽对齐
-//			float del = -rf.left;
-//			rf.left = 0;
-//			rf.right = rf.right+del;
-//		}else{
-//			//将高对齐
-//			float del = -rf.top;
-//			rf.top = 0;
-//			rf.bottom = rf.bottom+del;
-//		}
-		//Log.i("cky","scalerect w="+rf.width()+",h="+rf.height());
 		return rf;
 	}
 
@@ -753,6 +734,26 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		}else {
 			return new RectF(rotateRectF);
 		}
+	}
+
+	/**
+	 * 计算裁剪后裁剪框
+	 * @return
+	 */
+	public RectF getCurrentCropRotateRectF(RectF rectF){
+		return generateRectF(rectF);
+//		CropAction cropAction = null;
+//		for(Action action:actions){
+//			if(action instanceof CropAction){
+//				cropAction = (CropAction) action;
+//			}
+//		}
+//		if(cropAction==null) return null;
+//		if(mCurrentAngle/90%2==0){
+//			return generateRectF(cropAction.mCropRectF);
+//		}else{
+//			return generateRotateRectF(cropAction.mCropRectF);
+//		}
 	}
 
 	private Rect getCurrentRotateRect(){
@@ -831,12 +832,21 @@ public class ActionImageView extends ImageView implements TextsControlListener,C
 		this.mTextActionCacheQuery = mTextActionCacheQuery;
 	}
 
+	public void setLinkedListOperateListner(NotifyLinkedList.LinkedListOperateListner mLinkedListOperateListner) {
+		actions.setmLinkedListOperateListner(mLinkedListOperateListner);
+	}
+
 	public boolean isComplete() {
 		return isComplete;
 	}
 
 	public void setComplete(boolean complete) {
 		isComplete = complete;
+	}
+
+	public int getActionsCount(){
+		if(actions==null) return 0;
+		return actions.size();
 	}
 
 	public synchronized void recycleResource(){
